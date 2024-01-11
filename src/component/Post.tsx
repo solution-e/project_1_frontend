@@ -1,17 +1,24 @@
 import { Box, HStack, Heading, Image, Text } from "@chakra-ui/react";
 import { FaRegComment } from "react-icons/fa";
 
-export default function Post() {
+interface IPostprops{
+    imageUrl:string;
+    title:string;
+    category:string;
+    created_at:string;
+};
+
+export default function Post({imageUrl, title, category, created_at,} : IPostprops) {
     return(
     <HStack>
         <Box>
-            <Image src="https://a0.muscache.com/im/pictures/7d147293-0737-48e2-9bd1-ca17003b77a6.jpg?im_w=720" width="70px" height="40px"/>
+            <Image src={imageUrl} minH="40px" width="70px"/>
         </Box>
-        <Heading fontSize="sm">title</Heading>
+        <Heading fontSize="sm">{title}</Heading>
         <FaRegComment size="20px" />
         <Text mr={20}>[30]</Text>
-        <Text>category</Text>
-        <Text>created_time</Text>
+        <Text>{category}</Text>
+        <Text>{created_at}</Text>
     </HStack>
     )
 }
