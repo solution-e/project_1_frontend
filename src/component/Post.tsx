@@ -1,14 +1,14 @@
 import { Box, HStack, Heading, Image, Text } from "@chakra-ui/react";
 import { FaRegComment } from "react-icons/fa";
 
-interface IPostprops{
+interface IPost{
     imageUrl:string;
     title:string;
     category:string;
     created_at:string;
 };
 
-export default function Post({imageUrl, title, category, created_at,} : IPostprops) {
+export default function Post({imageUrl, title, category, created_at,} : IPost) {
     return(
     <HStack>
         <Box>
