@@ -2,6 +2,7 @@ import { Box, Button, HStack, IconButton, useColorMode, useDisclosure, useColorM
 import LoginModal from "./LoginModal";
 import SignUpModal from "./SignUpModal";
 import { FaFilter, FaMoon, FaRegSun } from "react-icons/fa";
+import { Link } from "react-router-dom";
 
 export default function Header(){
     const{ isOpen:isLoginOpen, onClose:onLoginClose, onOpen:onLoginOpen} = useDisclosure();
@@ -10,9 +11,11 @@ export default function Header(){
     const Icon = useColorModeValue(FaMoon, FaRegSun)
     return(
     <HStack justifyContent={"space-between"} py={2} px={10} borderBottomWidth={1}>
-    <Box color={"green.500"}>
-        <FaFilter size={"15"}/>
-    </Box>
+    <Link to={"/"}>
+        <Box color={"green.500"}>
+            <FaFilter size={"15"}/>
+        </Box>
+    </Link>
     <HStack spacing={2}>
         <IconButton
             onClick={toggleColorMode}

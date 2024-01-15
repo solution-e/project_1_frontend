@@ -3,6 +3,7 @@ import Root from "./component/Root";
 import Home from "./routes/Home";
 import Users from "./routes/User";
 import NotFound from "./routes/NotFound";
+import PostDetail from "./routes/PostDetail";
 
 const router = createBrowserRouter([
     {
@@ -13,6 +14,10 @@ const router = createBrowserRouter([
             {
                 path: "",
                 element: <Home />,
+            },
+            {
+                path: "post/:postPk",
+                element: <PostDetail />,
             },
         ],
     },
