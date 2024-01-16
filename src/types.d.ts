@@ -3,6 +3,15 @@ export interface IPhoto {
     photo_file:string;
 }
 
+interface IPost{
+    pk: number;
+    imageUrl:string;
+    title:string;
+    category:number;
+    created_at:string;
+    imageUrl:string;
+};
+
 export interface IPostList{
         pk: number;
         category: number;

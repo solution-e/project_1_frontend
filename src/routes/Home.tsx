@@ -1,4 +1,4 @@
-import { Box, Grid, VStack, Flex, HStack, Text, Image } from "@chakra-ui/react";
+import { Box, Grid, VStack, Flex, HStack, Text, Image, Heading } from "@chakra-ui/react";
 import { useQuery } from "@tanstack/react-query";
 import { getCategoryName, getPostList } from "./api";
 import PostList from "../component/Post";
@@ -10,20 +10,17 @@ export default function Home() {
         queryKey: ["post"],
         queryFn: getPostList,
     });
-    
+
     const { data: categoryData } = useQuery<ICategory[]>({
         queryKey: ["category"],
         queryFn: getCategoryName,
     });
 
     function getCategoryNameById(categoryPk: number) {
-        const category = categoryData?.find((cat) => {
-            console.log("Checking category:"+ `${cat.pk}`);
-            return cat.pk === categoryPk;
-        });
+        const category = categoryData?.find((cat) => cat.pk === categoryPk);
+        console.log(category)
         return category ? category.name : "no data";
     }
-    
 
     function formatTime(dateString: string) {
         const date = new Date(dateString);
@@ -63,3 +60,4 @@ export default function Home() {
         </Flex>
     );
 }
+
