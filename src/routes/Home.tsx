@@ -1,14 +1,29 @@
-import { Box, Grid, VStack, Flex } from "@chakra-ui/react";
+import { Box, Grid, VStack, Flex, HStack, Text, Image } from "@chakra-ui/react";
 import { useQuery } from "@tanstack/react-query";
-import { getPostList } from "./api";
+import { getCategoryName, getPostList } from "./api";
 import PostList from "../component/Post";
-import { IPostList } from "../types";
+import { IPostList, ICategory } from "../types";
+import { Link } from "react-router-dom";
 
 export default function Home() {
-    const { data } = useQuery<IPostList[]>({
+    const { data: postData } = useQuery<IPostList[]>({
         queryKey: ["post"],
         queryFn: getPostList,
     });
+    
+    const { data: categoryData } = useQuery<ICategory[]>({
+        queryKey: ["category"],
+        queryFn: getCategoryName,
+    });
+
+    function getCategoryNameById(categoryPk: number) {
+        const category = categoryData?.find((cat) => {
+            console.log("Checking category:"+ `${cat.pk}`);
+            return cat.pk === categoryPk;
+        });
+        return category ? category.name : "no data";
+    }
+    
 
     function formatTime(dateString: string) {
         const date = new Date(dateString);
@@ -20,19 +35,27 @@ export default function Home() {
     return (
         <Flex justifyContent="center" alignItems="center">
             <VStack>
-                <Grid rowGap="5" templateColumns={{sm:"1fr", md:"1fr", lg:"repeat(1, 1fr)", xl:"repeat(1, 1fr)"}} marginTop={100}>
-                    {data?.map((post: IPostList, index) => (
+                <Grid rowGap="1" templateColumns={{sm:"1fr", md:"1fr", lg:"repeat(1, 1fr)", xl:"repeat(1, 1fr)"}} marginTop={100}>
+                    {postData?.map((post: IPostList, index) => (
                         <Box
                             key={post.pk}
-                            borderBottom={index < data.length - 1 ? "1px solid gray" : "none"}
+                            borderBottom={index < postData.length - 1 ? "1px solid gray" : "none"}
+                            w={720}
                         >
-                            <PostList
-                                pk={post.pk}
-                                imageUrl={post.photo[0].photo_file}
-                                title={post.title}
-                                category={post.category}
-                                created_at={formatTime(post.created_at)}
-                            />
+                            <Link to={`/post/${post.pk}`}>
+                                <Box margin={1}>
+                                    <Flex justifyContent="space-between" width="100%" alignItems="center">
+                                        <HStack>
+                                            <Image src={post.photo[0].photo_file} w={"75px"} h="40px" />
+                                            <Text>{post.title}</Text>
+                                        </HStack>
+                                        <HStack>
+                                            <Text>{getCategoryNameById(post.category)}</Text>
+                                            <Text>{formatTime(post.created_at)}</Text>
+                                        </HStack>
+                                    </Flex>
+                                </Box>
+                            </Link>
                         </Box>
                     ))}
                 </Grid>

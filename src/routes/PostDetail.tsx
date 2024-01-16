@@ -10,8 +10,7 @@ export default function PostDetail() {
   return (
   <Box mt={10} px={{base:10, lg:40,}}>
     <Heading>{data?.title}</Heading>
-    <Grid>
-        <Text>pulltest</Text>
+    <Grid mt={8} h={"60vh"}>
         {data?.photo.map((photo) => (
             <Box key={photo.pk}>
                 <Image src={photo.photo_file} />

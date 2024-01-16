@@ -4,27 +4,37 @@ export interface IPhoto {
 }
 
 export interface IPostList{
-        pk: number
-        category: string,
-        title: string,
-        author: string,
-        photo: IPhoto[]
-        content: string,
-        total_likes: number,
-        total_dislikes: number,
-        created_at: string,
-        is_author: boolean
+        pk: number;
+        category: number;
+        title: string;
+        author: string;
+        photo: IPhoto[];
+        created_at: string;
+        content: string;
+        total_likes: number;
+        total_dislikes: number;
+        is_author: boolean;
+};
+
+export interface ICategory{
+    pk: number;
+    name: string;
+};
+
+export interface IPostCreatedAt{
+    pk: number;
+    created_at: string;
 };
 
 export interface IPostDetail{
-    pk: number
-    category: string,
-    title: string,
-    author: string,
-    photo: IPhoto[]
-    content: string,
-    total_likes: number,
-    total_dislikes: number,
-    created_at: string,
-    is_author: boolean
+    pk: number;
+    category: string;
+    title: string;
+    author: string;
+    photo: IPhoto[];
+    content: string;
+    total_likes: number;
+    total_dislikes: number;
+    created_at: string;
+    is_author: boolean;
 };
