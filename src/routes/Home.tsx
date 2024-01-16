@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { getPostList } from "./api";
 import PostList from "../component/Post";
 import { IPostList } from "../types";
+import styled from "@emotion/styled";
 
 export default function Home() {
     const { data } = useQuery<IPostList[]>({

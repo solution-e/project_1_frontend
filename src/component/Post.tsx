@@ -15,9 +15,9 @@ export default function Post({pk, imageUrl, title, category, created_at,} : IPos
     <Link to={`/post/${pk}`}>
         <HStack>
             <Box>
-                <Image src={imageUrl} minH="40px" width="70px"/>
+                <Image src={imageUrl} height="40px" objectFit="cover" minH="40px" width="70px"/>
             </Box>
-            <Heading fontSize="sm">{title}</Heading>
+            <Heading width="200px" overflow="hidden" textOverflow="ellipsis" whiteSpace="nowrap" fontSize="sm">{title}</Heading>
             <FaRegComment size="20px" />
             <Text mr={20}>[30]</Text>
             <Text>{category}</Text>
