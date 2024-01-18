@@ -1,26 +1,14 @@
-import { Box, Grid, VStack, Flex, HStack, Text, Image, Heading } from "@chakra-ui/react";
+import { Box, Grid, VStack, Flex } from "@chakra-ui/react";
 import { useQuery } from "@tanstack/react-query";
-import { getCategoryName, getPostList } from "./api";
-import PostList from "../component/Post";
-import { IPostList, ICategory } from "../types";
-import { Link } from "react-router-dom";
+import { getPostList } from "../api";
+import Post from "../component/Post";
+import { IPostList } from "../types";
 
 export default function Home() {
-    const { data: postData } = useQuery<IPostList[]>({
+    const { data } = useQuery<IPostList[]>({
         queryKey: ["post"],
         queryFn: getPostList,
     });
-
-    const { data: categoryData } = useQuery<ICategory[]>({
-        queryKey: ["category"],
-        queryFn: getCategoryName,
-    });
-
-    function getCategoryNameById(categoryPk: number) {
-        const category = categoryData?.find((cat) => cat.pk === categoryPk);
-        console.log(category)
-        return category ? category.name : "no data";
-    }
 
     function formatTime(dateString: string) {
         const date = new Date(dateString);
@@ -31,33 +19,23 @@ export default function Home() {
 
     return (
         <Flex justifyContent="center" alignItems="center">
+            <Box>
             <VStack>
                 <Grid rowGap="1" templateColumns={{sm:"1fr", md:"1fr", lg:"repeat(1, 1fr)", xl:"repeat(1, 1fr)"}} marginTop={100}>
-                    {postData?.map((post: IPostList, index) => (
-                        <Box
-                            key={post.pk}
-                            borderBottom={index < postData.length - 1 ? "1px solid gray" : "none"}
-                            w={720}
-                        >
-                            <Link to={`/post/${post.pk}`}>
-                                <Box margin={1}>
-                                    <Flex justifyContent="space-between" width="100%" alignItems="center">
-                                        <HStack>
-                                            <Image src={post.photo[0].photo_file} w={"75px"} h="40px" />
-                                            <Text>{post.title}</Text>
-                                        </HStack>
-                                        <HStack>
-                                            <Text>{getCategoryNameById(post.category)}</Text>
-                                            <Text>{formatTime(post.created_at)}</Text>
-                                        </HStack>
-                                    </Flex>
-                                </Box>
-                            </Link>
-                        </Box>
+                    {data?.map((post) => (
+                        <Post
+                        key={post.id}
+                        id={post.id}
+                        imageUrl={post.photo[0].photo_file}
+                        review_count={post.review_count}
+                        title={post.title}
+                        category={post.category.name}
+                        created_at={formatTime(post.created_at)}
+                        />
                     ))}
                 </Grid>
             </VStack>
+            </Box>
         </Flex>
     );
 }
-

@@ -4,29 +4,31 @@ export interface IPhoto {
 }
 
 interface IPost{
-    pk: number;
+    id:number;
     imageUrl:string;
     title:string;
-    category:number;
+    review_count:number;
+    category:string;
     created_at:string;
     imageUrl:string;
 };
 
 export interface IPostList{
-        pk: number;
-        category: number;
-        title: string;
-        author: string;
-        photo: IPhoto[];
-        created_at: string;
-        content: string;
-        total_likes: number;
-        total_dislikes: number;
-        is_author: boolean;
+    id: number;
+    category: ICategory;
+    title: string;
+    author: string;
+    photo: IPhoto[];
+    created_at: string;
+    content: string;
+    total_likes: number;
+    total_dislikes: number;
+    is_author: boolean;
+    review_count: number;
 };
 
 export interface ICategory{
-    pk: number;
+    pk: string;
     name: string;
 };
 
@@ -36,14 +38,39 @@ export interface IPostCreatedAt{
 };
 
 export interface IPostDetail{
-    pk: number;
-    category: string;
+    id: number;
+    category: ICategory;
     title: string;
-    author: string;
+    author: IAuthor;
     photo: IPhoto[];
+    created_at: string;
     content: string;
     total_likes: number;
     total_dislikes: number;
-    created_at: string;
     is_author: boolean;
 };
+
+
+interface IAuthor {
+    name: string;
+};
+
+export interface IUser {
+    last_login: string;
+    username: string;
+    email: string;
+    date_joined: string;
+    avatar: string;
+    name: string;
+    is_host: boolean;
+    gender: string;
+    language: string;
+    currency: string;
+};
+
+export interface IReview {
+    user: IUser;
+    review_content: string;
+    created_at: string;
+}
+

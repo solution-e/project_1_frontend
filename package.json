@@ -18,8 +18,10 @@
     "@types/react-router-dom": "^5.3.3",
     "axios": "^1.6.5",
     "framer-motion": "^10.17.12",
+    "js-cookie": "^3.0.5",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-hook-form": "^7.49.3",
     "react-icons": "^4.12.0",
     "react-router-dom": "^6.21.1",
     "react-scripts": "5.0.1",
@@ -49,5 +51,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "@types/js-cookie": "^3.0.6"
   }
 }

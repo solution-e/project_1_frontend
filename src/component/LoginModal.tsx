@@ -1,37 +1,59 @@
 import { Button, Input, InputGroup, InputLeftElement, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, VStack } from "@chakra-ui/react";
+import { useState } from "react";
 import { FaUser, FaLock, } from "react-icons/fa";
 import { IoIosLogIn } from "react-icons/io";
+import { useForm } from "react-hook-form";
 
 interface LoginModalProps {
     isOpen:boolean;
     onClose:() => void;
 }
 
+interface IForm {
+    username: string;
+    password: string;
+  }
+
 export default function LoginModal({isOpen, onClose}:LoginModalProps){
+    const {
+        register,
+        handleSubmit,
+        formState: { errors },
+      } = useForm<IForm>();
+      const onSubmit = (data: IForm) => {
+        console.log(data);
+      };
     return (
         <Modal onClose={onClose} isOpen={isOpen}>
             <ModalOverlay />
             <ModalContent>
                 <ModalHeader>Login</ModalHeader>
                 <ModalCloseButton />
-                <ModalBody>
+                <ModalBody as="form" onSubmit={handleSubmit(onSubmit)}>
                     <VStack>
                         <InputGroup>
                         <InputLeftElement children={<FaUser />} />
-                            <Input variant={"filled"} placeholder="Username" />
+                            <Input 
+                                isInvalid={Boolean(errors.username?.message)}
+                                {...register("username", {
+                                required: "IDを入力してください",
+                                })} variant={"filled"} placeholder="ID" />
                         </InputGroup>
                         <InputGroup>
                         <InputLeftElement children={<FaLock />} />
-                            <Input variant={"filled"} placeholder="Password" />
+                            <Input
+                                type="password" 
+                                isInvalid={Boolean(errors.password?.message)}
+                                {...register("password", {
+                                required: "パスワードを入力してください",
+                                })} variant={"filled"} placeholder="Password" />
                         </InputGroup>
                     </VStack>
-                </ModalBody>
-                <ModalFooter>
-                    <InputGroup>
+                    <InputGroup mt={2} mb={3}>
                             <InputLeftElement children={<IoIosLogIn />} />
-                            <Button colorScheme={"red"} width={"100%"}>Login</Button>
+                            <Button type="submit" colorScheme={"red"} width={"100%"}>Login</Button>
                     </InputGroup>
-                </ModalFooter>
+                </ModalBody>
             </ModalContent>
         </Modal>
     )
