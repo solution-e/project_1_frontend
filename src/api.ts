@@ -10,9 +10,11 @@ const instance = axios.create({
 export const getPostList = () =>
   instance.get("post/").then((response) => response.data);
 
-  export const getCategoryPostList = ({ queryKey }: QueryFunctionContext) => {
+export const getCategoryPostList = ({ queryKey }: QueryFunctionContext) => {
   const [_, categoryId] = queryKey;
-  return instance.get(`category/${categoryId}/post`).then((response) => response.data);
+  return instance
+    .get(`category/${categoryId}/post`)
+    .then((response) => response.data);
 };
 
 export const getCategory = () =>
