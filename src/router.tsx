@@ -17,6 +17,10 @@ const router = createBrowserRouter([
         element: <Home />,
       },
       {
+        path:"category/:categoryId/post",
+        element:<Home />
+      },
+      {
         path: "post/:postPk",
         element: <PostDetail />,
       },
