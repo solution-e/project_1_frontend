@@ -4,6 +4,7 @@ import { getPostDetail, getPostReviews } from "../api";
 import { IPostDetail, IReview } from "../types";
 import {
   Box,
+  Button,
   Grid,
   HStack,
   Heading,
@@ -22,16 +23,30 @@ export default function PostDetail() {
   return (
     <Box mt={10} px={{ base: 10, lg: 40 }}>
       <Heading>{data?.title}</Heading>
-      <Box mt={3}>
-        <Text fontSize={"xl"}>作成者: {data?.author.name}</Text>
-      </Box>
+      <HStack>
+        <Box mt={3}>
+          <Text fontSize={"xl"}>作成者: {data?.author.name}</Text>
+        </Box>
+        {data?.is_author ? (
+          <Button mt={4} size={"sm"}>
+            修正
+          </Button>
+        ) : null}
+        {data?.is_author ? (
+          <Button mt={4} size={"sm"}>
+            削除
+          </Button>
+        ) : null}
+      </HStack>
       <Grid mt={8} h={"60vh"}>
-        {data?.photo.map((photo) => (
-          <Box key={photo.pk}>
-            <Image src={photo.photo_file} />
-            {data?.content}
-          </Box>
-        ))}
+        {data?.photo && data?.photo.length > 0
+          ? data?.photo.map((photo) => (
+              <Box key={photo.pk}>
+                <Image src={photo.photo_file} />
+              </Box>
+            ))
+          : null}
+        <Box>{data?.content}</Box>
         <HStack mt={8}>
           <Grid templateColumns={"1fr 1fr"}>
             {reviewsData?.map((review, index) => (

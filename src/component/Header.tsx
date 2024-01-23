@@ -21,6 +21,7 @@ import {
   DrawerContent,
   DrawerCloseButton,
   useDisclosure,
+  VStack,
 } from "@chakra-ui/react";
 import { MdOutlineWbSunny } from "react-icons/md";
 import LoginModal from "./LoginModal";
@@ -124,7 +125,14 @@ export default function Header() {
             <DrawerCloseButton />
             <DrawerHeader>MENU</DrawerHeader>
             <DrawerBody>
-              {isLoggedIn && <Button onClick={onLogOut}>ログアウト</Button>}
+              <VStack>
+                {isLoggedIn && <Button onClick={onLogOut}>ログアウト</Button>}
+                {isLoggedIn && (
+                  <Link to="/post/upload">
+                    <Button>投稿</Button>
+                  </Link>
+                )}
+              </VStack>
             </DrawerBody>
           </DrawerContent>
         </Drawer>

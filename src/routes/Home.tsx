@@ -40,7 +40,7 @@ export default function Home() {
               <Post
                 key={post.id}
                 id={post.id}
-                imageUrl={post.photo[0].photo_file}
+                imageUrl={post.photo[0]?.photo_file}
                 review_count={post.review_count}
                 title={post.title}
                 category={post.category.name}

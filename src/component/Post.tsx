@@ -1,12 +1,4 @@
-import {
-  Box,
-  Container,
-  HStack,
-  Heading,
-  Image,
-  Text,
-  VStack,
-} from "@chakra-ui/react";
+import { Box, Container, HStack, Heading, Image, Text } from "@chakra-ui/react";
 import { Link } from "react-router-dom";
 import { IPost } from "../types";
 
@@ -22,15 +14,17 @@ export default function Post({
     <Link to={`/post/${id}`}>
       <Box borderBottom={"1px"} borderBottomColor={"lightgray"}>
         <HStack>
-          <Box marginBottom={1} marginTop={1}>
-            <Image
-              src={imageUrl}
-              height="40px"
-              objectFit="cover"
-              minH="40px"
-              width="70px"
-            />
-          </Box>
+          {imageUrl && (
+            <Box marginBottom={1} marginTop={1}>
+              <Image
+                src={imageUrl}
+                height="40px"
+                objectFit="cover"
+                minH="40px"
+                width="70px"
+              />
+            </Box>
+          )}
           <Container display="inline-flex" width="200px" alignItems="center">
             <Heading
               width="auto"

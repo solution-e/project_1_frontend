@@ -13,6 +13,13 @@ export const getPostList = () =>
 export const getCategory = () =>
   instance.get("category/").then((response) => response.data);
 
+export const getCategoryPost = ({ queryKey }: QueryFunctionContext) => {
+  const [_, categoryPk] = queryKey;
+  return instance
+    .get(`category/${categoryPk}/post`)
+    .then((response) => response.data);
+};
+
 export const getPostDetail = ({ queryKey }: QueryFunctionContext) => {
   const [_, postPk] = queryKey;
   return instance.get(`post/${postPk}`).then((response) => response.data);
@@ -97,4 +104,19 @@ export const signUp = ({
         },
       }
     )
+    .then((response) => response.data);
+
+export interface IUploadPostVariables {
+  title: string;
+  content: string;
+  category: number;
+}
+
+export const uploadPost = (variables: IUploadPostVariables) =>
+  instance
+    .post(`post/`, variables, {
+      headers: {
+        "X-CSRFToken": Cookie.get("csrftoken") || "",
+      },
+    })
     .then((response) => response.data);

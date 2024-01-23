@@ -4,6 +4,7 @@ import Home from "./routes/Home";
 import Users from "./routes/User";
 import NotFound from "./routes/NotFound";
 import PostDetail from "./routes/PostDetail";
+import UploadPost from "./routes/UploadPost";
 import CategoryList from "./routes/CategoryList";
 
 const router = createBrowserRouter([
@@ -15,6 +16,10 @@ const router = createBrowserRouter([
       {
         path: "",
         element: <Home />,
+      },
+      {
+        path: "post/upload",
+        element: <UploadPost />,
       },
       {
         path: "post/:postPk",
