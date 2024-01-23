@@ -22,6 +22,10 @@ const router = createBrowserRouter([
         element: <UploadPost />,
       },
       {
+        path: "category/:categoryId/post",
+        element: <Home />,
+      },
+      {
         path: "post/:postPk",
         element: <PostDetail />,
       },

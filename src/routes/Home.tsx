@@ -1,13 +1,16 @@
 import { Box, Grid, VStack, Flex, Button, Link } from "@chakra-ui/react";
 import { useQuery } from "@tanstack/react-query";
-import { getPostList } from "../api";
+import { getPostList, getCategoryPostList } from "../api";
 import Post from "../component/Post";
 import { IPostList } from "../types";
+import {useParams } from "react-router-dom";
 
 export default function Home() {
+  const {categoryId} = useParams();
+  const searchquery = categoryId !== undefined ? "category" : "post";
   const { data } = useQuery<IPostList[]>({
-    queryKey: ["post"],
-    queryFn: getPostList,
+    queryKey: [searchquery,categoryId],
+    queryFn:  searchquery === "category" ? getCategoryPostList : getPostList,
   });
 
   function formatTime(dateString: string) {
