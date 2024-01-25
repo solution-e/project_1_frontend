@@ -46,7 +46,11 @@ export default function PostDetail() {
               </Box>
             ))
           : null}
-        <Box>{data?.content}</Box>
+        <Box mt={8}>
+          {data?.content && (
+            <div dangerouslySetInnerHTML={{ __html: data.content }} />
+          )}
+        </Box>
         <HStack mt={8}>
           <Grid templateColumns={"1fr 1fr"}>
             {reviewsData?.map((review, index) => (

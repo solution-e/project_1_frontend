@@ -3,15 +3,20 @@ import { useQuery } from "@tanstack/react-query";
 import { getPostList, getCategoryPostList } from "../api";
 import Post from "../component/Post";
 import { IPostList } from "../types";
-import {useParams } from "react-router-dom";
+import { useParams, useLocation } from "react-router-dom";
+import userUser from "../lib/useUser";
 
 export default function Home() {
-  const {categoryId} = useParams();
+  const { categoryId } = useParams();
+  console.log(categoryId);
+  const { isLoggedIn } = userUser();
   const searchquery = categoryId !== undefined ? "category" : "post";
   const { data } = useQuery<IPostList[]>({
-    queryKey: [searchquery,categoryId],
-    queryFn:  searchquery === "category" ? getCategoryPostList : getPostList,
+    queryKey: [searchquery, categoryId],
+    queryFn: searchquery === "category" ? getCategoryPostList : getPostList,
   });
+  const location = useLocation();
+  const isCategoryInUrl = location.pathname.includes("category");
 
   function formatTime(dateString: string) {
     const date = new Date(dateString);
@@ -34,11 +39,18 @@ export default function Home() {
             }}
             marginTop={100}
           >
-            <Link href={`/category/`}>
-              <Box>
-                <Button>カテゴリー</Button>
-              </Box>
-            </Link>
+            <VStack>
+              <Link href={`/category/`}>
+                <Box>
+                  <Button>カテゴリー</Button>
+                  {isLoggedIn && isCategoryInUrl && (
+                    <Link href={`/post/upload?category=${categoryId}`}>
+                      <Button ml={3}>投稿</Button>
+                    </Link>
+                  )}
+                </Box>
+              </Link>
+            </VStack>
             {data?.map((post) => (
               <Post
                 key={post.id}

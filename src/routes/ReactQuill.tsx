@@ -21,12 +21,49 @@ import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { IUploadPostVariables } from "../api";
 import "react-quill/dist/quill.snow.css";
+import axios from "axios";
 
 export default function UploadPost() {
   const [content, setContent] = useState("");
   const { register, handleSubmit } = useForm<IUploadPostVariables>();
   const toast = useToast();
   const navigate = useNavigate();
+  const toolbarOptions = [
+    ["link", "image", "video"],
+    [{ header: [1, 2, 3, false] }],
+    ["bold", "italic", "underline", "strike"],
+    ["blockquote"],
+    [{ list: "ordered" }, { list: "bullet" }],
+    [{ color: [] }, { background: [] }],
+    [{ align: [] }],
+  ];
+
+  const formats = [
+    "header",
+    "font",
+    "size",
+    "bold",
+    "italic",
+    "underline",
+    "strike",
+    "align",
+    "blockquote",
+    "list",
+    "bullet",
+    "indent",
+    "background",
+    "color",
+    "link",
+    "image",
+    "video",
+    "width",
+  ];
+
+  const modules = {
+    toolbar: {
+      container: toolbarOptions,
+    },
+  };
 
   const mutation = useMutation(uploadPost, {
     onSuccess: (data: IPostDetail) => {
@@ -47,7 +84,7 @@ export default function UploadPost() {
   const onSubmit = (formData: IUploadPostVariables) => {
     const dataToSubmit = {
       ...formData,
-      content, // ReactQuill 에디터의 내용 추가
+      content,
     };
     mutation.mutate(dataToSubmit);
   };
@@ -92,9 +129,11 @@ export default function UploadPost() {
               <Input {...register("title", { required: true })} type="text" />
             </FormControl>
             <ReactQuill
+              style={{ width: "800px", height: "600px" }}
               value={content}
               onChange={handleQuillChange}
-              modules={{ toolbar: true }}
+              modules={modules}
+              formats={formats}
             />
             {mutation.isError && (
               <Text color={"red"}>エラーが発生しました</Text>

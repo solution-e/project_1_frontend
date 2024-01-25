@@ -6,63 +6,32 @@ import {
   FormLabel,
   Heading,
   Input,
-  Select,
   Text,
+  Textarea,
   VStack,
   useToast,
 } from "@chakra-ui/react";
-import ReactQuill from "react-quill";
 import ProtectedPage from "../component/ProtectedPage";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { ICategory, IPostDetail } from "../types";
-import { getCategory, uploadPost } from "../api";
+import { getCategoryInfo, uploadPost, IUploadPostVariables } from "../api";
 import { useForm } from "react-hook-form";
-import { useNavigate } from "react-router-dom";
-import { useState } from "react";
-import { IUploadPostVariables } from "../api";
-import "react-quill/dist/quill.snow.css";
+import { useNavigate, useLocation } from "react-router-dom";
+import { useEffect } from "react";
 
 export default function UploadPost() {
-  const [content, setContent] = useState("");
-  const { register, handleSubmit } = useForm<IUploadPostVariables>();
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+  const categoryPk = searchParams.get("category");
+
+  const { data: categoryData } = useQuery<ICategory>({
+    queryKey: ["category", categoryPk],
+    queryFn: getCategoryInfo,
+  });
+
+  const { register, handleSubmit, setValue } = useForm<IUploadPostVariables>();
   const toast = useToast();
   const navigate = useNavigate();
-  const toolbarOptions = [
-    ["link", "image", "video"],
-    [{ header: [1, 2, 3, false] }],
-    ["bold", "italic", "underline", "strike"],
-    ["blockquote"],
-    [{ list: "ordered" }, { list: "bullet" }],
-    [{ color: [] }, { background: [] }],
-    [{ align: [] }],
-  ];
-
-  const formats = [
-    "header",
-    "font",
-    "size",
-    "bold",
-    "italic",
-    "underline",
-    "strike",
-    "align",
-    "blockquote",
-    "list",
-    "bullet",
-    "indent",
-    "background",
-    "color",
-    "link",
-    "image",
-    "video",
-    "width",
-  ];
-
-  const modules = {
-    toolbar: {
-      container: toolbarOptions,
-    },
-  };
 
   const mutation = useMutation(uploadPost, {
     onSuccess: (data: IPostDetail) => {
@@ -75,21 +44,14 @@ export default function UploadPost() {
     },
   });
 
-  const { data: categoryData } = useQuery<ICategory[]>(
-    ["category"],
-    getCategory
-  );
+  useEffect(() => {
+    if (categoryData) {
+      setValue("category", categoryData.id);
+    }
+  }, [setValue, categoryData]);
 
-  const onSubmit = (formData: IUploadPostVariables) => {
-    const dataToSubmit = {
-      ...formData,
-      content,
-    };
-    mutation.mutate(dataToSubmit);
-  };
-
-  const handleQuillChange = (value: string) => {
-    setContent(value);
+  const onSubmit = (data: IUploadPostVariables) => {
+    mutation.mutate(data);
   };
 
   return (
@@ -112,27 +74,22 @@ export default function UploadPost() {
           >
             <FormControl>
               <FormLabel>カテゴリー</FormLabel>
-              <Select
-                {...register("category", { required: true })}
-                placeholder="カテゴリーを選択してください"
-              >
-                {categoryData?.map((category) => (
-                  <option key={category.id} value={category.id}>
-                    {category.name}
+              <FormLabel {...register("category", { required: true })}>
+                {categoryData && (
+                  <option key={categoryData.id} value={categoryData.id}>
+                    {categoryData.name}
                   </option>
-                ))}
-              </Select>
+                )}
+              </FormLabel>
             </FormControl>
             <FormControl>
               <FormLabel>タイトル</FormLabel>
               <Input {...register("title", { required: true })} type="text" />
             </FormControl>
-            <ReactQuill
-              value={content}
-              onChange={handleQuillChange}
-              modules={modules}
-              formats={formats}
-            />
+            <FormControl>
+              <FormLabel>内容</FormLabel>
+              <Textarea {...register("content", { required: true })} />
+            </FormControl>
             {mutation.isError && (
               <Text color={"red"}>エラーが発生しました</Text>
             )}

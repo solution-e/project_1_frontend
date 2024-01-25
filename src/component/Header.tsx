@@ -8,12 +8,8 @@ import {
   Text,
   Menu,
   MenuButton,
-  Avatar,
-  MenuList,
-  MenuItem,
   useToast,
   ToastId,
-  Toast,
   Drawer,
   DrawerBody,
   DrawerHeader,
@@ -26,15 +22,11 @@ import {
 import { MdOutlineWbSunny } from "react-icons/md";
 import LoginModal from "./LoginModal";
 import SignUpModal from "./SignUpModal";
-import { FaFilter, FaMoon, FaRegSun } from "react-icons/fa";
+import { FaFilter, FaMoon } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import userUser from "../lib/useUser";
 import { logOut } from "../api";
-import {
-  QueryClient,
-  useMutation,
-  useQueryClient,
-} from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { FiAlignJustify } from "react-icons/fi";
 import { useRef } from "react";
 
@@ -127,11 +119,6 @@ export default function Header() {
             <DrawerBody>
               <VStack>
                 {isLoggedIn && <Button onClick={onLogOut}>ログアウト</Button>}
-                {isLoggedIn && (
-                  <Link to="/post/upload">
-                    <Button>投稿</Button>
-                  </Link>
-                )}
               </VStack>
             </DrawerBody>
           </DrawerContent>

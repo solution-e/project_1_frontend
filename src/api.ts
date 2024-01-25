@@ -20,6 +20,13 @@ export const getCategoryPostList = ({ queryKey }: QueryFunctionContext) => {
 export const getCategory = () =>
   instance.get("category/").then((response) => response.data);
 
+export const getCategoryInfo = ({ queryKey }: QueryFunctionContext) => {
+  const [_, categoryPk] = queryKey;
+  return instance
+    .get(`category/${categoryPk}`)
+    .then((response) => response.data);
+};
+
 export const getCategoryPost = ({ queryKey }: QueryFunctionContext) => {
   const [_, categoryPk] = queryKey;
   return instance
