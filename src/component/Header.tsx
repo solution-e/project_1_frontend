@@ -118,6 +118,9 @@ export default function Header() {
             <DrawerHeader>MENU</DrawerHeader>
             <DrawerBody>
               <VStack>
+              {isLoggedIn && <Link to="/UserDetail/">
+              <Button >ユーザー情報</Button>
+              </Link>}
                 {isLoggedIn && <Button onClick={onLogOut}>ログアウト</Button>}
               </VStack>
             </DrawerBody>

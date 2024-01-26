@@ -1,7 +1,7 @@
 import { createBrowserRouter } from "react-router-dom";
 import Root from "./component/Root";
 import Home from "./routes/Home";
-import Users from "./routes/User";
+import UserDetail from "./routes/UserDetail";
 import NotFound from "./routes/NotFound";
 import PostDetail from "./routes/PostDetail";
 import UploadPost from "./routes/UploadPost";
@@ -32,6 +32,10 @@ const router = createBrowserRouter([
       {
         path: "category/",
         element: <CategoryList />,
+      },
+      {
+        path: "UserDetail/",
+        element: <UserDetail />,
       },
     ],
   },
