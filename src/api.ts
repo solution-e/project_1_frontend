@@ -136,6 +136,23 @@ export const uploadPost = (variables: IUploadPostVariables) =>
     })
     .then((response) => response.data);
 
+export interface IUserUpdateSuccess {
+  ok: string;
+}
+export interface IUserUpdateError {
+  error: string;
+}
+export interface IUserUpdateVariables {
+  name: string;
+  old_password: string;
+  new_password: string;
+}
+
+export interface IUploadImageVarialbes {
+  file: FileList;
+  uploadURL: string;
+}
+
 export const getUploadURL = () =>
   instance
     .post(`media/photo/get-url`, null, {
@@ -144,11 +161,6 @@ export const getUploadURL = () =>
       },
     })
     .then((response) => response.data);
-
-export interface IUploadImageVarialbes {
-  file: FileList;
-  uploadURL: string;
-}
 
 export const uploadImage = ({ file, uploadURL }: IUploadImageVarialbes) => {
   const form = new FormData();
@@ -159,5 +171,36 @@ export const uploadImage = ({ file, uploadURL }: IUploadImageVarialbes) => {
         "Content-Type": "multipart/form-data",
       },
     })
+    .then((response) => response.data);
+};
+
+export const userUpdate = ({
+  name,
+  old_password,
+  new_password,
+}: IUserUpdateVariables) =>
+  instance
+    .put(
+      `user/update`,
+      { name, old_password, new_password },
+      {
+        headers: {
+          "X-CSRFToken": Cookie.get("csrftoken") || "",
+        },
+      }
+    )
+    .then((response) => response.data);
+
+export const getMyPostList = ({ queryKey }: QueryFunctionContext) => {
+  const [_, author] = queryKey;
+  return instance
+    .get(`post/${author}/author`)
+    .then((response) => response.data);
+};
+
+export const getOtherInfo = ({ queryKey }: QueryFunctionContext) => {
+  const [_, otherId] = queryKey;
+  return instance
+    .get(`user/${otherId}/Other`)
     .then((response) => response.data);
 };

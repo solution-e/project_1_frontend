@@ -1,11 +1,13 @@
 import { createBrowserRouter } from "react-router-dom";
 import Root from "./component/Root";
 import Home from "./routes/Home";
-import Users from "./routes/User";
+import UserDetail from "./routes/UserDetail";
 import NotFound from "./routes/NotFound";
 import PostDetail from "./routes/PostDetail";
 import UploadPost from "./routes/UploadPost";
 import CategoryList from "./routes/CategoryList";
+import MyPostList from "./routes/MyPostList";
+import OtherInfo from "./routes/OtherInfo"
 
 const router = createBrowserRouter([
   {
@@ -33,6 +35,18 @@ const router = createBrowserRouter([
         path: "category/",
         element: <CategoryList />,
       },
+      {
+        path: "UserDetail/",
+        element: <UserDetail />,
+      },
+      {
+        path: "MyPostList/",
+        element: <MyPostList />,
+      },
+      {
+        path: "OtherInfo/:OtherId",
+        element:<OtherInfo />,
+      }
     ],
   },
 ]);
