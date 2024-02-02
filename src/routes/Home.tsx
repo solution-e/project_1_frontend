@@ -11,6 +11,7 @@ export default function Home() {
   console.log(categoryId);
   const { isLoggedIn } = userUser();
   const searchquery = categoryId !== undefined ? "category" : "post";
+
   const { data } = useQuery<IPostList[]>({
     queryKey: [searchquery, categoryId],
     queryFn: searchquery === "category" ? getCategoryPostList : getPostList,

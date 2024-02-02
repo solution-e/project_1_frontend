@@ -43,6 +43,7 @@ export interface IPostDetail {
   title: string;
   author: IAuthor;
   photo: IPhoto[];
+  file: FileList;
   created_at: string;
   content: string;
   total_likes: number;

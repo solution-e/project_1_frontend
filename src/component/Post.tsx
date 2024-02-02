@@ -2,6 +2,8 @@ import { Box, Container, HStack, Heading, Image, Text } from "@chakra-ui/react";
 import { Link } from "react-router-dom";
 import { IPost } from "../types";
 
+const defaultImageUrl = "./default_no_image.jpeg";
+
 export default function Post({
   id,
   imageUrl,
@@ -14,10 +16,21 @@ export default function Post({
     <Link to={`/post/${id}`}>
       <Box borderBottom={"1px"} borderBottomColor={"lightgray"}>
         <HStack>
-          {imageUrl && (
+          {imageUrl ? (
             <Box marginBottom={1} marginTop={1}>
               <Image
                 src={imageUrl}
+                height="40px"
+                objectFit="cover"
+                minH="40px"
+                width="70px"
+              />
+            </Box>
+          ) : (
+            //imageがない時
+            <Box marginBottom={1} marginTop={1}>
+              <Image
+                src={defaultImageUrl}
                 height="40px"
                 objectFit="cover"
                 minH="40px"

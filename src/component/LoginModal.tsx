@@ -13,7 +13,6 @@ import {
   VStack,
   useToast,
 } from "@chakra-ui/react";
-import { useState } from "react";
 import { FaUser, FaLock } from "react-icons/fa";
 import { IoIosLogIn } from "react-icons/io";
 import { useForm } from "react-hook-form";

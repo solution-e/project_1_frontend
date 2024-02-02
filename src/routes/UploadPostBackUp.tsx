@@ -6,7 +6,6 @@ import {
   FormLabel,
   Heading,
   Input,
-  Select,
   Text,
   Textarea,
   VStack,
@@ -15,17 +14,25 @@ import {
 import ProtectedPage from "../component/ProtectedPage";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { ICategory, IPostDetail } from "../types";
-import { getCategory, uploadPost } from "../api";
-import { IUploadPostVariables } from "../api";
+import { getCategoryInfo, uploadPost, IUploadPostVariables } from "../api";
 import { useForm } from "react-hook-form";
-import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { useEffect } from "react";
 
 export default function UploadPost() {
-  const [value, setValue] = useState("");
-  const { register, handleSubmit } = useForm<IUploadPostVariables>();
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+  const categoryPk = searchParams.get("category");
+
+  const { data: categoryData } = useQuery<ICategory>({
+    queryKey: ["category", categoryPk],
+    queryFn: getCategoryInfo,
+  });
+
+  const { register, handleSubmit, setValue } = useForm<IUploadPostVariables>();
   const toast = useToast();
   const navigate = useNavigate();
+
   const mutation = useMutation(uploadPost, {
     onSuccess: (data: IPostDetail) => {
       toast({
@@ -36,13 +43,17 @@ export default function UploadPost() {
       navigate(`/post/${data.id}`);
     },
   });
-  const { data: categoryData } = useQuery<ICategory[]>(
-    ["category"],
-    getCategory
-  );
+
+  useEffect(() => {
+    if (categoryData) {
+      setValue("category", categoryData.id);
+    }
+  }, [setValue, categoryData]);
+
   const onSubmit = (data: IUploadPostVariables) => {
     mutation.mutate(data);
   };
+
   return (
     <ProtectedPage>
       <Box
@@ -63,16 +74,13 @@ export default function UploadPost() {
           >
             <FormControl>
               <FormLabel>カテゴリー</FormLabel>
-              <Select
-                {...register("category", { required: true })}
-                placeholder="カテゴリーを選択してください"
-              >
-                {categoryData?.map((category) => (
-                  <option key={category.id} value={category.id}>
-                    {category.name}
+              <FormLabel {...register("category", { required: true })}>
+                {categoryData && (
+                  <option key={categoryData.id} value={categoryData.id}>
+                    {categoryData.name}
                   </option>
-                ))}
-              </Select>
+                )}
+              </FormLabel>
             </FormControl>
             <FormControl>
               <FormLabel>タイトル</FormLabel>
@@ -82,9 +90,9 @@ export default function UploadPost() {
               <FormLabel>内容</FormLabel>
               <Textarea {...register("content", { required: true })} />
             </FormControl>
-            {mutation.isError ? (
+            {mutation.isError && (
               <Text color={"red"}>エラーが発生しました</Text>
-            ) : null}
+            )}
             <Button type="submit" isLoading={mutation.isLoading}>
               投稿
             </Button>

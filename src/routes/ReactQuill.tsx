@@ -21,7 +21,6 @@ import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { IUploadPostVariables } from "../api";
 import "react-quill/dist/quill.snow.css";
-import axios from "axios";
 
 export default function UploadPost() {
   const [content, setContent] = useState("");

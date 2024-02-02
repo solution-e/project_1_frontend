@@ -14,10 +14,21 @@ import {
 import ProtectedPage from "../component/ProtectedPage";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { ICategory, IPostDetail } from "../types";
-import { getCategoryInfo, uploadPost, IUploadPostVariables } from "../api";
-import { useForm } from "react-hook-form";
-import { useNavigate, useLocation } from "react-router-dom";
+import {
+  getCategoryInfo,
+  uploadPost,
+  IUploadPostVariables,
+  uploadImage,
+  getUploadURL,
+} from "../api";
+import { useForm, useWatch } from "react-hook-form";
+import { useNavigate, useLocation, useParams } from "react-router-dom";
 import { useEffect } from "react";
+
+interface IUploadURLResponse {
+  id: string;
+  uploadURL: string;
+}
 
 export default function UploadPost() {
   const location = useLocation();
@@ -50,8 +61,23 @@ export default function UploadPost() {
     }
   }, [setValue, categoryData]);
 
+  const uploadImageMutation = useMutation(uploadImage, {
+    onSuccess: (data: any) => {
+      console.log(data);
+    },
+  });
+  const uploadURLMutation = useMutation(getUploadURL, {
+    onSuccess: (data: IUploadURLResponse) => {
+      uploadImageMutation.mutate({
+        uploadURL: data.uploadURL,
+        file: watch("file"),
+      });
+    },
+  });
+
   const onSubmit = (data: IUploadPostVariables) => {
     mutation.mutate(data);
+    uploadURLMutation.mutate();
   };
 
   return (
@@ -85,6 +111,9 @@ export default function UploadPost() {
             <FormControl>
               <FormLabel>タイトル</FormLabel>
               <Input {...register("title", { required: true })} type="text" />
+            </FormControl>
+            <FormControl>
+              <Input {...register("file")} type="file" accept="image/*" />
             </FormControl>
             <FormControl>
               <FormLabel>内容</FormLabel>
