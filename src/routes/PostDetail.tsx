@@ -12,6 +12,7 @@ import {
   Text,
   VStack,
 } from "@chakra-ui/react";
+import { Link } from "react-router-dom";
 
 export default function PostDetail() {
   const { postPk } = useParams();
@@ -25,7 +26,12 @@ export default function PostDetail() {
       <Heading>{data?.title}</Heading>
       <HStack>
         <Box mt={3}>
-          <Text fontSize={"xl"}>作成者: {data?.author.name}</Text>
+          <Text fontSize={"xl"}>
+            作成者: 
+            <Link to={`/OtherInfo/${data?.author?.id}`}>
+            {data?.author?.name}
+            </Link>
+            </Text>
         </Box>
         {data?.is_author ? (
           <Button mt={4} size={"sm"}>
@@ -56,7 +62,7 @@ export default function PostDetail() {
             {reviewsData?.map((review, index) => (
               <VStack key={index}>
                 <HStack>
-                  <Text>{review.user.name}</Text>
+                  <Text>{review.user?.name}</Text>
                   <Text>{review.review_content}</Text>
                   <Text>{review.created_at}</Text>
                 </HStack>

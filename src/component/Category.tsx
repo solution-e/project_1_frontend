@@ -7,10 +7,11 @@ import {
   Text,
   VStack,
 } from "@chakra-ui/react";
+import { Accordion, AccordionItem, AccordionButton, AccordionPanel, AccordionIcon } from '@chakra-ui/react';
 import { Link } from "react-router-dom";
 import { ICategory } from "../types";
 
-export default function Category({ id, name }: ICategory) {
+export default function Category({ id, name,parent_category }: ICategory) {
   return (
     <Link to={`/category/${id}/post`}>
       <Box borderBottom="1px" borderBottomColor="lightgray">

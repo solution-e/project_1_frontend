@@ -30,6 +30,7 @@ export interface IPostList {
 export interface ICategory {
   id: number;
   name: string;
+  parent_category
 }
 
 export interface IPostCreatedAt {
@@ -51,10 +52,12 @@ export interface IPostDetail {
 }
 
 interface IAuthor {
+  id : string;
   name: string;
 }
 
 export interface IUser {
+  id: number;
   last_login: string;
   username: string;
   email: string;
@@ -83,4 +86,10 @@ interface ISignUpSuccess {
 
 interface ISignUpError {
   fail: string;
+}
+
+interface IOtherInfo {
+  id: number;
+  name: string;
+  date_joined: string;
 }

@@ -6,6 +6,8 @@ import NotFound from "./routes/NotFound";
 import PostDetail from "./routes/PostDetail";
 import UploadPost from "./routes/UploadPost";
 import CategoryList from "./routes/CategoryList";
+import MyPostList from "./routes/MyPostList";
+import OtherInfo from "./routes/OtherInfo"
 
 const router = createBrowserRouter([
   {
@@ -37,6 +39,14 @@ const router = createBrowserRouter([
         path: "UserDetail/",
         element: <UserDetail />,
       },
+      {
+        path: "MyPostList/",
+        element: <MyPostList />,
+      },
+      {
+        path: "OtherInfo/:OtherId",
+        element:<OtherInfo />,
+      }
     ],
   },
 ]);
