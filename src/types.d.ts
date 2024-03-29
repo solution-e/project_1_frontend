@@ -69,9 +69,11 @@ export interface IUser {
 }
 
 export interface IReview {
+  id: number;
   user: IUser;
   review_content: string;
   created_at: string;
+  is_author:boolean;
 }
 
 interface ISignUpVariables {
@@ -93,4 +95,20 @@ interface IOtherInfo {
   id: number;
   name: string;
   date_joined: string;
+}
+
+interface IPostCount {
+  totalitems: number;
+}
+
+interface IfavoriteStatus {
+  isFavorite:boolean;
+}
+
+interface IIsLike {
+  islike:boolean;
+}
+
+interface IIsDislike {
+  isdislike:boolean;
 }

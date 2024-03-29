@@ -10,6 +10,20 @@ const instance = axios.create({
 export const getPostList = () =>
   instance.get("post/").then((response) => response.data);
 
+export const getPostListPagenate = ({ queryKey }: QueryFunctionContext) => {
+const [_, page] = queryKey;
+return instance
+  .get(`post/?page=${page}`)
+  .then((response) => response.data);
+};
+
+export const getCategoryPostListPagenate = ({ queryKey }: QueryFunctionContext) => {
+  const [_, categoryId ,page] = queryKey;
+  return instance
+    .get(`category/${categoryId}/post?page=${page}`)
+    .then((response) => response.data);
+  };
+
 export const getCategoryPostList = ({ queryKey }: QueryFunctionContext) => {
   const [_, categoryId] = queryKey;
   return instance
@@ -27,6 +41,17 @@ export const getCategoryInfo = ({ queryKey }: QueryFunctionContext) => {
     .then((response) => response.data);
 };
 
+export const getPostCount = () =>
+  instance.get("post/count").then((responce) => responce.data);
+
+export const getCategoryPostCount = ({ queryKey }: QueryFunctionContext) => {
+  const [_, categoryPk] = queryKey;
+  return instance
+    .get(`category/${categoryPk}/count`)
+    .then((response) => response.data);
+};
+
+
 export const getCategoryPost = ({ queryKey }: QueryFunctionContext) => {
   const [_, categoryPk] = queryKey;
   return instance
@@ -37,6 +62,27 @@ export const getCategoryPost = ({ queryKey }: QueryFunctionContext) => {
 export const getPostDetail = ({ queryKey }: QueryFunctionContext) => {
   const [_, postPk] = queryKey;
   return instance.get(`post/${postPk}`).then((response) => response.data);
+};
+export const DeletePostDetail = async ({ queryKey }: { queryKey: (string | number)[] }) => {
+  const [_, postPk] = queryKey;
+  return instance.delete(`post/${postPk}`, {
+    headers: {
+      "X-CSRFTOKEN": Cookie.get("csrftoken") || "",
+    },
+  })
+  .then((response) => response.data);
+};
+
+
+
+export const DeleteReviewDetail = async ({ queryKey }: { queryKey: (string | number)[] }) => {
+  const [_, reviewPk] = queryKey;
+  return instance.put(`review/${reviewPk}/delete`, null,{
+    headers: {
+      "X-CSRFTOKEN": Cookie.get("csrftoken") || "",
+    },
+  })
+  .then((response) => response.data);
 };
 
 export const getPostReviews = ({ queryKey }: QueryFunctionContext) => {
@@ -136,6 +182,21 @@ export const uploadPost = (variables: IUploadPostVariables) =>
     })
     .then((response) => response.data);
 
+export interface IUpdatePostVariables {
+  title: string;
+  content: string;
+  category: number;
+  postPk: number;
+}
+export const updatePost = (variables: IUpdatePostVariables) =>
+    instance
+      .put(`post/${variables.postPk}`, variables, {
+        headers: {
+          "X-CSRFToken": Cookie.get("csrftoken") || "",
+        },
+      })
+      .then((response) => response.data);
+
 export interface IUserUpdateSuccess {
   ok: string;
 }
@@ -204,3 +265,122 @@ export const getOtherInfo = ({ queryKey }: QueryFunctionContext) => {
     .get(`user/${otherId}/Other`)
     .then((response) => response.data);
 };
+export interface IUploadImages {
+  blob: Blob;
+  uploadURL: string;
+  regexwords:string;
+}
+
+export const uploadImages = ({ blob, uploadURL }: IUploadImages) => {
+  const formData = new FormData();
+  formData.append("file",blob)
+
+  return axios
+    .post(uploadURL, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    })
+    .then((response) => response.data);
+};
+
+export interface IUploadReviewVariables {
+  review_content: string;
+  postPk: number;
+}
+
+export const uploadReview = (variables: IUploadReviewVariables) =>
+  instance
+    .post(`post/${variables.postPk}/reviews`, variables, {
+      headers: {
+        "X-CSRFToken": Cookie.get("csrftoken") || "",
+      },
+    })
+    .then((response) => response.data);
+
+export const isLike = ({ queryKey }: QueryFunctionContext) => {
+  const [_, postpk] = queryKey;
+  return instance
+    .get(`post/${postpk}/like`)
+    .then((response) => response.data);
+};
+
+export const addLike = async ({ queryKey }: { queryKey: (string | number)[] }) => {
+  const [_, postpk] = queryKey;
+  return instance
+    .put(`post/${postpk}/like`, null,{
+      headers: {
+        "X-CSRFTOKEN": Cookie.get("csrftoken") || "",
+      },
+    })
+    .then((response) => response.data);
+}
+
+export const deleteLike = async ({ queryKey }: { queryKey: (string | number)[] }) => {
+  const [_, postpk] = queryKey;
+  return instance
+    .delete(`post/${postpk}/like`,{
+      headers: {
+        "X-CSRFTOKEN": Cookie.get("csrftoken") || "",
+      },
+    })
+    .then((response) => response.data);
+}
+
+export const isDislike = ({ queryKey }: QueryFunctionContext) => {
+  const [_, postpk] = queryKey;
+  return instance
+    .get(`post/${postpk}/dislike`)
+    .then((response) => response.data);
+};
+
+export const addDislike = async ({ queryKey }: { queryKey: (string | number)[] }) => {
+  const [_, postpk] = queryKey;
+  return instance
+    .put(`post/${postpk}/dislike`, null,{
+      headers: {
+        "X-CSRFTOKEN": Cookie.get("csrftoken") || "",
+      },
+    })
+    .then((response) => response.data);
+}
+
+export const deleteDislike = async ({ queryKey }: { queryKey: (string | number)[] }) => {
+  const [_, postpk] = queryKey;
+  return instance
+    .delete(`post/${postpk}/dislike`,{
+      headers: {
+        "X-CSRFTOKEN": Cookie.get("csrftoken") || "",
+      },
+    })
+    .then((response) => response.data);
+}
+
+export const isFavorite = ({ queryKey }: QueryFunctionContext) => {
+  const [_, categorypk] = queryKey;
+  return instance
+    .get(`favorite/${categorypk}/exists`)
+    .then((response) => response.data);
+};
+
+export const addFavorite = async ({ queryKey }: { queryKey: (string | number)[] }) => {
+  const [_, categorypk] = queryKey;
+  return instance
+    .post(`favorite/${categorypk}/toggle`, null,{
+      headers: {
+        "X-CSRFTOKEN": Cookie.get("csrftoken") || "",
+      },
+    })
+    .then((response) => response.data);
+}
+
+export const removeFavorite = async ({ queryKey }: { queryKey: (string | number)[] }) => {
+  const [_, categorypk] = queryKey;
+  return instance
+    .put(`favorite/${categorypk}/toggle`, null, {
+      headers: {
+        "X-CSRFTOKEN": Cookie.get("csrftoken") || "",
+      },
+    })
+    .then((response) => response.data);
+}

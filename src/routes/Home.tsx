@@ -1,23 +1,54 @@
-import { Box, Grid, VStack, Flex, Button, Link } from "@chakra-ui/react";
-import { useQuery } from "@tanstack/react-query";
-import { getPostList, getCategoryPostList } from "../api";
+import { Box, Grid,useToast,VStack, Flex, Button, Link,Icon } from "@chakra-ui/react";
+import { FaStar } from "react-icons/fa";
+import { useMutation,useQuery } from "@tanstack/react-query";
+import { getPostListPagenate, getPostCount, getCategoryPostListPagenate, isFavorite,addFavorite,removeFavorite } from "../api";
 import Post from "../component/Post";
-import { IPostList } from "../types";
+import { IPostCount, IPostList, IfavoriteStatus } from "../types";
 import { useParams, useLocation } from "react-router-dom";
 import userUser from "../lib/useUser";
+import React, { useState, useEffect } from 'react';
+import Pagenate from "../component/Pagenate"
 
 export default function Home() {
-  const { categoryId } = useParams();
-  console.log(categoryId);
-  const { isLoggedIn } = userUser();
-  const searchquery = categoryId !== undefined ? "category" : "post";
-
-  const { data } = useQuery<IPostList[]>({
-    queryKey: [searchquery, categoryId],
-    queryFn: searchquery === "category" ? getCategoryPostList : getPostList,
-  });
+  const toast = useToast();
   const location = useLocation();
   const isCategoryInUrl = location.pathname.includes("category");
+  const { categoryId } = useParams();
+  const { isLoggedIn } = userUser();
+  const {data:isfavorite} = useQuery<IfavoriteStatus>({
+    queryKey: ["favorite",categoryId],
+    queryFn: isFavorite,
+  })
+  const [favorited, setFavorited] = useState<boolean | undefined>(isfavorite?.isFavorite);
+  useEffect(() => {
+    if (isfavorite !== undefined) {
+      setFavorited(isfavorite.isFavorite);
+    }
+  }, [isfavorite]);
+  const params = new URLSearchParams(location.search);
+  const page = params.get('page') || '1';
+  const searchquery = categoryId !== undefined ? "category" : "post";
+  let queryFn;
+  let queryKey;
+  if (searchquery === "category") {
+    queryFn = getCategoryPostListPagenate;
+    queryKey = [searchquery, categoryId,page];
+  } else {
+    queryFn = getPostListPagenate;
+    queryKey = [searchquery, page];
+  }
+  const { data } = useQuery<IPostList[]>({
+      queryKey: queryKey,
+      queryFn: queryFn,
+    });
+
+  const {data:totalItems} = useQuery<IPostCount>({
+    queryKey: ["post"],
+    queryFn: getPostCount,
+  })
+
+  const AddFavoriteMutation = useMutation((categoryId: number) => addFavorite({ queryKey: ['favorite', Number(categoryId)] }));
+  const RemoveFavoriteMutation = useMutation((categoryId: number) => removeFavorite({ queryKey: ['favorite', Number(categoryId)] }));
 
   function formatTime(dateString: string) {
     const date = new Date(dateString);
@@ -25,6 +56,38 @@ export default function Home() {
     const minutes = date.getMinutes().toString().padStart(2, "0");
     return `${hours}:${minutes}`;
   }
+  
+  const handleFavoriteButtonClick = async () => {
+    try {
+      if (favorited) {
+        try {
+          await RemoveFavoriteMutation.mutateAsync(Number(categoryId));
+          toast({
+            status: "success",
+            title: "お気に入りを解除しました",
+            position: "bottom",
+          });
+        } catch (error) {
+            console.error("エラーが発生しました:", error);
+        }
+      } else {
+        try {
+          await AddFavoriteMutation.mutateAsync(Number(categoryId));
+          toast({
+            status: "success",
+            title: "お気に入りに設定しました",
+            position: "bottom",
+          });
+        } catch (error) {
+            console.error("エラーが発生しました:", error);
+        }
+      }
+      setFavorited(!favorited);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
 
   return (
     <Flex justifyContent="center" alignItems="center">
@@ -41,18 +104,25 @@ export default function Home() {
             marginTop={100}
           >
             <VStack>
-              <Link href={`/category/`}>
                 <Box>
-                  <Button>カテゴリー</Button>
+                  <Link href={`/category/`}>
+                    <Button>カテゴリー</Button>
+                  </Link>
                   {isLoggedIn && isCategoryInUrl && (
                     <Link href={`/post/upload?category=${categoryId}`}>
                       <Button ml={3}>投稿</Button>
                     </Link>
-                  )}
+                  )
+                  }
+                  {isLoggedIn && isCategoryInUrl && (
+                    <Button variant="unstyled" onClick={handleFavoriteButtonClick}>
+                      <Icon as={FaStar} color={favorited ? "yellow" : "black"} ml={3} />
+                    </Button>
+                  )
+                  }
                 </Box>
-              </Link>
             </VStack>
-            {data?.map((post) => (
+            {data && Array.isArray(data) && data.map((post) => (
               <Post
                 key={post.id}
                 id={post.id}
@@ -63,6 +133,8 @@ export default function Home() {
                 created_at={formatTime(post.created_at)}
               />
             ))}
+            {totalItems &&
+            <Pagenate currentPage={page} totalItems={totalItems.totalitems}></Pagenate>}
           </Grid>
         </VStack>
       </Box>

@@ -6,46 +6,98 @@ import {
   FormLabel,
   Heading,
   Input,
+  Select,
   Text,
-  Textarea,
   VStack,
   useToast,
 } from "@chakra-ui/react";
+import ReactQuill from "react-quill";
 import ProtectedPage from "../component/ProtectedPage";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { ICategory, IPostDetail } from "../types";
-import {
-  getCategoryInfo,
-  uploadPost,
-  IUploadPostVariables,
-  uploadImage,
-  getUploadURL,
-} from "../api";
-import { useForm, useWatch } from "react-hook-form";
-import { useNavigate, useLocation, useParams } from "react-router-dom";
-import { useEffect } from "react";
+import { getCategory, uploadPost,uploadImages,getUploadURL } from "../api";
+import { useForm } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
+import { useState,useRef } from "react";
+import { IUploadPostVariables } from "../api";
+import "react-quill/dist/quill.snow.css";
+import BasetoUrl from "../component/BasetoUrl";
+import { blob } from "stream/consumers";
 
-interface IUploadURLResponse {
-  id: string;
-  uploadURL: string;
+interface IForm {
+  file: string[];
 }
 
+interface IUploadURLResponse {
+    result: {
+        id: string;
+        uploadURL: string;
+    }
+}
+
+
 export default function UploadPost() {
-  const location = useLocation();
-  const searchParams = new URLSearchParams(location.search);
-  const categoryPk = searchParams.get("category");
-
-  const { data: categoryData } = useQuery<ICategory>({
-    queryKey: ["category", categoryPk],
-    queryFn: getCategoryInfo,
-  });
-
-  const { register, handleSubmit, setValue } = useForm<IUploadPostVariables>();
+  const [content, setContent] = useState("");
+  const contentRef = useRef("");
+  const { register, handleSubmit,watch  } = useForm<IUploadPostVariables>();
   const toast = useToast();
   const navigate = useNavigate();
+  const toolbarOptions = [
+    ["link", "image", "video"],
+    [{ header: [1, 2, 3, false] }],
+    ["bold", "italic", "underline", "strike"],
+    ["blockquote"],
+    [{ list: "ordered" }, { list: "bullet" }],
+    [{ color: [] }, { background: [] }],
+    [{ align: [] }],
+  ];
 
+  const formats = [
+    "header",
+    "font",
+    "size",
+    "bold",
+    "italic",
+    "underline",
+    "strike",
+    "align",
+    "blockquote",
+    "list",
+    "bullet",
+    "indent",
+    "background",
+    "color",
+    "link",
+    "image",
+    "video",
+    "width",
+  ];
+
+  const modules = {
+    toolbar: {
+      container: toolbarOptions,
+    },
+  };
+
+  const uploadImageMutation = useMutation(uploadImages, {
+    onSuccess: async (data: any, variables: { regexwords: string }) => {
+      console.log("success");
+      contentRef.current = contentRef.current.replace(variables.regexwords, data.result.variants);
+    },
+  });
+  
+  const uploadURLMutation = useMutation(getUploadURL, {
+    onSuccess: async (data: IUploadURLResponse, variables: { blob: Blob, regexword: string }) => {
+      await uploadImageMutation.mutateAsync({
+        uploadURL: data.result.uploadURL,
+        blob: variables.blob,
+        regexwords: variables.regexword,
+      });
+    },
+  });
+  
   const mutation = useMutation(uploadPost, {
-    onSuccess: (data: IPostDetail) => {
+    onSuccess: async (data) => {
       toast({
         status: "success",
         title: "投稿しました",
@@ -54,30 +106,36 @@ export default function UploadPost() {
       navigate(`/post/${data.id}`);
     },
   });
+  const { data: categoryData } = useQuery<ICategory[]>(
+    ["category"],
+    getCategory
+  );
 
-  useEffect(() => {
-    if (categoryData) {
-      setValue("category", categoryData.id);
+  const onSubmit = async(formData: IUploadPostVariables) => {
+    const imgSrcRegex = /<img.*?src="(.*?)"/g;
+    const imgSrcMatches: string[] = [];
+    contentRef.current = content;
+    let match;
+    while ((match = imgSrcRegex.exec(content)) !== null) {
+      imgSrcMatches.push(match[1]);
     }
-  }, [setValue, categoryData]);
+    const blob = BasetoUrl(imgSrcMatches);
+    const uploadPromises = blob.map(async (blobItem, i) => {
+      await uploadURLMutation.mutateAsync({ blob: blobItem, regexword: imgSrcMatches[i] });
+    });
+  
+    await Promise.all(uploadPromises);
+  
+    console.log(contentRef.current);
+    const dataToSubmit = {
+      ...formData,
+      content: contentRef.current,
+    };
+    await mutation.mutate(dataToSubmit);
+  };
 
-  const uploadImageMutation = useMutation(uploadImage, {
-    onSuccess: (data: any) => {
-      console.log(data);
-    },
-  });
-  const uploadURLMutation = useMutation(getUploadURL, {
-    onSuccess: (data: IUploadURLResponse) => {
-      uploadImageMutation.mutate({
-        uploadURL: data.uploadURL,
-        file: watch("file"),
-      });
-    },
-  });
-
-  const onSubmit = (data: IUploadPostVariables) => {
-    mutation.mutate(data);
-    uploadURLMutation.mutate();
+  const handleQuillChange = (value: string) => {
+    setContent(value);
   };
 
   return (
@@ -100,25 +158,28 @@ export default function UploadPost() {
           >
             <FormControl>
               <FormLabel>カテゴリー</FormLabel>
-              <FormLabel {...register("category", { required: true })}>
-                {categoryData && (
-                  <option key={categoryData.id} value={categoryData.id}>
-                    {categoryData.name}
+              <Select
+                {...register("category", { required: true })}
+                placeholder="カテゴリーを選択してください"
+              >
+                {categoryData?.map((category) => (
+                  <option key={category.id} value={category.id}>
+                    {category.name}
                   </option>
-                )}
-              </FormLabel>
+                ))}
+              </Select>
             </FormControl>
             <FormControl>
               <FormLabel>タイトル</FormLabel>
               <Input {...register("title", { required: true })} type="text" />
             </FormControl>
-            <FormControl>
-              <Input {...register("file")} type="file" accept="image/*" />
-            </FormControl>
-            <FormControl>
-              <FormLabel>内容</FormLabel>
-              <Textarea {...register("content", { required: true })} />
-            </FormControl>
+            <ReactQuill
+              style={{ width: "800px", height: "600px" }}
+              value={content}
+              onChange={handleQuillChange}
+              modules={modules}
+              formats={formats}
+            />
             {mutation.isError && (
               <Text color={"red"}>エラーが発生しました</Text>
             )}
