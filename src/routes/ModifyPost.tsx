@@ -32,7 +32,6 @@ import {
     const navigate = useNavigate();
     const location = useLocation();
     const modifypk = location.state?.modifypk;
-    console.log(modifypk);
     const { data } = useQuery<IPostDetail>([`post`, modifypk], getPostDetail);
     const toolbarOptions = [
         ["link", "image", "video"],

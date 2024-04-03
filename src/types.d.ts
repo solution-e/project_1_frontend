@@ -11,9 +11,25 @@ interface IPost {
   category: string;
   created_at: string;
   imageUrl: string;
+  total_likes: number;
+  total_dislikes: number;
 }
 
 export interface IPostList {
+  id: number;
+  category: ICategory;
+  title: string;
+  author: string;
+  photo: IPhoto[];
+  created_at: string;
+  content: string;
+  total_likes: number;
+  total_dislikes: number;
+  is_author: boolean;
+  review_count: number;
+}
+
+export interface ISortPostList {
   id: number;
   category: ICategory;
   title: string;

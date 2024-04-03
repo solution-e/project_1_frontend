@@ -64,6 +64,8 @@ export default function OtherInfo() {
                 title={post.title}
                 category={post.category.name}
                 created_at={formatTime(post.created_at)}
+                total_likes = {post.total_likes}
+                total_dislikes = {post.total_dislikes}
               />
             ))}
           </Grid>

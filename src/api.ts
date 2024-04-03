@@ -358,7 +358,10 @@ export const deleteDislike = async ({ queryKey }: { queryKey: (string | number)[
 
 export const isFavorite = ({ queryKey }: QueryFunctionContext) => {
   const [_, categorypk] = queryKey;
-  return instance
+  if (categorypk == undefined) {
+    return Promise.resolve(false);
+  }
+    return instance
     .get(`favorite/${categorypk}/exists`)
     .then((response) => response.data);
 };
@@ -384,3 +387,27 @@ export const removeFavorite = async ({ queryKey }: { queryKey: (string | number)
     })
     .then((response) => response.data);
 }
+
+export const GetLikeSortPostList  = ({ queryKey }: QueryFunctionContext) => {
+  const [_, page] = queryKey;
+  return instance
+    .get(`post/sort/likes?page=${page}`)
+    .then((response) => response.data);
+};
+
+export const GetLikeSortCategoryList = ({ queryKey }: QueryFunctionContext) => {
+  const [_, categoryId ,page] = queryKey;
+  return instance
+    .get(`category/${categoryId}/sort/likes?page=${page}`)
+    .then((response) => response.data);
+  };
+
+  export const getLikesSortPostCount = () =>
+  instance.get("post/sort/likes/count").then((responce) => responce.data);
+
+  export const getLikesSortCategoryPostCount = ({ queryKey }: QueryFunctionContext) => {
+    const [_, categoryPk] = queryKey;
+    return instance
+      .get(`category/${categoryPk}/sort/likes/count`)
+      .then((response) => response.data);
+  };

@@ -15,9 +15,9 @@ import ReactQuill from "react-quill";
 import ProtectedPage from "../component/ProtectedPage";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { ICategory, IPostDetail } from "../types";
-import { getCategory, uploadPost,uploadImages,getUploadURL } from "../api";
+import { getCategory, uploadPost,uploadImages,getUploadURL,getCategoryInfo } from "../api";
 import { useForm } from "react-hook-form";
-import { useNavigate } from "react-router-dom";
+import { useNavigate,useParams,useLocation } from "react-router-dom";
 import { useState,useRef } from "react";
 import { IUploadPostVariables } from "../api";
 import "react-quill/dist/quill.snow.css";
@@ -39,6 +39,12 @@ interface IUploadURLResponse {
 export default function UploadPost() {
   const [content, setContent] = useState("");
   const contentRef = useRef("");
+  const location = useLocation();
+  const categoryPk = location.state?.categorypk;
+  const { data: categoryData } = useQuery<ICategory>({
+    queryKey: ["category", categoryPk],
+    queryFn: getCategoryInfo,
+  });
   const { register, handleSubmit,watch  } = useForm<IUploadPostVariables>();
   const toast = useToast();
   const navigate = useNavigate();
@@ -106,10 +112,6 @@ export default function UploadPost() {
       navigate(`/post/${data.id}`);
     },
   });
-  const { data: categoryData } = useQuery<ICategory[]>(
-    ["category"],
-    getCategory
-  );
 
   const onSubmit = async(formData: IUploadPostVariables) => {
     const imgSrcRegex = /<img.*?src="(.*?)"/g;
@@ -125,13 +127,17 @@ export default function UploadPost() {
     });
   
     await Promise.all(uploadPromises);
-  
-    console.log(contentRef.current);
-    const dataToSubmit = {
-      ...formData,
-      content: contentRef.current,
-    };
-    await mutation.mutate(dataToSubmit);
+    
+    if(categoryData == undefined) {
+      navigate("/")
+    } else {
+      const dataToSubmit = {
+        ...formData,
+        content: contentRef.current,
+        category:categoryData.id
+      };
+      await mutation.mutate(dataToSubmit);
+    }
   };
 
   const handleQuillChange = (value: string) => {
@@ -158,16 +164,9 @@ export default function UploadPost() {
           >
             <FormControl>
               <FormLabel>カテゴリー</FormLabel>
-              <Select
-                {...register("category", { required: true })}
-                placeholder="カテゴリーを選択してください"
-              >
-                {categoryData?.map((category) => (
-                  <option key={category.id} value={category.id}>
-                    {category.name}
-                  </option>
-                ))}
-              </Select>
+              <Text>
+                {categoryData?.name}
+              </Text>
             </FormControl>
             <FormControl>
               <FormLabel>タイトル</FormLabel>

@@ -1,30 +1,24 @@
-import { Box, Grid,useToast,VStack, Flex, Button, Link,Icon } from "@chakra-ui/react";
+import { Box, Grid,useToast,VStack, Flex, Button, Link,Icon,Tabs,TabList,TabPanels,Tab,TabPanel } from "@chakra-ui/react";
 import { FaStar } from "react-icons/fa";
 import { useMutation,useQuery } from "@tanstack/react-query";
-import { getPostListPagenate, getPostCount, getCategoryPostListPagenate, isFavorite,addFavorite,removeFavorite } from "../api";
+import { getPostListPagenate, getPostCount, getCategoryPostListPagenate, isFavorite,addFavorite,
+  removeFavorite,getCategoryPostCount,GetLikeSortPostList,GetLikeSortCategoryList,
+  getLikesSortPostCount,getLikesSortCategoryPostCount, } from "../api";
 import Post from "../component/Post";
-import { IPostCount, IPostList, IfavoriteStatus } from "../types";
-import { useParams, useLocation } from "react-router-dom";
+import { IPostCount, IPostList, IfavoriteStatus,ISortPostList } from "../types";
+import { useParams, useLocation, useNavigate } from "react-router-dom";
 import userUser from "../lib/useUser";
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import Pagenate from "../component/Pagenate"
 
 export default function Home() {
   const toast = useToast();
   const location = useLocation();
+  const navigate = useNavigate();
   const isCategoryInUrl = location.pathname.includes("category");
   const { categoryId } = useParams();
   const { isLoggedIn } = userUser();
-  const {data:isfavorite} = useQuery<IfavoriteStatus>({
-    queryKey: ["favorite",categoryId],
-    queryFn: isFavorite,
-  })
-  const [favorited, setFavorited] = useState<boolean | undefined>(isfavorite?.isFavorite);
-  useEffect(() => {
-    if (isfavorite !== undefined) {
-      setFavorited(isfavorite.isFavorite);
-    }
-  }, [isfavorite]);
+  
   const params = new URLSearchParams(location.search);
   const page = params.get('page') || '1';
   const searchquery = categoryId !== undefined ? "category" : "post";
@@ -40,12 +34,48 @@ export default function Home() {
   const { data } = useQuery<IPostList[]>({
       queryKey: queryKey,
       queryFn: queryFn,
-    });
+  });
 
-  const {data:totalItems} = useQuery<IPostCount>({
-    queryKey: ["post"],
-    queryFn: getPostCount,
+  const SortQuery = searchquery === "category" ? GetLikeSortCategoryList : GetLikeSortPostList
+  const { data:SortListData } = useQuery<IPostList[]>({
+    queryKey: [searchquery,Number(page)],
+    queryFn: SortQuery,
+  });
+  if (searchquery === "category") {
+    queryFn = getCategoryPostCount;
+    queryKey = ["category", categoryId];
+  } else {
+    queryFn = getPostCount;
+    queryKey = [searchquery];
+  }
+  const { data: totalItems } = useQuery<IPostCount>({
+    queryKey: queryKey,
+    queryFn: queryFn,
+  });
+  
+  if (searchquery === "category") {
+    queryFn = getLikesSortCategoryPostCount;
+    queryKey = ["category", Number(categoryId)];
+  } else {
+    queryFn = getLikesSortPostCount;
+    queryKey = [searchquery];
+  }
+  const { data: likesSortTotalItems } = useQuery<IPostCount>({
+    queryKey: queryKey,
+    queryFn: queryFn,
+  });
+
+  const {data:isfavorite} = useQuery<IfavoriteStatus>({
+    queryKey: ["favorite",categoryId],
+    queryFn: isFavorite,
   })
+  const [favorited, setFavorited] = useState<boolean | undefined>(isfavorite?.isFavorite);
+  useEffect(() => {
+    if (isfavorite !== undefined) {
+      setFavorited(isfavorite.isFavorite);
+    }
+  }, [isfavorite]);
+
 
   const AddFavoriteMutation = useMutation((categoryId: number) => addFavorite({ queryKey: ['favorite', Number(categoryId)] }));
   const RemoveFavoriteMutation = useMutation((categoryId: number) => removeFavorite({ queryKey: ['favorite', Number(categoryId)] }));
@@ -109,9 +139,7 @@ export default function Home() {
                     <Button>カテゴリー</Button>
                   </Link>
                   {isLoggedIn && isCategoryInUrl && (
-                    <Link href={`/post/upload?category=${categoryId}`}>
-                      <Button ml={3}>投稿</Button>
-                    </Link>
+                      <Button ml={3} onClick={() => {navigate('/post/upload',{state:{categorypk:categoryId}})}}>投稿</Button>
                   )
                   }
                   {isLoggedIn && isCategoryInUrl && (
@@ -122,7 +150,14 @@ export default function Home() {
                   }
                 </Box>
             </VStack>
-            {data && Array.isArray(data) && data.map((post) => (
+            <Tabs variant='enclosed'>
+              <TabList>
+                <Tab>ALL</Tab>
+                <Tab>Likes</Tab>
+              </TabList>
+              <TabPanels>
+              <TabPanel>
+                {data && Array.isArray(data) && data.map((post) => (
               <Post
                 key={post.id}
                 id={post.id}
@@ -131,10 +166,33 @@ export default function Home() {
                 title={post.title}
                 category={post.category.name}
                 created_at={formatTime(post.created_at)}
+                total_likes = {post.total_likes}
+                total_dislikes = {post.total_dislikes}
               />
             ))}
             {totalItems &&
             <Pagenate currentPage={page} totalItems={totalItems.totalitems}></Pagenate>}
+            </TabPanel>
+            <TabPanel>
+                { SortListData && Array.isArray(SortListData) && SortListData.map((post) => (
+              <Post
+                key={post.id}
+                id={post.id}
+                imageUrl={post.photo[0]?.photo_file}
+                review_count={post.review_count}
+                title={post.title}
+                category={post.category.name}
+                created_at={formatTime(post.created_at)}
+                total_likes = {post.total_likes}
+                total_dislikes = {post.total_dislikes}
+              />
+            ))}
+            {likesSortTotalItems &&
+            <Pagenate currentPage={page} totalItems={likesSortTotalItems.totalitems}></Pagenate>}
+            </TabPanel>
+            </TabPanels>
+            </Tabs>
+            
           </Grid>
         </VStack>
       </Box>

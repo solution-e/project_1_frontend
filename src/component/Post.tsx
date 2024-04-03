@@ -1,6 +1,7 @@
-import { Box, Container, HStack, Heading, Image, Text } from "@chakra-ui/react";
+import { Box, Container, HStack, Heading, Image, Text,Icon } from "@chakra-ui/react";
 import { Link } from "react-router-dom";
 import { IPost } from "../types";
+import { FaThumbsUp,FaThumbsDown } from 'react-icons/fa';
 
 const defaultImageUrl = "./default_no_image.jpeg";
 
@@ -11,6 +12,8 @@ export default function Post({
   category,
   created_at,
   review_count,
+  total_likes,
+  total_dislikes,
 }: IPost) {
   return (
     <Link to={`/post/${id}`}>
@@ -55,6 +58,8 @@ export default function Post({
           <Text color={"dimgray"} ml={20}>
             {category}
           </Text>
+          <Text color={"dimgray"}><Icon as={FaThumbsUp}/>{total_likes}</Text>
+          <Text color={"dimgray"}><Icon as={FaThumbsDown}/>{total_dislikes}</Text>
           <Text color={"dimgray"}>{created_at}</Text>
         </HStack>
       </Box>
