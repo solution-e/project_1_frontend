@@ -15,18 +15,25 @@ import {
   import ProtectedPage from "../component/ProtectedPage";
   import { useMutation, useQuery } from "@tanstack/react-query";
   import { ICategory, IPostDetail } from "../types";
-  import { getCategory, updatePost,uploadImages,getUploadURL, getPostDetail } from "../api";
+  import { getCategory, updatePost, getPostDetail,uploadImages,getUploadURL } from "../api";
   import { useForm } from "react-hook-form";
   import { useNavigate,useLocation } from "react-router-dom";
   import { useState,useRef,useEffect } from "react";
   import { IUploadPostVariables } from "../api";
   import "react-quill/dist/quill.snow.css";
   import BasetoUrl from "../component/BasetoUrl";
-  import { blob } from "stream/consumers";
+
   
-  
+  interface IUploadURLResponse {
+    result: {
+        id: string;
+        uploadURL: string;
+    }
+  }  
   export default function ModifyPost() {
     const [content, setContent] = useState("");
+    const contentRef = useRef("");
+    const mainImgRef = useRef("");
     const { register, handleSubmit } = useForm<IUploadPostVariables>();
     const toast = useToast();
     const navigate = useNavigate();
@@ -69,6 +76,27 @@ import {
           container: toolbarOptions,
         },
       };
+
+      const uploadImageMutation = useMutation(uploadImages, {
+        onSuccess: async (data: any, variables: { regexwords: string,count: number }) => {
+          console.log("success");
+          contentRef.current = contentRef.current.replace(variables.regexwords, data.result.variants);
+          if (variables.count == 0) {
+            mainImgRef.current = data.result.variants;
+          } 
+        },
+      });
+      
+      const uploadURLMutation = useMutation(getUploadURL, {
+        onSuccess: async (data: IUploadURLResponse, variables: { blob: Blob, regexword: string,count: number }) => {
+          await uploadImageMutation.mutateAsync({
+            uploadURL: data.result.uploadURL,
+            blob: variables.blob,
+            regexwords: variables.regexword,
+            count:variables.count,
+          });
+        },
+      });
     
       const mutation = useMutation(updatePost, {
         onSuccess: (data: IPostDetail) => {
@@ -86,11 +114,25 @@ import {
         getCategory
       );
     
-      const onSubmit = (formData: IUploadPostVariables) => {
+      const onSubmit = async(formData: IUploadPostVariables) => {
+        const imgSrcRegex = /<img.*?src="(.*?)"/g;
+        const imgSrcMatches: string[] = [];
+        contentRef.current = content;
+        let match;
+        while ((match = imgSrcRegex.exec(content)) !== null) {
+          imgSrcMatches.push(match[1]);
+        }
+        const blob = BasetoUrl(imgSrcMatches);
+        const uploadPromises = blob.map(async (blobItem, i) => {
+          await uploadURLMutation.mutateAsync({ blob: blobItem, regexword: imgSrcMatches[i],count:i });
+        });
+      
+        await Promise.all(uploadPromises);
         const dataToSubmit = {
           ...formData,
           content,
-          postPk:modifypk
+          postPk:modifypk,
+          mainimage:mainImgRef.current[0],
         };
         mutation.mutate(dataToSubmit);
       };

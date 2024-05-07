@@ -1,5 +1,5 @@
 import {  useNavigate, useParams } from "react-router-dom";
-import { DeletePostDetail,DeleteReviewDetail ,getPostDetail, getPostReviews,IUploadPostVariables, uploadReview,isLike,deleteLike,addLike,isDislike,addDislike,deleteDislike } from "../api";
+import { DeletePostDetail,DeleteReviewDetail ,getPostDetail, getPostReviews,IUploadPostVariables, uploadReview,isLike,deleteLike,addLike,isDislike,addDislike,deleteDislike, IUpdatePostVariables, IUpdateReviewVariables, updateReview } from "../api";
 import { IIsLike, IPostDetail, IReview ,IIsDislike} from "../types";
 import {
   Box,
@@ -14,22 +14,22 @@ import {
   Modal,
   ModalOverlay,
   ModalContent,
-  ModalHeader,
   ModalFooter,
   ModalBody,
   ModalCloseButton,
   Center,
+  Flex,
+  Input,
 } from "@chakra-ui/react";
 import { Icon } from '@chakra-ui/react';
 import { Link } from "react-router-dom";
 import "react-quill/dist/quill.snow.css";
-import ReactQuill from "react-quill";
 import { useState,useRef } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import baseToUrl from "../component/BasetoUrl";
 import { uploadImages,getUploadURL } from "../api";
 import { useForm } from "react-hook-form";
 import { FaThumbsUp,FaThumbsDown } from 'react-icons/fa';
+import {formarYearToMinutes} from '../component/FormatTime'
 
 
 interface IUploadURLResponse {
@@ -66,17 +66,15 @@ export default function PostDetail() {
   const [disliked, setDisLiked] = useState<boolean | undefined>(isdislike?.isdislike);
   const navigate = useNavigate();
   const contentRef = useRef("");
+  const reviewPkRef = useRef<number | null>(null);
   const { register, handleSubmit,watch  } = useForm<IUploadPostVariables>();
   const toast = useToast();
-  const toolbarOptions = [
-    ["link", "image", "video"],
-    [{ header: [1, 2, 3, false] }],
-    ["bold", "italic", "underline", "strike"],
-    ["blockquote"],
-    [{ list: "ordered" }, { list: "bullet" }],
-    [{ color: [] }, { background: [] }],
-    [{ align: [] }],
-  ];
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [editingReviewContent, setEditingReviewContent] = useState("");
+  const [isEditing, setIsEditing] = useState(false);
+  const [isReplyReview, setIsReplyReview] =useState(false);
+  const [parentReviewId, setParentReviewId] = useState<number | null>(null);
+  const replyInputRef = useRef<HTMLInputElement>(null);
 
   const deletePostMutation = useMutation((postId: number) => DeletePostDetail({ queryKey: ['post', postId] }));
   const deleteReviewMutation = useMutation((reviewId: number) => DeleteReviewDetail({ queryKey: ['review', reviewId] }));
@@ -91,35 +89,6 @@ export default function PostDetail() {
     }
   }
 
-  const formats = [
-    "header",
-    "font",
-    "size",
-    "bold",
-    "italic",
-    "underline",
-    "strike",
-    "align",
-    "blockquote",
-    "list",
-    "bullet",
-    "indent",
-    "background",
-    "color",
-    "link",
-    "image",
-    "video",
-    "width",
-  ];
-
-  const modules = {
-    toolbar: {
-      container: toolbarOptions,
-    },
-  };
-  const handleQuillChange = (value: string) => {
-    setContent(value);
-  };
   const handleDeletePost = async (postId: number) => {
     try {
       await deletePostMutation.mutateAsync(postId);
@@ -162,9 +131,21 @@ export default function PostDetail() {
         uploadURL: data.result.uploadURL,
         blob: variables.blob,
         regexwords: variables.regexword,
+        count:0,
       });
     },
   });
+
+  const updateReviewMutation = useMutation(updateReview,{
+    onSuccess: async(data) => {
+      toast({
+        status:"success",
+        title:"編集が完了しました",
+        position:"bottom"
+      });
+      window.location.reload();
+    },
+  })
   
   const mutation = useMutation(uploadReview, {
     onSuccess: async (data) => {
@@ -178,24 +159,10 @@ export default function PostDetail() {
   });
 
   const onSubmit = async(formData: IUploadPostVariables) => {
-    const imgSrcRegex = /<img.*?src="(.*?)"/g;
-    const imgSrcMatches: string[] = [];
-    contentRef.current = content;
-    let match;
-    while ((match = imgSrcRegex.exec(content)) !== null) {
-      imgSrcMatches.push(match[1]);
-    }
-    const blob = baseToUrl(imgSrcMatches);
-    const uploadPromises = blob.map(async (blobItem, i) => {
-      await uploadURLMutation.mutateAsync({ blob: blobItem, regexword: imgSrcMatches[i] });
-    });
-  
-    await Promise.all(uploadPromises);
-  
-
     const dataToSubmit = {
-      review_content: contentRef.current,
-      postPk:Number(postPk)
+      review_content: inputRef.current ? inputRef.current.value : "",
+      postPk:Number(postPk),
+      parent_review:null,
     };
     await mutation.mutate(dataToSubmit);
   };
@@ -240,6 +207,15 @@ export default function PostDetail() {
     }
   };
 
+  const EditButtonClick = () => {
+    const dataToSubmit = {
+      review_content: inputRef.current ? inputRef.current.value : "",
+      reviewPk:reviewPkRef.current ?? 0,
+    };
+    updateReviewMutation.mutate(dataToSubmit);
+  };
+
+
   const handleDisLikeButtonClick = async (postId: number) => {
     try {
       if (disliked) {
@@ -266,8 +242,30 @@ export default function PostDetail() {
     }
   };
 
+  const handleEditButtonClick = async (reviewContent: string,reviewPk: number) => {
+    setIsEditing(true);
+    setEditingReviewContent(reviewContent);
+    reviewPkRef.current = reviewPk;
+  };
+
+  const handleCancelEdit = () => {
+    setEditingReviewContent("");
+    setIsEditing(false);
+    reviewPkRef.current = 0;
+  };
+
+  const replyButtonClick = (parentReviewId:number) => {
+    const dataToSubmit = {
+      review_content: replyInputRef.current ? replyInputRef.current.value : "",
+      postPk: postPk ? Number(postPk) : 0,
+      parent_review:parentReviewId,
+    };
+    mutation.mutate(dataToSubmit);
+  }
+
   return (
-    <Box mt={10} px={{ base: 10, lg: 40 }}>
+    <Flex paddingLeft="180px" paddingRight="180px">
+    <Box mt={10} px={{ base: 10, lg: 40 }} width="100%">
       <Heading>{data?.title}</Heading>
       <HStack>
         <Box mt={3}>
@@ -276,7 +274,10 @@ export default function PostDetail() {
             <Link to={`/OtherInfo/${data?.author?.id}`}>
             {data?.author?.name}
             </Link>
-            </Text>
+          </Text>
+          <Text>
+            {data?.updated_at && formatTime(data.updated_at)}
+          </Text>
         </Box>
         {data?.is_author ? (
           <Button mt={4} size={"sm"} onClick={() => {navigate('/post/modifypost',{state:{modifypk:postPk}})}} >
@@ -325,15 +326,41 @@ export default function PostDetail() {
         </Box>
         <VStack mt={8} alignItems="flex-start" >
         {reviewsData?.map((review, index) => (
-          <Box key={index} borderWidth="1px" p={4} borderRadius="md">
-            <Text>{review.user?.name}</Text>
-            <Text>{formatTime(review.created_at)}</Text>
-            <Text><div dangerouslySetInnerHTML={{ __html: review.review_content }} /></Text>
+          <Box key={index} width="100%" py={4} borderBottom="1px solid lightgray">
+            <HStack>
+            {review.parent_review !== null && 
+            <Box flex={0.2} alignContent="center" borderRight="1px solid lightgray">
+              ↳
+            </Box>
+            }
+            <Box flex={1} borderRight="1px solid lightgray">
+              {review.user?.name}
+            </Box>
+            <Box flex={3} borderRight="1px solid lightgray" onClick={() => {review.parent_review === null && setParentReviewId(review.id); setIsReplyReview(true);}}>
+              <div dangerouslySetInnerHTML={{ __html: review.review_content }} />
+            </Box>
+            <Box flex={1} borderRight="1px solid lightgray">
+              {formarYearToMinutes(review.created_at)}
+            </Box>
+            {review?.is_author && review?.review_content != "この投稿は削除されました" ? (
+            <Button borderRight="1px solid lightgray" variant="ghost" onClick={() => handleEditButtonClick(review.review_content,review.id)}>
+              編集
+            </Button>
+            ) : <Text textDecoration="line-through">編集</Text>}
           {review?.is_author && review?.review_content != "この投稿は削除されました" ? (
             <Button variant="ghost" onClick={() => review?.id && handleDeleteReview(review.id)}>
               削除
             </Button>
-            ) : null}
+            ) : 
+            <Text textDecoration="line-through">削除</Text>}
+            </HStack>
+            { isReplyReview && parentReviewId === review.id && review?.review_content != "この投稿は削除されました" &&
+            <Box>
+              <Input height="width 80%" type="text" textAlign="left" ref={replyInputRef}></Input>
+              <Button onClick={() => replyButtonClick(review.id)}>投稿</Button>
+              <Button onClick={() => {setIsReplyReview(false); setParentReviewId(null)}}>キャンセル</Button>
+            </Box>
+            }
           </Box>
         ))}
       </VStack>
@@ -344,18 +371,21 @@ export default function PostDetail() {
         mt={5}
       >
       <Text padding="10px" align="center">コメントを書く</Text>
-        <ReactQuill
-          style={{ width: "800px", height: "400px" }}
-          value={content}
-          onChange={handleQuillChange}
-          modules={modules}
-          formats={formats}
-        />
+      <Input height="400px" type="text" textAlign="left" defaultValue={editingReviewContent} ref={inputRef}></Input>
+      {!isEditing && (
         <Button marginTop="20px" type="submit" isLoading={mutation.isLoading}>
           投稿
         </Button>
+      )}
+        {isEditing && (
+          <Box>
+          <Button onClick={EditButtonClick}>保存</Button> 
+          <Button onClick={handleCancelEdit}>キャンセル</Button>
+          </Box>
+        )}
       </VStack>
       </Grid>
     </Box>
+    </Flex>
   );
 }

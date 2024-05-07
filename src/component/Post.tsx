@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { IPost } from "../types";
 import { FaThumbsUp,FaThumbsDown } from 'react-icons/fa';
 
-const defaultImageUrl = "./default_no_image.jpeg";
+const defaultImageUrl = "/default_no_image.jpeg";
 
 export default function Post({
   id,
@@ -55,12 +55,12 @@ export default function Post({
               [{review_count}]
             </Text>
           </Container>
-          <Text color={"dimgray"} ml={20}>
+          <Text color={"dimgray"} ml={10} width="100px">
             {category}
           </Text>
-          <Text color={"dimgray"}><Icon as={FaThumbsUp}/>{total_likes}</Text>
-          <Text color={"dimgray"}><Icon as={FaThumbsDown}/>{total_dislikes}</Text>
-          <Text color={"dimgray"}>{created_at}</Text>
+          <Text color={"orangered"} width="25px"><Icon as={FaThumbsUp}/>{total_likes}</Text>
+          <Text color={"dodgerblue"} width="25px"><Icon as={FaThumbsDown}/>{total_dislikes}</Text>
+          <Text color={"dimgray"} width="70px">{created_at}</Text>
         </HStack>
       </Box>
     </Link>

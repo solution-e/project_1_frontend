@@ -14,15 +14,14 @@ import {
 import ReactQuill from "react-quill";
 import ProtectedPage from "../component/ProtectedPage";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { ICategory, IPostDetail } from "../types";
-import { getCategory, uploadPost,uploadImages,getUploadURL,getCategoryInfo } from "../api";
+import { ICategory} from "../types";
+import { uploadPost,uploadImages,getUploadURL,getCategoryInfo } from "../api";
 import { useForm } from "react-hook-form";
-import { useNavigate,useParams,useLocation } from "react-router-dom";
+import { useNavigate,useLocation } from "react-router-dom";
 import { useState,useRef } from "react";
 import { IUploadPostVariables } from "../api";
 import "react-quill/dist/quill.snow.css";
 import BasetoUrl from "../component/BasetoUrl";
-import { blob } from "stream/consumers";
 
 interface IForm {
   file: string[];
@@ -39,6 +38,7 @@ interface IUploadURLResponse {
 export default function UploadPost() {
   const [content, setContent] = useState("");
   const contentRef = useRef("");
+  const mainImgRef = useRef("");
   const location = useLocation();
   const categoryPk = location.state?.categorypk;
   const { data: categoryData } = useQuery<ICategory>({
@@ -86,18 +86,22 @@ export default function UploadPost() {
   };
 
   const uploadImageMutation = useMutation(uploadImages, {
-    onSuccess: async (data: any, variables: { regexwords: string }) => {
+    onSuccess: async (data: any, variables: { regexwords: string,count: number }) => {
       console.log("success");
       contentRef.current = contentRef.current.replace(variables.regexwords, data.result.variants);
+      if (variables.count == 0) {
+        mainImgRef.current = data.result.variants;
+      } 
     },
   });
   
   const uploadURLMutation = useMutation(getUploadURL, {
-    onSuccess: async (data: IUploadURLResponse, variables: { blob: Blob, regexword: string }) => {
+    onSuccess: async (data: IUploadURLResponse, variables: { blob: Blob, regexword: string,count: number }) => {
       await uploadImageMutation.mutateAsync({
         uploadURL: data.result.uploadURL,
         blob: variables.blob,
         regexwords: variables.regexword,
+        count:variables.count,
       });
     },
   });
@@ -123,7 +127,7 @@ export default function UploadPost() {
     }
     const blob = BasetoUrl(imgSrcMatches);
     const uploadPromises = blob.map(async (blobItem, i) => {
-      await uploadURLMutation.mutateAsync({ blob: blobItem, regexword: imgSrcMatches[i] });
+      await uploadURLMutation.mutateAsync({ blob: blobItem, regexword: imgSrcMatches[i],count:i });
     });
   
     await Promise.all(uploadPromises);
@@ -134,7 +138,8 @@ export default function UploadPost() {
       const dataToSubmit = {
         ...formData,
         content: contentRef.current,
-        category:categoryData.id
+        category:categoryData.id,
+        mainimage:mainImgRef.current[0],
       };
       await mutation.mutate(dataToSubmit);
     }

@@ -1,4 +1,4 @@
-import { Box, Grid,useToast,VStack, Flex, Button, Link,Icon,Tabs,TabList,TabPanels,Tab,TabPanel,Text,HStack,Container,Heading } from "@chakra-ui/react";
+import { Box, Grid,useToast,VStack, Flex, Button, Link,Icon,Tabs,TabList,TabPanels,Tab,TabPanel } from "@chakra-ui/react";
 import { FaStar } from "react-icons/fa";
 import { useMutation,useQuery } from "@tanstack/react-query";
 import { getPostListPagenate, getCategoryPostListPagenate, isFavorite,addFavorite,
@@ -22,7 +22,6 @@ export default function Home() {
   const params = new URLSearchParams(location.search);
   const srcParam = params.get('src');
   const page = params.get('page') || '1';
-  const srcObject = params.get('srcobj') || 'all'
   const searchquery = categoryId !== undefined ? "category" : "post";
   let queryFn;
   let queryKey;
@@ -34,7 +33,7 @@ export default function Home() {
     queryKey = [searchquery, page];
   } else {
     queryFn = GetsearchPostList;
-    queryKey = [searchquery, srcParam,srcObject,page];
+    queryKey = [searchquery, srcParam];
   }
   const { data } = useQuery<IPostInfo>({
       queryKey: queryKey,
@@ -92,10 +91,6 @@ export default function Home() {
       console.error(error);
     }
   };
-  const [selectedTab, setSelectedTab] = useState(0);
-  const handleTabChange = (index:number) => {
-    setSelectedTab(index);
-  };
 
 
   return (
@@ -115,12 +110,10 @@ export default function Home() {
             <VStack>
                 <Box>
                   <Link href={`/category/`}>
-                    <Button px={6} colorScheme={'blue'} bg={'blue.400'} _hover={{ bg: 'blue.500' }}>
-                      カテゴリー
-                    </Button>
+                    <Button>カテゴリー</Button>
                   </Link>
                   {isLoggedIn && isCategoryInUrl && (
-                      <Button px={6} colorScheme={'blue'} bg={'blue.400'} _hover={{ bg: 'blue.500' }} ml={3} onClick={() => {navigate('/post/upload',{state:{categorypk:categoryId}})}}>投稿</Button>
+                      <Button ml={3} onClick={() => {navigate('/post/upload',{state:{categorypk:categoryId}})}}>投稿</Button>
                   )
                   }
                   {isLoggedIn && isCategoryInUrl && (
@@ -131,34 +124,13 @@ export default function Home() {
                   }
                 </Box>
             </VStack>
-            <Tabs onChange={handleTabChange} variant="soft-rounded" colorScheme="blue">
+            <Tabs variant='enclosed'>
               <TabList>
                 <Tab>ALL</Tab>
                 <Tab>Likes</Tab>
               </TabList>
               <TabPanels>
               <TabPanel>
-              <Box borderBottom="2px solid lightgray" display="flex" borderTop="2px solid lightgray" height="40px" width="100%" >
-              <HStack>
-              <Box marginBottom={1} marginTop={1} width="70px"></Box>
-                <Container width="200px" ml="0px">
-                  <Heading
-                    width="auto"
-                    overflow="hidden"
-                    alignContent="left"
-                    textOverflow="ellipsis"
-                    whiteSpace="nowrap"
-                    fontSize="sm"
-                  >
-                   タイトル
-                  </Heading>
-                </Container>
-                <Text color={"dimgray"} ml={10} width="100px">カテゴリー</Text>
-                <Text color={"dimgray"} width="25px"></Text>
-                <Text color={"dimgray"} width="25px"></Text>
-                <Text color={"dimgray"} width="70px">作成日</Text>
-                </HStack>
-                </Box>
                 {data && Array.isArray(data.result) && data.result.map((post) => (
               <Post
                 key={post.id}
@@ -172,36 +144,10 @@ export default function Home() {
                 total_dislikes = {post.total_dislikes}
               />
             ))}
-            {data?.count == 0 &&
-              <Box>
-                <Text>対象の投稿物は存在しません</Text>
-              </Box>
-            }
-            {data &&
+            {data?.count &&
             <Pagenate currentPage={page} totalItems={data.count}></Pagenate>}
             </TabPanel>
             <TabPanel>
-            <Box borderBottom="2px solid lightgray" display="flex" borderTop="2px solid lightgray" height="40px" width="100%" >
-              <HStack>
-            <Box marginBottom={1} marginTop={1} width="70px"></Box>
-                <Container width="200px" ml="0px">
-                  <Heading
-                    width="auto"
-                    overflow="hidden"
-                    alignContent="left"
-                    textOverflow="ellipsis"
-                    whiteSpace="nowrap"
-                    fontSize="sm"
-                  >
-                   タイトル
-                  </Heading>
-                </Container>
-                <Text color={"dimgray"} ml={10} width="100px">カテゴリー</Text>
-                <Text color={"dimgray"} width="25px"></Text>
-                <Text color={"dimgray"} width="25px"></Text>
-                <Text color={"dimgray"} width="70px">作成日</Text>
-                </HStack>
-                </Box>
                 { SortListData && Array.isArray(SortListData) && SortListData.map((post) => (
               <Post
                 key={post.id}
@@ -215,11 +161,6 @@ export default function Home() {
                 total_dislikes = {post.total_dislikes}
               />
             ))}
-            {SortListData?.count == 0 &&
-              <Box>
-                <Text align="center">対象の投稿物は存在しません</Text>
-              </Box>
-            }
             {SortListData &&
             <Pagenate currentPage={page} totalItems={SortListData.count}></Pagenate>}
             </TabPanel>

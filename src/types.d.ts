@@ -15,6 +15,11 @@ interface IPost {
   total_dislikes: number;
 }
 
+export interface IPostInfo {
+  count:number;
+  result: IPostListSearch;
+}
+
 export interface IPostList {
   id: number;
   category: ICategory;
@@ -27,6 +32,7 @@ export interface IPostList {
   total_dislikes: number;
   is_author: boolean;
   review_count: number;
+  mainimage: string;
 }
 
 export interface ISortPostList {
@@ -66,6 +72,7 @@ export interface IPostDetail {
   total_likes: number;
   total_dislikes: number;
   is_author: boolean;
+  updated_at: string;
 }
 
 interface IAuthor {
@@ -90,6 +97,7 @@ export interface IReview {
   review_content: string;
   created_at: string;
   is_author:boolean;
+  parent_review:number;
 }
 
 interface ISignUpVariables {
@@ -115,6 +123,10 @@ interface IOtherInfo {
 
 interface IPostCount {
   totalitems: number;
+}
+
+interface ILikeSortPostCount {
+  sortTotalitems: number;
 }
 
 interface IfavoriteStatus {

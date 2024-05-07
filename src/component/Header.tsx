@@ -18,17 +18,20 @@ import {
   DrawerCloseButton,
   useDisclosure,
   VStack,
+  Stack,
+  Input,
+  Select,
 } from "@chakra-ui/react";
 import { MdOutlineWbSunny } from "react-icons/md";
 import LoginModal from "./LoginModal";
 import SignUpModal from "./SignUpModal";
 import { FaFilter, FaMoon } from "react-icons/fa";
-import { Link } from "react-router-dom";
+import { Link,useNavigate } from "react-router-dom";
 import userUser from "../lib/useUser";
 import { logOut } from "../api";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { FiAlignJustify } from "react-icons/fi";
-import { useRef } from "react";
+import { FiAlignJustify,FiChevronDown } from "react-icons/fi";
+import { useRef,useState } from "react";
 
 export default function Header() {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -73,6 +76,18 @@ export default function Header() {
   const onLogOut = async () => {
     mutation.mutate();
   };
+  const [keyword, setKeyword] = useState('');
+  const navigate = useNavigate();
+  const handleSearch = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    navigate(`/?src=${keyword}&srcobj=${selectedItem}`);
+  };
+  const [selectedItem, setSelectedItem] = useState("all");
+
+  const handleItemSelect = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedItem(event.target.value);
+  };
+
   return (
     <HStack
       justifyContent={"space-between"}
@@ -85,6 +100,30 @@ export default function Header() {
           <FaFilter size={"15"} />
         </Box>
       </Link>
+      <form onSubmit={handleSearch}>
+      <Stack direction="row" spacing={2}>
+      <VStack spacing={8}>
+        <Select value={selectedItem} onChange={handleItemSelect} width="140px">
+          <option value="all">全て</option>
+          <option value="title">タイトル</option>
+          <option value="user">ユーザー名</option>
+          <option value="content">内容</option>
+        </Select>
+      </VStack>
+        <Input
+          name="src"
+          placeholder="キーワードを入力"
+          variant="filled"
+          size="md"
+          value={keyword}
+          onChange={(e) => setKeyword(e.target.value)}
+          backgroundColor="gainsboro"
+        />
+        <Button type="submit" colorScheme="green">
+          検索
+        </Button>
+      </Stack>
+    </form>
       <HStack spacing={2}>
         <IconButton
           onClick={toggleColorMode}

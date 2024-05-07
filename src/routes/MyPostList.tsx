@@ -2,28 +2,21 @@ import { Box, Grid, VStack, Flex, Button, Link } from "@chakra-ui/react";
 import { useQuery } from "@tanstack/react-query";
 import { getMyPostList } from "../api";
 import Post from "../component/Post";
-import { IPostList } from "../types";
+import { IPostInfo, IPostList } from "../types";
 import userUser from "../lib/useUser";
 import { useNavigate } from "react-router-dom";
-import ProtectedPage from "../component/ProtectedPage";
+import {formatHourToMinutes} from "../component/FormatTime";
 
 export default function MyPostList() {
   const navigate = useNavigate();
   const { user } = userUser();
   const { isLoggedIn } = userUser();
-  const { data } = useQuery<IPostList[]>({
+  const { data } = useQuery<IPostInfo>({
     queryKey: ["post", user?.id],
     queryFn: getMyPostList,
   });
   if(!isLoggedIn){
     navigate('/')
-  }
-
-  function formatTime(dateString: string) {
-    const date = new Date(dateString);
-    const hours = date.getHours().toString().padStart(2, "0");
-    const minutes = date.getMinutes().toString().padStart(2, "0");
-    return `${hours}:${minutes}`;
   }
 
   return (
@@ -40,7 +33,7 @@ export default function MyPostList() {
             }}
             marginTop={100}
           >
-            {data?.map((post) => (
+            {data && Array.isArray(data.result) && data.result.map((post) => (
               <Post
                 key={post.id}
                 id={post.id}
@@ -48,7 +41,7 @@ export default function MyPostList() {
                 review_count={post.review_count}
                 title={post.title}
                 category={post.category.name}
-                created_at={formatTime(post.created_at)}
+                created_at={formatHourToMinutes(post.created_at)}
                 total_likes = {post.total_likes}
                 total_dislikes = {post.total_dislikes}
               />

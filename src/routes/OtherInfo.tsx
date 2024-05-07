@@ -4,6 +4,7 @@ import { getMyPostList, getOtherInfo, } from "../api";
 import Post from "../component/Post";
 import { IOtherInfo, IPostList } from "../types";
 import { useParams} from "react-router-dom";
+import {formatHourToMinutes, formatYearToMonth} from "../component/FormatTime";
 
 export default function OtherInfo() {
     const { OtherId } = useParams();
@@ -16,23 +17,9 @@ export default function OtherInfo() {
         queryFn: getOtherInfo,
     });
 
-    function formatTime(dateString: string) {
-        const date = new Date(dateString);
-        const hours = date.getHours().toString().padStart(2, "0");
-        const minutes = date.getMinutes().toString().padStart(2, "0");
-        return `${hours}:${minutes}`;
-    }
-    function formatYearMonth(dateString: string) {
-        const date = new Date(dateString);
-        const year = date.getFullYear().toString();
-        const month = (date.getMonth() + 1).toString().padStart(2, "0");
-        const day = date.getDate().toString().padStart(2, "0");
-        return `${year}/${month}/${day}`;
-    }
-
     if (isLoading) {
         return <div>Loading...</div>;
-      }
+    }
   return (
     <Flex justifyContent="center" alignItems="center">
       <Box>
@@ -41,7 +28,7 @@ export default function OtherInfo() {
             ユーザ名:{OtherInfo?.name}
         </Text>
         <Text>
-            加入日:{OtherInfo && formatYearMonth(OtherInfo.date_joined)}
+            加入日:{OtherInfo && formatYearToMonth(OtherInfo.date_joined)}
         </Text>
         </VStack>
         <VStack>
@@ -63,7 +50,7 @@ export default function OtherInfo() {
                 review_count={post.review_count}
                 title={post.title}
                 category={post.category.name}
-                created_at={formatTime(post.created_at)}
+                created_at={formatHourToMinutes(post.created_at)}
                 total_likes = {post.total_likes}
                 total_dislikes = {post.total_dislikes}
               />

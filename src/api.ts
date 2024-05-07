@@ -187,6 +187,7 @@ export interface IUpdatePostVariables {
   content: string;
   category: number;
   postPk: number;
+  mainimage:string;
 }
 export const updatePost = (variables: IUpdatePostVariables) =>
     instance
@@ -269,6 +270,7 @@ export interface IUploadImages {
   blob: Blob;
   uploadURL: string;
   regexwords:string;
+  count:number;
 }
 
 export const uploadImages = ({ blob, uploadURL }: IUploadImages) => {
@@ -287,6 +289,7 @@ export const uploadImages = ({ blob, uploadURL }: IUploadImages) => {
 export interface IUploadReviewVariables {
   review_content: string;
   postPk: number;
+  parent_review: number | null;
 }
 
 export const uploadReview = (variables: IUploadReviewVariables) =>
@@ -297,6 +300,20 @@ export const uploadReview = (variables: IUploadReviewVariables) =>
       },
     })
     .then((response) => response.data);
+
+export interface IUpdateReviewVariables {
+  review_content: string;
+  reviewPk: number;
+}
+  
+export const updateReview = (variables: IUpdateReviewVariables) =>
+instance
+  .put(`review/${variables.reviewPk}/update`, variables, {
+    headers: {
+      "X-CSRFToken": Cookie.get("csrftoken") || "",
+    },
+  })
+  .then((response) => response.data);
 
 export const isLike = ({ queryKey }: QueryFunctionContext) => {
   const [_, postpk] = queryKey;
@@ -411,3 +428,10 @@ export const GetLikeSortCategoryList = ({ queryKey }: QueryFunctionContext) => {
       .get(`category/${categoryPk}/sort/likes/count`)
       .then((response) => response.data);
   };
+
+  export const GetsearchPostList = ({ queryKey }: QueryFunctionContext) => {
+    const [_, keyword,srcObject,page] = queryKey;
+    return instance
+      .get(`post/${keyword}/search?search=${srcObject}&page=${page}`)
+      .then((response) => response.data);
+  }
