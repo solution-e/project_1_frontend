@@ -1,6 +1,6 @@
 import {  useNavigate, useParams } from "react-router-dom";
 import { DeletePostDetail,DeleteReviewDetail ,getPostDetail, getPostReviews,IUploadPostVariables, uploadReview,isLike,deleteLike,addLike,isDislike,addDislike,deleteDislike, IUpdatePostVariables, IUpdateReviewVariables, updateReview } from "../api";
-import { IIsLike, IPostDetail, IReview ,IIsDislike} from "../types";
+import { IIsLike, IPostDetail, IReviewInfo ,IIsDislike} from "../types";
 import {
   Box,
   Button,
@@ -28,7 +28,7 @@ import { useState,useRef } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { uploadImages,getUploadURL } from "../api";
 import { useForm } from "react-hook-form";
-import { FaThumbsUp,FaThumbsDown } from 'react-icons/fa';
+import { FaThumbsUp,FaThumbsDown, FaArrowRight, FaAngleRight } from 'react-icons/fa';
 import {formarYearToMinutes} from '../component/FormatTime'
 
 
@@ -44,13 +44,12 @@ type MyState = {
 }
 
 export default function PostDetail() {
-  const [content, setContent] = useState("");
   const { postPk } = useParams();
   const { data } = useQuery<IPostDetail>([`post`, postPk], getPostDetail);
   const [isOpen, setIsOpen] = useState(false);
   const onClose = () => setIsOpen(false);
   const onOpen = () => setIsOpen(true);
-  const { data: reviewsData } = useQuery<IReview[]>(
+  const { data: reviewsData } = useQuery<IReviewInfo>(
     [`post`, postPk, `reviews`],
     getPostReviews
   );
@@ -65,7 +64,6 @@ export default function PostDetail() {
   const [liked, setLiked] = useState<boolean | undefined>(islike?.islike);
   const [disliked, setDisLiked] = useState<boolean | undefined>(isdislike?.isdislike);
   const navigate = useNavigate();
-  const contentRef = useRef("");
   const reviewPkRef = useRef<number | null>(null);
   const { register, handleSubmit,watch  } = useForm<IUploadPostVariables>();
   const toast = useToast();
@@ -118,24 +116,6 @@ export default function PostDetail() {
     }
   };
 
-  const uploadImageMutation = useMutation(uploadImages, {
-    onSuccess: async (data: any, variables: { regexwords: string }) => {
-      console.log("success");
-      contentRef.current = contentRef.current.replace(variables.regexwords, data.result.variants);
-    },
-  });
-  
-  const uploadURLMutation = useMutation(getUploadURL, {
-    onSuccess: async (data: IUploadURLResponse, variables: { blob: Blob, regexword: string }) => {
-      await uploadImageMutation.mutateAsync({
-        uploadURL: data.result.uploadURL,
-        blob: variables.blob,
-        regexwords: variables.regexword,
-        count:0,
-      });
-    },
-  });
-
   const updateReviewMutation = useMutation(updateReview,{
     onSuccess: async(data) => {
       toast({
@@ -167,15 +147,6 @@ export default function PostDetail() {
     await mutation.mutate(dataToSubmit);
   };
 
-  function formatTime(dateString: string) {
-    const date = new Date(dateString);
-    const year = date.getFullYear().toString();
-    const month = (date.getMonth() + 1).toString().padStart(2, "0");
-    const day = date.getDate().toString().padStart(2, "0");
-    const hours = date.getHours().toString().padStart(2, "0");
-    const minutes = date.getMinutes().toString().padStart(2, "0");
-    return `${year}/${month}/${day} ${hours}:${minutes}`;
-  }
   const handleLikeButtonClick = async (postId: number) => {
     try {
       if (liked) {
@@ -267,7 +238,7 @@ export default function PostDetail() {
     <Flex paddingLeft="180px" paddingRight="180px">
     <Box mt={10} px={{ base: 10, lg: 40 }} width="100%">
       <Heading>{data?.title}</Heading>
-      <HStack>
+      <HStack borderBottom="2px solid gray">
         <Box mt={3}>
           <Text fontSize={"xl"}>
             作成者: 
@@ -276,7 +247,7 @@ export default function PostDetail() {
             </Link>
           </Text>
           <Text>
-            {data?.updated_at && formatTime(data.updated_at)}
+            {data?.updated_at && formarYearToMinutes(data.updated_at)}
           </Text>
         </Box>
         {data?.is_author ? (
@@ -311,7 +282,7 @@ export default function PostDetail() {
       <Button mt={4} size={"sm"} leftIcon={<Icon as={FaThumbsUp} color= {liked ? "yellow" : "white"} />} onClick={() => data?.id && handleLikeButtonClick(data.id)} colorScheme="green" />
       <Button mt={4} size={"sm"} leftIcon={<Icon as={FaThumbsDown} color= {disliked ? "yellow" : "white"} />} onClick={() => data?.id && handleDisLikeButtonClick(data.id)} colorScheme="blue" />
       </HStack>
-      <Grid mt={8} h={"60vh"}>
+      <Grid mt={8} h={"60vh"} >
         {data?.photo && data?.photo.length > 0
           ? data?.photo.map((photo) => (
               <Box key={photo.pk}>
@@ -324,35 +295,45 @@ export default function PostDetail() {
             <div dangerouslySetInnerHTML={{ __html: data.content }} />
           )}
         </Box>
+
         <VStack mt={8} alignItems="flex-start" >
-        {reviewsData?.map((review, index) => (
+        <Box width="100%" display="flex" borderBottom="2px solid gray">
+          <Text>コメント</Text>
+          <Text color="red" fontWeight="bold" ml={1}>
+            {reviewsData?.count}
+          </Text>
+          <Text>件</Text>
+        </Box>
+        {reviewsData?.result.map((review, index) => (
           <Box key={index} width="100%" py={4} borderBottom="1px solid lightgray">
             <HStack>
             {review.parent_review !== null && 
-            <Box flex={0.2} alignContent="center" borderRight="1px solid lightgray">
-              ↳
+            <Box flex={0.1} alignContent="center" borderRight="1px solid lightgray">
+              <Icon as={FaAngleRight} ></Icon>
             </Box>
             }
-            <Box flex={1} borderRight="1px solid lightgray">
+            <Box flex={review.parent_review !== null ? 0.85 : 1} borderRight="1px solid lightgray" textAlign="left">
               {review.user?.name}
             </Box>
             <Box flex={3} borderRight="1px solid lightgray" onClick={() => {review.parent_review === null && setParentReviewId(review.id); setIsReplyReview(true);}}>
               <div dangerouslySetInnerHTML={{ __html: review.review_content }} />
             </Box>
-            <Box flex={1} borderRight="1px solid lightgray">
-              {formarYearToMinutes(review.created_at)}
+            <Box flex={0.5} borderRight="1px solid lightgray">
+              <Text color="dimgray" fontSize={"xs"}>
+                {formarYearToMinutes(review.created_at)}
+              </Text>
             </Box>
             {review?.is_author && review?.review_content != "この投稿は削除されました" ? (
             <Button borderRight="1px solid lightgray" variant="ghost" onClick={() => handleEditButtonClick(review.review_content,review.id)}>
               編集
             </Button>
-            ) : <Text textDecoration="line-through">編集</Text>}
+            ) : <Button borderRight="1px solid lightgray"><Text textDecoration="line-through underline">編集</Text></Button>}
           {review?.is_author && review?.review_content != "この投稿は削除されました" ? (
             <Button variant="ghost" onClick={() => review?.id && handleDeleteReview(review.id)}>
               削除
             </Button>
             ) : 
-            <Text textDecoration="line-through">削除</Text>}
+            <Button borderRight="1px solid lightgray"><Text textDecoration="line-through underline">削除</Text></Button>}
             </HStack>
             { isReplyReview && parentReviewId === review.id && review?.review_content != "この投稿は削除されました" &&
             <Box>
@@ -371,9 +352,9 @@ export default function PostDetail() {
         mt={5}
       >
       <Text padding="10px" align="center">コメントを書く</Text>
-      <Input height="400px" type="text" textAlign="left" defaultValue={editingReviewContent} ref={inputRef}></Input>
+      <Input height="200px" width="60%" type="text" textAlign="left" defaultValue={editingReviewContent} ref={inputRef}></Input>
       {!isEditing && (
-        <Button marginTop="20px" type="submit" isLoading={mutation.isLoading}>
+        <Button margin="10px" type="submit" isLoading={mutation.isLoading}>
           投稿
         </Button>
       )}

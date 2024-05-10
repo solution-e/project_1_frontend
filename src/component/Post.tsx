@@ -60,7 +60,7 @@ export default function Post({
           </Text>
           <Text color={"orangered"} width="25px"><Icon as={FaThumbsUp}/>{total_likes}</Text>
           <Text color={"dodgerblue"} width="25px"><Icon as={FaThumbsDown}/>{total_dislikes}</Text>
-          <Text color={"dimgray"} width="70px">{created_at}</Text>
+          <Text color={"dimgray"} width="100px">{created_at}</Text>
         </HStack>
       </Box>
     </Link>

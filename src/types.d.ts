@@ -91,6 +91,11 @@ export interface IUser {
   user_flag: string;
 }
 
+export interface IReviewInfo {
+  count: number;
+  result:IReview[];
+}
+
 export interface IReview {
   id: number;
   user: IUser;
