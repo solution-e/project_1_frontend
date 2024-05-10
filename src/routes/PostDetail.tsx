@@ -1,5 +1,5 @@
 import {  useNavigate, useParams } from "react-router-dom";
-import { DeletePostDetail,DeleteReviewDetail ,getPostDetail, getPostReviews,IUploadPostVariables, uploadReview,isLike,deleteLike,addLike,isDislike,addDislike,deleteDislike, IUpdatePostVariables, IUpdateReviewVariables, updateReview } from "../api";
+import { DeletePostDetail,DeleteReviewDetail ,getPostDetail, getPostReviews,IUploadPostVariables, uploadReview,isLike,deleteLike,addLike,isDislike,addDislike,deleteDislike,updateReview } from "../api";
 import { IIsLike, IPostDetail, IReviewInfo ,IIsDislike} from "../types";
 import {
   Box,
@@ -20,24 +20,17 @@ import {
   Center,
   Flex,
   Input,
+  border,
 } from "@chakra-ui/react";
 import { Icon } from '@chakra-ui/react';
 import { Link } from "react-router-dom";
 import "react-quill/dist/quill.snow.css";
-import { useState,useRef } from "react";
+import { useState,useRef, useEffect } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { uploadImages,getUploadURL } from "../api";
 import { useForm } from "react-hook-form";
 import { FaThumbsUp,FaThumbsDown, FaArrowRight, FaAngleRight } from 'react-icons/fa';
 import {formarYearToMinutes} from '../component/FormatTime'
-
-
-interface IUploadURLResponse {
-  result: {
-      id: string;
-      uploadURL: string;
-  }
-}
 
 type MyState = {
   modifyPostPk:string;
@@ -45,27 +38,36 @@ type MyState = {
 
 export default function PostDetail() {
   const { postPk } = useParams();
-  const { data } = useQuery<IPostDetail>([`post`, postPk], getPostDetail);
   const [isOpen, setIsOpen] = useState(false);
   const onClose = () => setIsOpen(false);
   const onOpen = () => setIsOpen(true);
+
+  const { data } = useQuery<IPostDetail>([`post`, postPk], getPostDetail);
   const { data: reviewsData } = useQuery<IReviewInfo>(
     [`post`, postPk, `reviews`],
     getPostReviews
   );
-  const { data: islike } = useQuery<IIsLike>(
-    [`post`, postPk],
-    isLike
-  );
-  const { data: isdislike } = useQuery<IIsDislike>(
-    [`post`, postPk],
-    isDislike
-  );
+
+  const { data: islike } = useQuery<IIsLike>([`like`, postPk], isLike);
   const [liked, setLiked] = useState<boolean | undefined>(islike?.islike);
+  useEffect(() => {
+    if (islike) {
+      setLiked(islike.islike);
+    }
+  }, [islike]);
+  const { data: isdislike, isLoading: isDislikeLoading } = useQuery<IIsDislike>([`dislike`, postPk], isDislike);
   const [disliked, setDisLiked] = useState<boolean | undefined>(isdislike?.isdislike);
+
+  useEffect(() => {
+    if (!isDislikeLoading) {
+      setDisLiked(isdislike?.isdislike);
+    }
+  }, [isdislike, isDislikeLoading]);
+  console.log(isdislike)
+  console.log(islike)
   const navigate = useNavigate();
   const reviewPkRef = useRef<number | null>(null);
-  const { register, handleSubmit,watch  } = useForm<IUploadPostVariables>();
+  const {handleSubmit } = useForm<IUploadPostVariables>();
   const toast = useToast();
   const inputRef = useRef<HTMLInputElement>(null);
   const [editingReviewContent, setEditingReviewContent] = useState("");
@@ -194,7 +196,7 @@ export default function PostDetail() {
             await deleteDislikeMutation.mutateAsync(postId);
             toast({
               status: "success",
-              title: "低評価しました",
+              title: "低評価を取り消しました",
               position: "bottom",
             });
           } catch (error) {
@@ -203,11 +205,16 @@ export default function PostDetail() {
       } else {
           try {
             await AddDislikeMutation.mutateAsync(postId);
+            toast({
+              status: "success",
+              title: "低評価しました",
+              position: "bottom",
+            });
           } catch (error) {
             console.error("エラーが発生しました:", error);
           }
       }
-      setDisLiked(!disliked);
+    setDisLiked(!disliked);
     } catch (error) {
       console.error(error);
     }
@@ -239,14 +246,14 @@ export default function PostDetail() {
     <Box mt={10} px={{ base: 10, lg: 40 }} width="100%">
       <Heading>{data?.title}</Heading>
       <HStack borderBottom="2px solid gray">
-        <Box mt={3}>
+        <Box mt={3} display="flex">
           <Text fontSize={"xl"}>
             作成者: 
             <Link to={`/OtherInfo/${data?.author?.id}`}>
             {data?.author?.name}
             </Link>
           </Text>
-          <Text>
+          <Text ml={6} fontSize={"xl"}>
             {data?.updated_at && formarYearToMinutes(data.updated_at)}
           </Text>
         </Box>
@@ -279,8 +286,6 @@ export default function PostDetail() {
           </ModalFooter>
         </ModalContent>
       </Modal>
-      <Button mt={4} size={"sm"} leftIcon={<Icon as={FaThumbsUp} color= {liked ? "yellow" : "white"} />} onClick={() => data?.id && handleLikeButtonClick(data.id)} colorScheme="green" />
-      <Button mt={4} size={"sm"} leftIcon={<Icon as={FaThumbsDown} color= {disliked ? "yellow" : "white"} />} onClick={() => data?.id && handleDisLikeButtonClick(data.id)} colorScheme="blue" />
       </HStack>
       <Grid mt={8} h={"60vh"} >
         {data?.photo && data?.photo.length > 0
@@ -295,8 +300,11 @@ export default function PostDetail() {
             <div dangerouslySetInnerHTML={{ __html: data.content }} />
           )}
         </Box>
-
-        <VStack mt={8} alignItems="flex-start" >
+        <Box display="flex" justifyContent="center">
+          <Button mt={4} size={"lg"} leftIcon={<Icon as={FaThumbsUp} color= {liked ? "yellow" : "white"} />} onClick={() => data?.id && handleLikeButtonClick(data.id)} colorScheme="green" />
+          <Button mt={4} size={"lg"} leftIcon={<Icon as={FaThumbsDown} color= {disliked ? "yellow" : "white"} />} onClick={() => data?.id && handleDisLikeButtonClick(data.id)} colorScheme="blue" />
+        </Box>
+        <VStack mt={8} alignItems="center" borderBottom="2px solid gray" >
         <Box width="100%" display="flex" borderBottom="2px solid gray">
           <Text>コメント</Text>
           <Text color="red" fontWeight="bold" ml={1}>
@@ -305,17 +313,17 @@ export default function PostDetail() {
           <Text>件</Text>
         </Box>
         {reviewsData?.result.map((review, index) => (
-          <Box key={index} width="100%" py={4} borderBottom="1px solid lightgray">
+          <Box key={index} width={review.parent_review !== null ? "90%" : "100%"} py={4} borderBottom="1px solid gray" backgroundColor={review.parent_review !== null ? "lightgray" : "white" } border={review.parent_review !== null ? "1px solid gray" : "" }>
             <HStack>
             {review.parent_review !== null && 
-            <Box flex={0.1} alignContent="center" borderRight="1px solid lightgray">
+            <Box flex={0.1} alignContent="center">
               <Icon as={FaAngleRight} ></Icon>
             </Box>
             }
-            <Box flex={review.parent_review !== null ? 0.85 : 1} borderRight="1px solid lightgray" textAlign="left">
+            <Box flex={review.parent_review !== null ? 0.85 : 1} borderRight="1px solid gray" textAlign="left">
               {review.user?.name}
             </Box>
-            <Box flex={3} borderRight="1px solid lightgray" onClick={() => {review.parent_review === null && setParentReviewId(review.id); setIsReplyReview(true);}}>
+            <Box flex={3} onClick={() => {review.parent_review === null && setParentReviewId(review.id); setIsReplyReview(true);}}>
               <div dangerouslySetInnerHTML={{ __html: review.review_content }} />
             </Box>
             <Box flex={0.5} borderRight="1px solid lightgray">
@@ -351,10 +359,10 @@ export default function PostDetail() {
         onSubmit={handleSubmit(onSubmit)}
         mt={5}
       >
-      <Text padding="10px" align="center">コメントを書く</Text>
-      <Input height="200px" width="60%" type="text" textAlign="left" defaultValue={editingReviewContent} ref={inputRef}></Input>
+      <Text align="center">コメントを書く</Text>
+      <Input height="200px" border="1px solid gray" width="60%" type="text" textAlign="left" defaultValue={editingReviewContent} ref={inputRef}></Input>
       {!isEditing && (
-        <Button margin="10px" type="submit" isLoading={mutation.isLoading}>
+        <Button margin="5px" type="submit" isLoading={mutation.isLoading}>
           投稿
         </Button>
       )}
