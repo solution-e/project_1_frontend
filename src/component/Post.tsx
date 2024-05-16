@@ -41,7 +41,7 @@ export default function Post({
               />
             </Box>
           )}
-          <Container display="inline-flex" width="200px" alignItems="center">
+          <Container display="inline-flex" width="400px" alignItems="center">
             <Heading
               width="auto"
               overflow="hidden"

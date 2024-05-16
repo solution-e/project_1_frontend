@@ -56,15 +56,13 @@ export default function PostDetail() {
     }
   }, [islike]);
   const { data: isdislike, isLoading: isDislikeLoading } = useQuery<IIsDislike>([`dislike`, postPk], isDislike);
-  const [disliked, setDisLiked] = useState<boolean | undefined>(isdislike?.isdislike);
+  const [disliked, setDisLiked] = useState<boolean | undefined>(isdislike?.isdislikes);
 
   useEffect(() => {
     if (!isDislikeLoading) {
-      setDisLiked(isdislike?.isdislike);
+      setDisLiked(isdislike?.isdislikes);
     }
   }, [isdislike, isDislikeLoading]);
-  console.log(isdislike)
-  console.log(islike)
   const navigate = useNavigate();
   const reviewPkRef = useRef<number | null>(null);
   const {handleSubmit } = useForm<IUploadPostVariables>();
@@ -74,6 +72,15 @@ export default function PostDetail() {
   const [isEditing, setIsEditing] = useState(false);
   const [isReplyReview, setIsReplyReview] =useState(false);
   const [parentReviewId, setParentReviewId] = useState<number | null>(null);
+  const [likes , setLikes] = useState<number>(0);
+  const [dislikes, setDislikes] = useState<number>(0);
+  useEffect(() => {
+    if (data !== undefined) {
+      setLikes(data.likes);
+      setDislikes(data.dislikes);
+    }
+  }, [data]);
+  
   const replyInputRef = useRef<HTMLInputElement>(null);
 
   const deletePostMutation = useMutation((postId: number) => DeletePostDetail({ queryKey: ['post', postId] }));
@@ -159,6 +166,7 @@ export default function PostDetail() {
               title: "いいねを取り消しました",
               position: "bottom",
             });
+            setLikes(Number(likes) - 1);
           } catch (error) {
             console.error("エラーが発生しました:", error);
           }
@@ -170,6 +178,7 @@ export default function PostDetail() {
               title: "いいねしました",
               position: "bottom",
             });
+            setLikes(Number(likes) + 1);
           } catch (error) {
             console.error("エラーが発生しました:", error);
           }
@@ -199,6 +208,7 @@ export default function PostDetail() {
               title: "低評価を取り消しました",
               position: "bottom",
             });
+            setDislikes(Number(dislikes) - 1)
           } catch (error) {
             console.error("エラーが発生しました:", error);
           }
@@ -210,6 +220,7 @@ export default function PostDetail() {
               title: "低評価しました",
               position: "bottom",
             });
+            setDislikes(Number(dislikes) + 1)
           } catch (error) {
             console.error("エラーが発生しました:", error);
           }
@@ -301,8 +312,12 @@ export default function PostDetail() {
           )}
         </Box>
         <Box display="flex" justifyContent="center">
-          <Button mt={4} size={"lg"} leftIcon={<Icon as={FaThumbsUp} color= {liked ? "yellow" : "white"} />} onClick={() => data?.id && handleLikeButtonClick(data.id)} colorScheme="green" />
-          <Button mt={4} size={"lg"} leftIcon={<Icon as={FaThumbsDown} color= {disliked ? "yellow" : "white"} />} onClick={() => data?.id && handleDisLikeButtonClick(data.id)} colorScheme="blue" />
+          <Button mt={4} isDisabled={disliked} size={"lg"} leftIcon={<Icon as={FaThumbsUp} color= {liked ? "yellow" : "white"} />} onClick={() => data?.id && handleLikeButtonClick(data.id)} colorScheme="green">
+            {likes}
+          </Button>
+          <Button mt={4} isDisabled={liked} size={"lg"} leftIcon={<Icon as={FaThumbsDown} color= {disliked ? "yellow" : "white"} />} onClick={() => data?.id && handleDisLikeButtonClick(data.id)} colorScheme="blue">
+            {dislikes}
+          </Button>
         </Box>
         <VStack mt={8} alignItems="center" borderBottom="2px solid gray" >
         <Box width="100%" display="flex" borderBottom="2px solid gray">
@@ -359,8 +374,7 @@ export default function PostDetail() {
         onSubmit={handleSubmit(onSubmit)}
         mt={5}
       >
-      <Text align="center">コメントを書く</Text>
-      <Input height="200px" border="1px solid gray" width="60%" type="text" textAlign="left" defaultValue={editingReviewContent} ref={inputRef}></Input>
+      <Input height="200px" placeholder="コメントを書く" border="1px solid gray" width="60%" type="text" textAlign="left" defaultValue={editingReviewContent} ref={inputRef}></Input>
       {!isEditing && (
         <Button margin="5px" type="submit" isLoading={mutation.isLoading}>
           投稿

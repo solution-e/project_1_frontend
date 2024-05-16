@@ -69,8 +69,8 @@ export interface IPostDetail {
   file: FileList;
   created_at: string;
   content: string;
-  total_likes: number;
-  total_dislikes: number;
+  likes: number;
+  dislikes: number;
   is_author: boolean;
   updated_at: string;
 }
@@ -143,5 +143,5 @@ interface IIsLike {
 }
 
 interface IIsDislike {
-  isdislike:boolean;
+  isdislikes:boolean;
 }
