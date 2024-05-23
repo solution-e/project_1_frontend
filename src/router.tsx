@@ -10,7 +10,6 @@ import MyPostList from "./routes/MyPostList";
 import OtherInfo from "./routes/OtherInfo"
 import UploadMedia from "./routes/UploadMedia";
 import ModifyPost from "./routes/ModifyPost";
-import HomeTest from "./routes/Hometest";
 
 const router = createBrowserRouter([
   {
@@ -58,10 +57,6 @@ const router = createBrowserRouter([
         path: "post/modifypost",
         element: <ModifyPost />,
       },
-      {
-        path: "/test",
-        element: <HomeTest/>,
-      }
     ],
   },
 ]);
