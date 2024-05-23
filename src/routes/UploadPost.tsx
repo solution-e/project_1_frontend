@@ -6,7 +6,6 @@ import {
   FormLabel,
   Heading,
   Input,
-  Select,
   Text,
   VStack,
   useToast,
@@ -14,11 +13,11 @@ import {
 import ReactQuill from "react-quill";
 import ProtectedPage from "../component/ProtectedPage";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { ICategory} from "../types";
-import { uploadPost,uploadImages,getUploadURL,getCategoryInfo } from "../api";
+import { ICategory } from "../types";
+import { uploadPost, uploadImages, getUploadURL, getCategoryInfo } from "../api";
 import { useForm } from "react-hook-form";
-import { useNavigate,useLocation } from "react-router-dom";
-import { useState,useRef } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { useState, useRef } from "react";
 import { IUploadPostVariables } from "../api";
 import "react-quill/dist/quill.snow.css";
 import BasetoUrl from "../component/BasetoUrl";
@@ -28,12 +27,11 @@ interface IForm {
 }
 
 interface IUploadURLResponse {
-    result: {
-        id: string;
-        uploadURL: string;
-    }
+  result: {
+    id: string;
+    uploadURL: string;
+  };
 }
-
 
 export default function UploadPost() {
   const [content, setContent] = useState("");
@@ -45,7 +43,7 @@ export default function UploadPost() {
     queryKey: ["category", categoryPk],
     queryFn: getCategoryInfo,
   });
-  const { register, handleSubmit,watch  } = useForm<IUploadPostVariables>();
+  const { register, handleSubmit } = useForm<IUploadPostVariables>();
   const toast = useToast();
   const navigate = useNavigate();
   const toolbarOptions = [
@@ -86,26 +84,26 @@ export default function UploadPost() {
   };
 
   const uploadImageMutation = useMutation(uploadImages, {
-    onSuccess: async (data: any, variables: { regexwords: string,count: number }) => {
+    onSuccess: async (data: any, variables: { regexwords: string, count: number }) => {
       console.log("success");
       contentRef.current = contentRef.current.replace(variables.regexwords, data.result.variants);
       if (variables.count == 0) {
         mainImgRef.current = data.result.variants;
-      } 
+      }
     },
   });
-  
+
   const uploadURLMutation = useMutation(getUploadURL, {
-    onSuccess: async (data: IUploadURLResponse, variables: { blob: Blob, regexword: string,count: number }) => {
+    onSuccess: async (data: IUploadURLResponse, variables: { blob: Blob, regexword: string, count: number }) => {
       await uploadImageMutation.mutateAsync({
         uploadURL: data.result.uploadURL,
         blob: variables.blob,
         regexwords: variables.regexword,
-        count:variables.count,
+        count: variables.count,
       });
     },
   });
-  
+
   const mutation = useMutation(uploadPost, {
     onSuccess: async (data) => {
       toast({
@@ -117,7 +115,7 @@ export default function UploadPost() {
     },
   });
 
-  const onSubmit = async(formData: IUploadPostVariables) => {
+  const onSubmit = async (formData: IUploadPostVariables) => {
     const imgSrcRegex = /<img.*?src="(.*?)"/g;
     const imgSrcMatches: string[] = [];
     contentRef.current = content;
@@ -127,19 +125,19 @@ export default function UploadPost() {
     }
     const blob = BasetoUrl(imgSrcMatches);
     const uploadPromises = blob.map(async (blobItem, i) => {
-      await uploadURLMutation.mutateAsync({ blob: blobItem, regexword: imgSrcMatches[i],count:i });
+      await uploadURLMutation.mutateAsync({ blob: blobItem, regexword: imgSrcMatches[i], count: i });
     });
-  
+
     await Promise.all(uploadPromises);
-    
-    if(categoryData == undefined) {
-      navigate("/")
+
+    if (categoryData == undefined) {
+      navigate("/");
     } else {
       const dataToSubmit = {
         ...formData,
         content: contentRef.current,
-        category:categoryData.id,
-        mainimage:mainImgRef.current[0],
+        category: categoryData.id,
+        mainimage: mainImgRef.current[0],
       };
       await mutation.mutate(dataToSubmit);
     }
@@ -155,17 +153,18 @@ export default function UploadPost() {
         pb={40}
         mt={10}
         px={{
-          base: 10,
-          lg: 40,
+          base: 5,
+          lg: 20,
         }}
       >
-        <Container>
+        <Container maxW="container.lg">
           <Heading textAlign={"center"}>投稿フォーム</Heading>
           <VStack
             spacing={8}
             as="form"
             onSubmit={handleSubmit(onSubmit)}
             mt={5}
+            width="100%"
           >
             <FormControl>
               <FormLabel>カテゴリー</FormLabel>
@@ -177,17 +176,25 @@ export default function UploadPost() {
               <FormLabel>タイトル</FormLabel>
               <Input {...register("title", { required: true })} type="text" />
             </FormControl>
-            <ReactQuill
-              style={{ width: "800px", height: "600px" }}
-              value={content}
-              onChange={handleQuillChange}
-              modules={modules}
-              formats={formats}
-            />
+            <Box
+              w="100%"
+              maxW={{
+                base: "100%",
+                lg: "800px",
+              }}
+            >
+              <ReactQuill
+                value={content}
+                onChange={handleQuillChange}
+                modules={modules}
+                formats={formats}
+                style={{ height: "400px" }}
+              />
+            </Box>
             {mutation.isError && (
               <Text color={"red"}>エラーが発生しました</Text>
             )}
-            <Button type="submit" isLoading={mutation.isLoading}>
+            <Button mt={10} type="submit" isLoading={mutation.isLoading}>
               投稿
             </Button>
           </VStack>

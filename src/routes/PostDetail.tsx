@@ -21,6 +21,12 @@ import {
   Flex,
   Input,
   border,
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuList,
+  IconButton,
+  Textarea,
 } from "@chakra-ui/react";
 import { Icon } from '@chakra-ui/react';
 import { Link } from "react-router-dom";
@@ -29,7 +35,7 @@ import { useState,useRef, useEffect } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { uploadImages,getUploadURL } from "../api";
 import { useForm } from "react-hook-form";
-import { FaThumbsUp,FaThumbsDown, FaArrowRight, FaAngleRight } from 'react-icons/fa';
+import { FaThumbsUp,FaThumbsDown, FaArrowRight, FaAngleRight,FaEllipsisV, FaEdit, FaTrash } from 'react-icons/fa';
 import {formarYearToMinutes} from '../component/FormatTime'
 
 type MyState = {
@@ -67,7 +73,7 @@ export default function PostDetail() {
   const reviewPkRef = useRef<number | null>(null);
   const {handleSubmit } = useForm<IUploadPostVariables>();
   const toast = useToast();
-  const inputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
   const [editingReviewContent, setEditingReviewContent] = useState("");
   const [isEditing, setIsEditing] = useState(false);
   const [isReplyReview, setIsReplyReview] =useState(false);
@@ -253,142 +259,186 @@ export default function PostDetail() {
   }
 
   return (
-    <Flex paddingLeft="180px" paddingRight="180px">
-    <Box mt={10} px={{ base: 10, lg: 40 }} width="100%">
-      <Heading>{data?.title}</Heading>
-      <HStack borderBottom="2px solid gray">
-        <Box mt={3} display="flex">
-          <Text fontSize={"xl"}>
-            作成者: 
-            <Link to={`/OtherInfo/${data?.author?.id}`}>
-            {data?.author?.name}
-            </Link>
-          </Text>
-          <Text ml={6} fontSize={"xl"}>
-            {data?.updated_at && formarYearToMinutes(data.updated_at)}
-          </Text>
-        </Box>
-        {data?.is_author ? (
-          <Button mt={4} size={"sm"} onClick={() => {navigate('/post/modifypost',{state:{modifypk:postPk}})}} >
-            修正
-          </Button>
-        ) : null}
-        {data?.is_author ? (
-          <Button mt={4} onClick={onOpen} size={"sm"}>
-            削除
-          </Button>
-        ) : null}
-        <Modal isOpen={isOpen} onClose={onClose}>
-        <ModalOverlay />
-        <ModalContent>
-          <ModalCloseButton />
-          <ModalBody>
-            <Box marginTop="20px">
-            <Center>
-            <Text>本当に削除しますか？</Text>
-            </Center>
-            </Box>
-          </ModalBody>
-          <ModalFooter>
-            <Button colorScheme="blue" mr={3} onClick={onClose}>
-              閉じる
-            </Button>
-            <Button variant="ghost" onClick={() => data?.id && handleDeletePost(data.id)}>削除</Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
-      </HStack>
-      <Grid mt={8} h={"60vh"} >
-        {data?.photo && data?.photo.length > 0
-          ? data?.photo.map((photo) => (
+    <Flex
+      paddingX={{ base: "20px", md: "40px", lg: "180px" }}
+      direction={{ base: "column", md: "row" }}
+    >
+      <Box mt={10} width="100%">
+        <Heading>{data?.title}</Heading>
+        <HStack borderBottom="2px solid gray" flexWrap="wrap">
+          <Box mt={3} display="flex">
+            <Text fontSize={"xl"}>
+              <Link to={`/OtherInfo/${data?.author?.id}`}>
+                {data?.author?.name}
+              </Link>
+            </Text>
+            <Text ml={6} fontSize={"xl"}>
+              {data?.updated_at && formarYearToMinutes(data.updated_at)}
+            </Text>
+          </Box>
+          {data?.is_author && (
+            <>
+              <Button
+                mt={4}
+                size={"sm"}
+                onClick={() => {
+                  navigate('/post/modifypost', { state: { modifypk: postPk } })
+                }}
+              >
+                修正
+              </Button>
+              <Button mt={4} onClick={onOpen} size={"sm"}>
+                削除
+              </Button>
+              <Modal isOpen={isOpen} onClose={onClose}>
+                <ModalOverlay />
+                <ModalContent>
+                  <ModalCloseButton />
+                  <ModalBody>
+                    <Box marginTop="20px">
+                      <Center>
+                        <Text>本当に削除しますか？</Text>
+                      </Center>
+                    </Box>
+                  </ModalBody>
+                  <ModalFooter>
+                    <Button colorScheme="blue" mr={3} onClick={onClose}>
+                      閉じる
+                    </Button>
+                    <Button variant="ghost" onClick={() => data?.id && handleDeletePost(data.id)}>削除</Button>
+                  </ModalFooter>
+                </ModalContent>
+              </Modal>
+            </>
+          )}
+        </HStack>
+        <Grid mt={8} h={"60vh"}>
+          {data?.photo && data?.photo.length > 0
+            ? data?.photo.map((photo) => (
               <Box key={photo.pk}>
                 <Image src={photo.photo_file} />
               </Box>
             ))
-          : null}
-        <Box mt={8}>
-          {data?.content && (
-            <div dangerouslySetInnerHTML={{ __html: data.content }} />
-          )}
-        </Box>
-        <Box display="flex" justifyContent="center">
-          <Button mt={4} isDisabled={disliked} size={"lg"} leftIcon={<Icon as={FaThumbsUp} color= {liked ? "yellow" : "white"} />} onClick={() => data?.id && handleLikeButtonClick(data.id)} colorScheme="green">
-            {likes}
-          </Button>
-          <Button mt={4} isDisabled={liked} size={"lg"} leftIcon={<Icon as={FaThumbsDown} color= {disliked ? "yellow" : "white"} />} onClick={() => data?.id && handleDisLikeButtonClick(data.id)} colorScheme="blue">
-            {dislikes}
-          </Button>
-        </Box>
-        <VStack mt={8} alignItems="center" borderBottom="2px solid gray" >
-        <Box width="100%" display="flex" borderBottom="2px solid gray">
-          <Text>コメント</Text>
-          <Text color="red" fontWeight="bold" ml={1}>
-            {reviewsData?.count}
-          </Text>
-          <Text>件</Text>
-        </Box>
-        {reviewsData?.result.map((review, index) => (
-          <Box key={index} width={review.parent_review !== null ? "90%" : "100%"} py={4} borderBottom="1px solid gray" backgroundColor={review.parent_review !== null ? "lightgray" : "white" } border={review.parent_review !== null ? "1px solid gray" : "" }>
-            <HStack>
-            {review.parent_review !== null && 
-            <Box flex={0.1} alignContent="center">
-              <Icon as={FaAngleRight} ></Icon>
-            </Box>
-            }
-            <Box flex={review.parent_review !== null ? 0.85 : 1} borderRight="1px solid gray" textAlign="left">
-              {review.user?.name}
-            </Box>
-            <Box flex={3} onClick={() => {review.parent_review === null && setParentReviewId(review.id); setIsReplyReview(true);}}>
-              <div dangerouslySetInnerHTML={{ __html: review.review_content }} />
-            </Box>
-            <Box flex={0.5} borderRight="1px solid lightgray">
-              <Text color="dimgray" fontSize={"xs"}>
-                {formarYearToMinutes(review.created_at)}
+            : null}
+          <Box mt={8}>
+            {data?.content && (
+              <div dangerouslySetInnerHTML={{ __html: data.content }} />
+            )}
+          </Box>
+          <Box display="flex" justifyContent="center">
+            <Button
+              mt={4}
+              isDisabled={disliked}
+              size={"lg"}
+              leftIcon={<Icon as={FaThumbsUp} color={liked ? "yellow" : "white"} />}
+              onClick={() => data?.id && handleLikeButtonClick(data.id)}
+              colorScheme="green"
+            >
+              {likes}
+            </Button>
+            <Button
+              mt={4}
+              isDisabled={liked}
+              size={"lg"}
+              leftIcon={<Icon as={FaThumbsDown} color={disliked ? "yellow" : "white"} />}
+              onClick={() => data?.id && handleDisLikeButtonClick(data.id)}
+              colorScheme="blue"
+            >
+              {dislikes}
+            </Button>
+          </Box>
+          <VStack mt={8} alignItems="center" borderBottom="2px solid gray">
+            <Box width="100%" display="flex" borderBottom="2px solid gray">
+              <Text>コメント</Text>
+              <Text color="red" fontWeight="bold" ml={1}>
+                {reviewsData?.count}
               </Text>
+              <Text>件</Text>
             </Box>
-            {review?.is_author && review?.review_content != "この投稿は削除されました" ? (
-            <Button borderRight="1px solid lightgray" variant="ghost" onClick={() => handleEditButtonClick(review.review_content,review.id)}>
-              編集
-            </Button>
-            ) : <Button borderRight="1px solid lightgray"><Text textDecoration="line-through underline">編集</Text></Button>}
-          {review?.is_author && review?.review_content != "この投稿は削除されました" ? (
-            <Button variant="ghost" onClick={() => review?.id && handleDeleteReview(review.id)}>
-              削除
-            </Button>
-            ) : 
-            <Button borderRight="1px solid lightgray"><Text textDecoration="line-through underline">削除</Text></Button>}
-            </HStack>
-            { isReplyReview && parentReviewId === review.id && review?.review_content != "この投稿は削除されました" &&
-            <Box>
-              <Input height="width 80%" type="text" textAlign="left" ref={replyInputRef}></Input>
-              <Button onClick={() => replyButtonClick(review.id)}>投稿</Button>
-              <Button onClick={() => {setIsReplyReview(false); setParentReviewId(null)}}>キャンセル</Button>
-            </Box>
-            }
-          </Box>
-        ))}
-      </VStack>
-      <VStack
-        spacing={8}
-        as="form"
-        onSubmit={handleSubmit(onSubmit)}
-        mt={5}
-      >
-      <Input height="200px" placeholder="コメントを書く" border="1px solid gray" width="60%" type="text" textAlign="left" defaultValue={editingReviewContent} ref={inputRef}></Input>
-      {!isEditing && (
-        <Button margin="5px" type="submit" isLoading={mutation.isLoading}>
-          投稿
-        </Button>
-      )}
-        {isEditing && (
-          <Box>
-          <Button onClick={EditButtonClick}>保存</Button> 
-          <Button onClick={handleCancelEdit}>キャンセル</Button>
-          </Box>
-        )}
-      </VStack>
-      </Grid>
-    </Box>
+            {reviewsData?.result.map((review, index) => (
+              <Box
+                key={index}
+                width={review.parent_review !== null ? "90%" : "100%"}
+                py={4}
+                borderBottom="1px solid gray"
+                backgroundColor={review.parent_review !== null ? "lightgray" : "white"}
+                border={review.parent_review !== null ? "1px solid gray" : ""}
+              >
+                <HStack>
+                  {review.parent_review !== null &&
+                    <Box flex={0.1} alignContent="center">
+                      <Icon as={FaAngleRight}></Icon>
+                    </Box>
+                  }
+                  <Box flex={review.parent_review !== null ? 0.85 : 1} borderRight="1px solid gray" textAlign="left">
+                    {review.user?.name}
+                  </Box>
+                  <Box flex={3} onClick={() => { review.parent_review === null && setParentReviewId(review.id); setIsReplyReview(true); }} 
+                    dangerouslySetInnerHTML={{ __html: review.review_content }}
+                    whiteSpace="normal"
+                  />
+                  <Box flex={0.5} borderRight="1px solid lightgray">
+                    <Text color="dimgray" fontSize={"xs"}>
+                      {formarYearToMinutes(review.created_at)}
+                    </Text>
+                  </Box>
+                  {review?.is_author && review?.review_content !== "この投稿は削除されました" && (
+                    <Menu>
+                      <MenuButton
+                        as={IconButton}
+                        aria-label="Options"
+                        icon={<FaEllipsisV />}
+                        backgroundColor={review.parent_review !== null ? "lightgray" : "white"}
+                      />
+                      <MenuList>
+                        <MenuItem icon={<FaEdit />} onClick={() => handleEditButtonClick(review.review_content, review.id)}>
+                          編集
+                        </MenuItem>
+                        <MenuItem icon={<FaTrash />} onClick={() => review?.id && handleDeleteReview(review.id)}>
+                          削除
+                        </MenuItem>
+                      </MenuList>
+                    </Menu>
+                  )}
+                </HStack>
+                {isReplyReview && parentReviewId === review.id && review?.review_content != "この投稿は削除されました" &&
+                  <Box>
+                    <Input height="width 80%" type="text" textAlign="left" ref={replyInputRef}></Input>
+                    <Button onClick={() => replyButtonClick(review.id)}>投稿</Button>
+                    <Button onClick={() => { setIsReplyReview(false); setParentReviewId(null) }}>キャンセル</Button>
+                  </Box>
+                }
+              </Box>
+            ))}
+          </VStack>
+          <VStack
+            spacing={8}
+            as="form"
+            onSubmit={handleSubmit(onSubmit)}
+            mt={5}
+          >
+            <Textarea
+              height="200px"
+              placeholder="コメントを書く"
+              border="1px solid gray"
+              width={{ base: "90%", md: "80%", lg: "60%" }}
+              defaultValue={editingReviewContent}
+              ref={inputRef}
+            />
+            {!isEditing && (
+              <Button margin="5px" type="submit" isLoading={mutation.isLoading}>
+                投稿
+              </Button>
+            )}
+            {isEditing && (
+              <Box>
+                <Button onClick={EditButtonClick}>保存</Button>
+                <Button onClick={handleCancelEdit}>キャンセル</Button>
+              </Box>
+            )}
+          </VStack>
+        </Grid>
+      </Box>
     </Flex>
   );
 }

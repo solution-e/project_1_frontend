@@ -15,7 +15,9 @@ import {
   Text,
   HStack,
   Container,
-  Heading
+  Heading,
+  List,
+  useBreakpointValue,
 } from "@chakra-ui/react";
 import { FaStar } from "react-icons/fa";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -30,6 +32,7 @@ import {
   GetsearchPostList,
 } from "../api";
 import Post from "../component/Post";
+import SmartPhonePost from "src/component/SmartPhonePost";
 import { IfavoriteStatus, IPostInfo } from "../types";
 import { useParams, useLocation, useNavigate } from "react-router-dom";
 import userUser from "../lib/useUser";
@@ -44,6 +47,7 @@ export default function Home() {
   const isCategoryInUrl = location.pathname.includes("category");
   const { categoryId } = useParams();
   const { isLoggedIn } = userUser();
+  const isMobile = useBreakpointValue({ base: true, md: false });
 
   const params = new URLSearchParams(location.search);
   const srcParam = params.get('src');
@@ -125,7 +129,7 @@ export default function Home() {
 
   return (
     <Flex justifyContent="center" alignItems="center" width={"100%"}>
-      <Box width={{ base: "100%", md: "80%" }} p={4}>
+      <Box width={{ base: "100%", md: "80%" }}  p={4}>
         <VStack>
           <Grid
             rowGap={4}
@@ -134,8 +138,9 @@ export default function Home() {
               lg: "repeat(1, 1fr)",
             }}
             marginTop={{ base: 4, md: 100 }}
+            width={{ base: "100%", md: "80%" }}
           >
-            <VStack>
+            <VStack alignItems={"center"}>
               <Box>
                 <Link href={`/category/`}>
                   <Button px={6} colorScheme={'blue'} bg={'blue.400'} _hover={{ bg: 'blue.500' }}>
@@ -168,39 +173,34 @@ export default function Home() {
               </TabList>
               <TabPanels>
                 <TabPanel>
-                  <Box borderBottom="2px solid lightgray" display="flex" borderTop="2px solid lightgray" height="40px" width="100%" >
-                    <HStack>
-                      <Box marginBottom={1} marginTop={1} width="70px"></Box>
-                      <Container width="200px" ml="0px">
-                        <Heading
-                          width="auto"
-                          overflow="hidden"
-                          alignContent="left"
-                          textOverflow="ellipsis"
-                          whiteSpace="nowrap"
-                          fontSize="sm"
-                        >
-                          タイトル
-                        </Heading>
-                      </Container>
-                      <Text color={"dimgray"} ml={10} width="100px">カテゴリー</Text>
-                      <Text color={"dimgray"} width="25px"></Text>
-                      <Text color={"dimgray"} width="25px"></Text>
-                      <Text color={"dimgray"} width="70px">作成日</Text>
-                    </HStack>
-                  </Box>
                   {data && Array.isArray(data.result) && data.result.map((post) => (
-                    <Post
-                      key={post.id}
-                      id={post.id}
-                      imageUrl={post.mainimage}
-                      review_count={post.review_count}
-                      title={post.title}
-                      category={post.category.name}
-                      created_at={formatHourToMinutes(post.created_at)}
-                      total_likes={post.total_likes}
-                      total_dislikes={post.total_dislikes}
-                    />
+                    <List>
+                      {isMobile ?
+                      <SmartPhonePost
+                        key={post.id}
+                        id={post.id}
+                        imageUrl={post.imageUrl}
+                        title={post.title}
+                        category={post.category.name}
+                        created_at={formatHourToMinutes(post.created_at)}
+                        review_count={post.review_count}
+                        total_likes={post.total_likes}
+                        total_dislikes={post.total_dislikes}
+                      />
+                      :
+                      <Post
+                        key={post.id}
+                        id={post.id}
+                        imageUrl={post.imageUrl}
+                        title={post.title}
+                        category={post.category.name}
+                        created_at={formatHourToMinutes(post.created_at)}
+                        review_count={post.review_count}
+                        total_likes={post.total_likes}
+                        total_dislikes={post.total_dislikes}
+                      />
+}
+                  </List>
                   ))}
                   {data?.count == 0 &&
                     <Box>
@@ -224,17 +224,19 @@ export default function Home() {
                     </HStack>
                   </Box>
                   {SortListData && Array.isArray(SortListData) && SortListData.map((post) => (
+                    <List spacing={3}>
                     <Post
                       key={post.id}
                       id={post.id}
-                      imageUrl={post.photo[0]?.photo_file}
-                      review_count={post.review_count}
+                      imageUrl={post.imageUrl}
                       title={post.title}
                       category={post.category.name}
-                      created_at={formatHourToMinutes(post.created_at)}
+                      created_at={post.created_at}
+                      review_count={post.review_count}
                       total_likes={post.total_likes}
                       total_dislikes={post.total_dislikes}
                     />
+                </List>
                   ))}
                   {SortListData?.count == 0 &&
                     <Box>

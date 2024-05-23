@@ -94,6 +94,7 @@ export default function Header() {
       py={2}
       px={10}
       borderBottomWidth={1}
+      width={"100%"}
     >
       <Link to={"/"}>
         <Box color={"green.500"}>
@@ -103,7 +104,7 @@ export default function Header() {
       <form onSubmit={handleSearch}>
       <Stack direction="row" spacing={2}>
       <VStack spacing={8}>
-        <Select value={selectedItem} onChange={handleItemSelect} width="140px">
+        <Select value={selectedItem} onChange={handleItemSelect} width="100%">
           <option value="all">全て</option>
           <option value="title">タイトル</option>
           <option value="user">ユーザー名</option>

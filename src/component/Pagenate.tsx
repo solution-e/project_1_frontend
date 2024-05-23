@@ -1,6 +1,8 @@
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Button, Box } from '@chakra-ui/react';
+import { Button, Box, IconButton } from '@chakra-ui/react';
 import React from 'react';
+import { MdArrowBack, MdArrowForward } from "react-icons/md"
+
 
 interface PaginationProps {
   currentPage: string;
@@ -29,16 +31,41 @@ const Pagenate: React.FC<PaginationProps> = ({ currentPage, totalItems }) => {
   }
 
   return (
-    <Box display="flex" justifyContent="center">
-      { totalPages > 1 &&
-        <Button onClick={() => goToPage(pageId - 1)} isDisabled={pageId <= 1}>Previous</Button>
-      }
+    <Box display="flex" justifyContent="center" flexWrap={{ base: "wrap", md: "nowrap" }} mt={4}>
+      {totalPages > 1 && (
+        <IconButton
+        size="sm"
+        icon={<MdArrowBack />}
+        onClick={() => goToPage(pageId - 1)}
+        isDisabled={pageId <= 1}
+        mx={1}
+        mb={{ base: 2, md: 0 }}
+        aria-label="Previous page"
+      />
+      )}
       {totalPages > 1 && pageNumbers.map((number) => (
-        <Button bg={number === pageId ? "lightblue" : ""} key={number} onClick={() => goToPage(number)}>{number}</Button>
+        <Button
+          size="sm"
+          bg={number === pageId ? "lightblue" : ""}
+          key={number}
+          onClick={() => goToPage(number)}
+          mx={1}
+          mb={{ base: 2, md: 0 }}
+        >
+          {number}
+        </Button>
       ))}
-      { totalPages > 1 && 
-        <Button onClick={() => goToPage(pageId + 1)} isDisabled={totalPages <= pageId}>Next</Button>
-      }
+      {totalPages > 1 && (
+        <IconButton
+          size="sm"
+          icon={<MdArrowForward />}
+          onClick={() => goToPage(pageId + 1)}
+          isDisabled={totalPages <= pageId}
+          mx={1}
+          mb={{ base: 2, md: 0 }}
+          aria-label="Next page"
+        />
+      )}
     </Box>
   );
 };
