@@ -16,8 +16,8 @@ interface IPost {
 }
 
 export interface IPostInfo {
-  count:number;
-  result: IPostListSearch;
+  count: number;
+  result: IPostList;
 }
 
 export interface IPostList {
@@ -52,7 +52,7 @@ export interface ISortPostList {
 export interface ICategory {
   id: number;
   name: string;
-  parent_category
+  parent_category;
 }
 
 export interface IPostCreatedAt {
@@ -76,7 +76,7 @@ export interface IPostDetail {
 }
 
 interface IAuthor {
-  id : string;
+  id: string;
   name: string;
 }
 
@@ -93,7 +93,7 @@ export interface IUser {
 
 export interface IReviewInfo {
   count: number;
-  result:IReview[];
+  result: IReview[];
 }
 
 export interface IReview {
@@ -101,8 +101,8 @@ export interface IReview {
   user: IUser;
   review_content: string;
   created_at: string;
-  is_author:boolean;
-  parent_review:number;
+  is_author: boolean;
+  parent_review: number;
 }
 
 interface ISignUpVariables {
@@ -135,13 +135,13 @@ interface ILikeSortPostCount {
 }
 
 interface IfavoriteStatus {
-  isFavorite:boolean;
+  isFavorite: boolean;
 }
 
 interface IIsLike {
-  islike:boolean;
+  islike: boolean;
 }
 
 interface IIsDislike {
-  isdislikes:boolean;
+  isdislikes: boolean;
 }

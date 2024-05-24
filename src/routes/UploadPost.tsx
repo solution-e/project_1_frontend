@@ -9,12 +9,23 @@ import {
   Text,
   VStack,
   useToast,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  Spinner,
 } from "@chakra-ui/react";
 import ReactQuill from "react-quill";
 import ProtectedPage from "../component/ProtectedPage";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { ICategory } from "../types";
-import { uploadPost, uploadImages, getUploadURL, getCategoryInfo } from "../api";
+import {
+  uploadPost,
+  uploadImages,
+  getUploadURL,
+  getCategoryInfo,
+} from "../api";
 import { useForm } from "react-hook-form";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useState, useRef } from "react";
@@ -35,6 +46,7 @@ interface IUploadURLResponse {
 
 export default function UploadPost() {
   const [content, setContent] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const contentRef = useRef("");
   const mainImgRef = useRef("");
   const location = useLocation();
@@ -84,9 +96,14 @@ export default function UploadPost() {
   };
 
   const uploadImageMutation = useMutation(uploadImages, {
-    onSuccess: async (data: any, variables: { regexwords: string, count: number }) => {
-      console.log("success");
-      contentRef.current = contentRef.current.replace(variables.regexwords, data.result.variants);
+    onSuccess: async (
+      data: any,
+      variables: { regexwords: string; count: number }
+    ) => {
+      contentRef.current = contentRef.current.replace(
+        variables.regexwords,
+        data.result.variants
+      );
       if (variables.count == 0) {
         mainImgRef.current = data.result.variants;
       }
@@ -94,7 +111,10 @@ export default function UploadPost() {
   });
 
   const uploadURLMutation = useMutation(getUploadURL, {
-    onSuccess: async (data: IUploadURLResponse, variables: { blob: Blob, regexword: string, count: number }) => {
+    onSuccess: async (
+      data: IUploadURLResponse,
+      variables: { blob: Blob; regexword: string; count: number }
+    ) => {
       await uploadImageMutation.mutateAsync({
         uploadURL: data.result.uploadURL,
         blob: variables.blob,
@@ -105,6 +125,9 @@ export default function UploadPost() {
   });
 
   const mutation = useMutation(uploadPost, {
+    onMutate: () => {
+      setIsLoading(true);
+    },
     onSuccess: async (data) => {
       toast({
         status: "success",
@@ -112,6 +135,9 @@ export default function UploadPost() {
         position: "bottom",
       });
       navigate(`/post/${data.id}`);
+    },
+    onSettled: () => {
+      setIsLoading(false);
     },
   });
 
@@ -125,7 +151,11 @@ export default function UploadPost() {
     }
     const blob = BasetoUrl(imgSrcMatches);
     const uploadPromises = blob.map(async (blobItem, i) => {
-      await uploadURLMutation.mutateAsync({ blob: blobItem, regexword: imgSrcMatches[i], count: i });
+      await uploadURLMutation.mutateAsync({
+        blob: blobItem,
+        regexword: imgSrcMatches[i],
+        count: i,
+      });
     });
 
     await Promise.all(uploadPromises);
@@ -168,9 +198,7 @@ export default function UploadPost() {
           >
             <FormControl>
               <FormLabel>カテゴリー</FormLabel>
-              <Text>
-                {categoryData?.name}
-              </Text>
+              <Text>{categoryData?.name}</Text>
             </FormControl>
             <FormControl>
               <FormLabel>タイトル</FormLabel>
@@ -182,6 +210,7 @@ export default function UploadPost() {
                 base: "100%",
                 lg: "800px",
               }}
+              mb={10}
             >
               <ReactQuill
                 value={content}
@@ -200,6 +229,16 @@ export default function UploadPost() {
           </VStack>
         </Container>
       </Box>
+
+      <Modal isOpen={isLoading} onClose={() => {}}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>投稿中</ModalHeader>
+          <ModalBody display="flex" justifyContent="center" alignItems="center">
+            <Spinner size="xl" />
+          </ModalBody>
+        </ModalContent>
+      </Modal>
     </ProtectedPage>
   );
 }

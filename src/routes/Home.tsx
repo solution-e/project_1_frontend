@@ -14,7 +14,6 @@ import {
   TabPanel,
   Text,
   HStack,
-  Container,
   Heading,
   List,
   useBreakpointValue,
@@ -50,9 +49,9 @@ export default function Home() {
   const isMobile = useBreakpointValue({ base: true, md: false });
 
   const params = new URLSearchParams(location.search);
-  const srcParam = params.get('src');
-  const page = params.get('page') || '1';
-  const srcObject = params.get('srcobj') || 'all'
+  const srcParam = params.get("src");
+  const page = params.get("page") || "1";
+  const srcObject = params.get("srcobj") || "all";
   const searchquery = categoryId !== undefined ? "category" : "post";
   let queryFn;
   let queryKey;
@@ -71,7 +70,8 @@ export default function Home() {
     queryFn: queryFn,
   });
 
-  const SortQuery = searchquery === "category" ? GetLikeSortCategoryList : GetLikeSortPostList
+  const SortQuery =
+    searchquery === "category" ? GetLikeSortCategoryList : GetLikeSortPostList;
   const { data: SortListData } = useQuery<IPostInfo>({
     queryKey: [searchquery, Number(page)],
     queryFn: SortQuery,
@@ -80,17 +80,23 @@ export default function Home() {
   const { data: isfavorite } = useQuery<IfavoriteStatus>({
     queryKey: ["favorite", categoryId],
     queryFn: isFavorite,
-  })
+  });
 
-  const [favorited, setFavorited] = useState<boolean | undefined>(isfavorite?.isFavorite);
+  const [favorited, setFavorited] = useState<boolean | undefined>(
+    isfavorite?.isFavorite
+  );
   useEffect(() => {
     if (isfavorite !== undefined) {
       setFavorited(isfavorite.isFavorite);
     }
   }, [isfavorite]);
 
-  const AddFavoriteMutation = useMutation((categoryId: number) => addFavorite({ queryKey: ['favorite', Number(categoryId)] }));
-  const RemoveFavoriteMutation = useMutation((categoryId: number) => removeFavorite({ queryKey: ['favorite', Number(categoryId)] }));
+  const AddFavoriteMutation = useMutation((categoryId: number) =>
+    addFavorite({ queryKey: ["favorite", Number(categoryId)] })
+  );
+  const RemoveFavoriteMutation = useMutation((categoryId: number) =>
+    removeFavorite({ queryKey: ["favorite", Number(categoryId)] })
+  );
 
   const handleFavoriteButtonClick = async () => {
     try {
@@ -129,7 +135,7 @@ export default function Home() {
 
   return (
     <Flex justifyContent="center" alignItems="center" width={"100%"}>
-      <Box width={{ base: "100%", md: "80%" }}  p={4}>
+      <Box width={{ base: "100%", md: "80%" }}>
         <VStack>
           <Grid
             rowGap={4}
@@ -143,108 +149,128 @@ export default function Home() {
             <VStack alignItems={"center"}>
               <Box>
                 <Link href={`/category/`}>
-                  <Button px={6} colorScheme={'blue'} bg={'blue.400'} _hover={{ bg: 'blue.500' }}>
+                  <Button
+                    px={6}
+                    colorScheme={"blue"}
+                    bg={"blue.400"}
+                    _hover={{ bg: "blue.500" }}
+                  >
                     カテゴリー
                   </Button>
                 </Link>
                 {isLoggedIn && isCategoryInUrl && (
                   <Button
                     px={6}
-                    colorScheme={'blue'}
-                    bg={'blue.400'}
-                    _hover={{ bg: 'blue.500' }}
+                    colorScheme={"blue"}
+                    bg={"blue.400"}
+                    _hover={{ bg: "blue.500" }}
                     ml={3}
-                    onClick={() => { navigate('/post/upload', { state: { categorypk: categoryId } }) }}
+                    onClick={() => {
+                      navigate("/post/upload", {
+                        state: { categorypk: categoryId },
+                      });
+                    }}
                   >
                     投稿
                   </Button>
                 )}
                 {isLoggedIn && isCategoryInUrl && (
-                  <Button variant="unstyled" onClick={handleFavoriteButtonClick}>
-                    <Icon as={FaStar} color={favorited ? "yellow" : "black"} ml={3} />
+                  <Button
+                    variant="unstyled"
+                    onClick={handleFavoriteButtonClick}
+                  >
+                    <Icon
+                      as={FaStar}
+                      color={favorited ? "yellow" : "black"}
+                      ml={3}
+                    />
                   </Button>
                 )}
               </Box>
             </VStack>
-            <Tabs onChange={handleTabChange} variant="soft-rounded" colorScheme="blue">
+            <Tabs
+              onChange={handleTabChange}
+              variant="soft-rounded"
+              colorScheme="blue"
+            >
               <TabList>
                 <Tab>ALL</Tab>
                 <Tab>Best</Tab>
               </TabList>
               <TabPanels>
                 <TabPanel>
-                  {data && Array.isArray(data.result) && data.result.map((post) => (
-                    <List>
-                      {isMobile ?
-                      <SmartPhonePost
-                        key={post.id}
-                        id={post.id}
-                        imageUrl={post.imageUrl}
-                        title={post.title}
-                        category={post.category.name}
-                        created_at={formatHourToMinutes(post.created_at)}
-                        review_count={post.review_count}
-                        total_likes={post.total_likes}
-                        total_dislikes={post.total_dislikes}
-                      />
-                      :
-                      <Post
-                        key={post.id}
-                        id={post.id}
-                        imageUrl={post.imageUrl}
-                        title={post.title}
-                        category={post.category.name}
-                        created_at={formatHourToMinutes(post.created_at)}
-                        review_count={post.review_count}
-                        total_likes={post.total_likes}
-                        total_dislikes={post.total_dislikes}
-                      />
-}
-                  </List>
-                  ))}
-                  {data?.count == 0 &&
+                  {data &&
+                    Array.isArray(data.result) &&
+                    data.result.map((post) => (
+                      <List>
+                        {isMobile ? (
+                          <SmartPhonePost
+                            key={post.id}
+                            id={post.id}
+                            imageUrl={post.mainimage}
+                            title={post.title}
+                            category={post.category.name}
+                            created_at={formatHourToMinutes(post.created_at)}
+                            review_count={post.review_count}
+                            total_likes={post.total_likes}
+                            total_dislikes={post.total_dislikes}
+                          />
+                        ) : (
+                          <Post
+                            key={post.id}
+                            id={post.id}
+                            imageUrl={post.mainimage}
+                            title={post.title}
+                            category={post.category.name}
+                            created_at={formatHourToMinutes(post.created_at)}
+                            review_count={post.review_count}
+                            total_likes={post.total_likes}
+                            total_dislikes={post.total_dislikes}
+                          />
+                        )}
+                      </List>
+                    ))}
+                  {data?.count == 0 && (
                     <Box>
                       <Text>対象の投稿物は存在しません</Text>
                     </Box>
-                  }
-                  {data &&
-                    <Pagenate currentPage={page} totalItems={data.count}></Pagenate>}
+                  )}
+                  {data && (
+                    <Pagenate
+                      currentPage={page}
+                      totalItems={data.count}
+                    ></Pagenate>
+                  )}
                 </TabPanel>
                 <TabPanel>
-                  <Box borderBottom="2px solid lightgray" display="flex" borderTop="2px solid lightgray" height="40px" width="100%" >
-                    <HStack>
-                      <Box marginBottom={1} marginTop={1} width="70px"></Box>
-                      <Box width="400px" ml="0px">
-                        タイトル
-                      </Box>
-                      <Text color={"dimgray"} ml={10} width="100px">カテゴリー</Text>
-                      <Text color={"dimgray"} width="25px"></Text>
-                      <Text color={"dimgray"} width="25px"></Text>
-                      <Text color={"dimgray"} width="70px">作成日</Text>
-                    </HStack>
-                  </Box>
-                  {SortListData && Array.isArray(SortListData) && SortListData.map((post) => (
-                    <List spacing={3}>
-                    <Post
-                      key={post.id}
-                      id={post.id}
-                      imageUrl={post.imageUrl}
-                      title={post.title}
-                      category={post.category.name}
-                      created_at={post.created_at}
-                      review_count={post.review_count}
-                      total_likes={post.total_likes}
-                      total_dislikes={post.total_dislikes}
-                    />
-                </List>
-                  ))}
-                  {SortListData?.count == 0 &&
+                  {SortListData &&
+                    Array.isArray(SortListData) &&
+                    SortListData.map((post) => (
+                      <List spacing={3}>
+                        <Post
+                          key={post.id}
+                          id={post.id}
+                          imageUrl={post.imageUrl}
+                          title={post.title}
+                          category={post.category.name}
+                          created_at={post.created_at}
+                          review_count={post.review_count}
+                          total_likes={post.total_likes}
+                          total_dislikes={post.total_dislikes}
+                        />
+                      </List>
+                    ))}
+                  {SortListData?.count == 0 && (
                     <Box>
                       <Text align="center">対象の投稿物は存在しません</Text>
                     </Box>
-                  }
-                  {SortListData &&
-                    <Pagenate currentPage={page} totalItems={SortListData.count}></Pagenate>}
+                  )}
+                  {SortListData && (
+                    <Pagenate
+                      currentPage={page}
+                      totalItems={SortListData.count}
+                    ></Pagenate>
+                  )}
                 </TabPanel>
               </TabPanels>
             </Tabs>

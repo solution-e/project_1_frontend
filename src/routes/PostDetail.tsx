@@ -1,6 +1,20 @@
-import {  useNavigate, useParams } from "react-router-dom";
-import { DeletePostDetail,DeleteReviewDetail ,getPostDetail, getPostReviews,IUploadPostVariables, uploadReview,isLike,deleteLike,addLike,isDislike,addDislike,deleteDislike,updateReview } from "../api";
-import { IIsLike, IPostDetail, IReviewInfo ,IIsDislike} from "../types";
+import { useNavigate, useParams } from "react-router-dom";
+import {
+  DeletePostDetail,
+  DeleteReviewDetail,
+  getPostDetail,
+  getPostReviews,
+  IUploadPostVariables,
+  uploadReview,
+  isLike,
+  deleteLike,
+  addLike,
+  isDislike,
+  addDislike,
+  deleteDislike,
+  updateReview,
+} from "../api";
+import { IIsLike, IPostDetail, IReviewInfo, IIsDislike } from "../types";
 import {
   Box,
   Button,
@@ -28,19 +42,27 @@ import {
   IconButton,
   Textarea,
 } from "@chakra-ui/react";
-import { Icon } from '@chakra-ui/react';
+import { Icon } from "@chakra-ui/react";
 import { Link } from "react-router-dom";
 import "react-quill/dist/quill.snow.css";
-import { useState,useRef, useEffect } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { uploadImages,getUploadURL } from "../api";
+import { uploadImages, getUploadURL } from "../api";
 import { useForm } from "react-hook-form";
-import { FaThumbsUp,FaThumbsDown, FaArrowRight, FaAngleRight,FaEllipsisV, FaEdit, FaTrash } from 'react-icons/fa';
-import {formarYearToMinutes} from '../component/FormatTime'
+import {
+  FaThumbsUp,
+  FaThumbsDown,
+  FaArrowRight,
+  FaAngleRight,
+  FaEllipsisV,
+  FaEdit,
+  FaTrash,
+} from "react-icons/fa";
+import { formarYearToMinutes } from "../component/FormatTime";
 
 type MyState = {
-  modifyPostPk:string;
-}
+  modifyPostPk: string;
+};
 
 export default function PostDetail() {
   const { postPk } = useParams();
@@ -61,8 +83,13 @@ export default function PostDetail() {
       setLiked(islike.islike);
     }
   }, [islike]);
-  const { data: isdislike, isLoading: isDislikeLoading } = useQuery<IIsDislike>([`dislike`, postPk], isDislike);
-  const [disliked, setDisLiked] = useState<boolean | undefined>(isdislike?.isdislikes);
+  const { data: isdislike, isLoading: isDislikeLoading } = useQuery<IIsDislike>(
+    [`dislike`, postPk],
+    isDislike
+  );
+  const [disliked, setDisLiked] = useState<boolean | undefined>(
+    isdislike?.isdislikes
+  );
 
   useEffect(() => {
     if (!isDislikeLoading) {
@@ -71,14 +98,14 @@ export default function PostDetail() {
   }, [isdislike, isDislikeLoading]);
   const navigate = useNavigate();
   const reviewPkRef = useRef<number | null>(null);
-  const {handleSubmit } = useForm<IUploadPostVariables>();
+  const { handleSubmit } = useForm<IUploadPostVariables>();
   const toast = useToast();
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const [editingReviewContent, setEditingReviewContent] = useState("");
   const [isEditing, setIsEditing] = useState(false);
-  const [isReplyReview, setIsReplyReview] =useState(false);
+  const [isReplyReview, setIsReplyReview] = useState(false);
   const [parentReviewId, setParentReviewId] = useState<number | null>(null);
-  const [likes , setLikes] = useState<number>(0);
+  const [likes, setLikes] = useState<number>(0);
   const [dislikes, setDislikes] = useState<number>(0);
   useEffect(() => {
     if (data !== undefined) {
@@ -86,20 +113,32 @@ export default function PostDetail() {
       setDislikes(data.dislikes);
     }
   }, [data]);
-  
+
   const replyInputRef = useRef<HTMLInputElement>(null);
 
-  const deletePostMutation = useMutation((postId: number) => DeletePostDetail({ queryKey: ['post', postId] }));
-  const deleteReviewMutation = useMutation((reviewId: number) => DeleteReviewDetail({ queryKey: ['review', reviewId] }));
-  const deleteLikeMutation = useMutation((postId: number) => deleteLike({ queryKey: ['post', postId] }));
-  const AddLikeMutation = useMutation((postId: number) => addLike({ queryKey: ['post', postId] }));
-  const deleteDislikeMutation = useMutation((postId: number) => deleteDislike({ queryKey: ['post', postId] }));
-  const AddDislikeMutation = useMutation((postId: number) => addDislike({ queryKey: ['post', postId] }));
+  const deletePostMutation = useMutation((postId: number) =>
+    DeletePostDetail({ queryKey: ["post", postId] })
+  );
+  const deleteReviewMutation = useMutation((reviewId: number) =>
+    DeleteReviewDetail({ queryKey: ["review", reviewId] })
+  );
+  const deleteLikeMutation = useMutation((postId: number) =>
+    deleteLike({ queryKey: ["post", postId] })
+  );
+  const AddLikeMutation = useMutation((postId: number) =>
+    addLike({ queryKey: ["post", postId] })
+  );
+  const deleteDislikeMutation = useMutation((postId: number) =>
+    deleteDislike({ queryKey: ["post", postId] })
+  );
+  const AddDislikeMutation = useMutation((postId: number) =>
+    addDislike({ queryKey: ["post", postId] })
+  );
 
-  if(postPk != undefined){
+  if (postPk != undefined) {
     const myState: MyState = {
-      modifyPostPk:postPk
-    }
+      modifyPostPk: postPk,
+    };
   }
 
   const handleDeletePost = async (postId: number) => {
@@ -131,17 +170,17 @@ export default function PostDetail() {
     }
   };
 
-  const updateReviewMutation = useMutation(updateReview,{
-    onSuccess: async(data) => {
+  const updateReviewMutation = useMutation(updateReview, {
+    onSuccess: async (data) => {
       toast({
-        status:"success",
-        title:"編集が完了しました",
-        position:"bottom"
+        status: "success",
+        title: "編集が完了しました",
+        position: "bottom",
       });
       window.location.reload();
     },
-  })
-  
+  });
+
   const mutation = useMutation(uploadReview, {
     onSuccess: async (data) => {
       toast({
@@ -149,15 +188,15 @@ export default function PostDetail() {
         title: "投稿しました",
         position: "bottom",
       });
-      window.location.reload()
+      window.location.reload();
     },
   });
 
-  const onSubmit = async(formData: IUploadPostVariables) => {
+  const onSubmit = async (formData: IUploadPostVariables) => {
     const dataToSubmit = {
       review_content: inputRef.current ? inputRef.current.value : "",
-      postPk:Number(postPk),
-      parent_review:null,
+      postPk: Number(postPk),
+      parent_review: null,
     };
     await mutation.mutate(dataToSubmit);
   };
@@ -165,29 +204,29 @@ export default function PostDetail() {
   const handleLikeButtonClick = async (postId: number) => {
     try {
       if (liked) {
-          try {
-            await deleteLikeMutation.mutateAsync(postId);
-            toast({
-              status: "success",
-              title: "いいねを取り消しました",
-              position: "bottom",
-            });
-            setLikes(Number(likes) - 1);
-          } catch (error) {
-            console.error("エラーが発生しました:", error);
-          }
+        try {
+          await deleteLikeMutation.mutateAsync(postId);
+          toast({
+            status: "success",
+            title: "いいねを取り消しました",
+            position: "bottom",
+          });
+          setLikes(Number(likes) - 1);
+        } catch (error) {
+          console.error("エラーが発生しました:", error);
+        }
       } else {
-          try {
-            await AddLikeMutation.mutateAsync(postId);
-            toast({
-              status: "success",
-              title: "いいねしました",
-              position: "bottom",
-            });
-            setLikes(Number(likes) + 1);
-          } catch (error) {
-            console.error("エラーが発生しました:", error);
-          }
+        try {
+          await AddLikeMutation.mutateAsync(postId);
+          toast({
+            status: "success",
+            title: "いいねしました",
+            position: "bottom",
+          });
+          setLikes(Number(likes) + 1);
+        } catch (error) {
+          console.error("エラーが発生しました:", error);
+        }
       }
       setLiked(!liked);
     } catch (error) {
@@ -198,46 +237,48 @@ export default function PostDetail() {
   const EditButtonClick = () => {
     const dataToSubmit = {
       review_content: inputRef.current ? inputRef.current.value : "",
-      reviewPk:reviewPkRef.current ?? 0,
+      reviewPk: reviewPkRef.current ?? 0,
     };
     updateReviewMutation.mutate(dataToSubmit);
   };
 
-
   const handleDisLikeButtonClick = async (postId: number) => {
     try {
       if (disliked) {
-          try {
-            await deleteDislikeMutation.mutateAsync(postId);
-            toast({
-              status: "success",
-              title: "低評価を取り消しました",
-              position: "bottom",
-            });
-            setDislikes(Number(dislikes) - 1)
-          } catch (error) {
-            console.error("エラーが発生しました:", error);
-          }
+        try {
+          await deleteDislikeMutation.mutateAsync(postId);
+          toast({
+            status: "success",
+            title: "低評価を取り消しました",
+            position: "bottom",
+          });
+          setDislikes(Number(dislikes) - 1);
+        } catch (error) {
+          console.error("エラーが発生しました:", error);
+        }
       } else {
-          try {
-            await AddDislikeMutation.mutateAsync(postId);
-            toast({
-              status: "success",
-              title: "低評価しました",
-              position: "bottom",
-            });
-            setDislikes(Number(dislikes) + 1)
-          } catch (error) {
-            console.error("エラーが発生しました:", error);
-          }
+        try {
+          await AddDislikeMutation.mutateAsync(postId);
+          toast({
+            status: "success",
+            title: "低評価しました",
+            position: "bottom",
+          });
+          setDislikes(Number(dislikes) + 1);
+        } catch (error) {
+          console.error("エラーが発生しました:", error);
+        }
       }
-    setDisLiked(!disliked);
+      setDisLiked(!disliked);
     } catch (error) {
       console.error(error);
     }
   };
 
-  const handleEditButtonClick = async (reviewContent: string,reviewPk: number) => {
+  const handleEditButtonClick = async (
+    reviewContent: string,
+    reviewPk: number
+  ) => {
     setIsEditing(true);
     setEditingReviewContent(reviewContent);
     reviewPkRef.current = reviewPk;
@@ -249,14 +290,14 @@ export default function PostDetail() {
     reviewPkRef.current = 0;
   };
 
-  const replyButtonClick = (parentReviewId:number) => {
+  const replyButtonClick = (parentReviewId: number) => {
     const dataToSubmit = {
       review_content: replyInputRef.current ? replyInputRef.current.value : "",
       postPk: postPk ? Number(postPk) : 0,
-      parent_review:parentReviewId,
+      parent_review: parentReviewId,
     };
     mutation.mutate(dataToSubmit);
-  }
+  };
 
   return (
     <Flex
@@ -282,7 +323,7 @@ export default function PostDetail() {
                 mt={4}
                 size={"sm"}
                 onClick={() => {
-                  navigate('/post/modifypost', { state: { modifypk: postPk } })
+                  navigate("/post/modifypost", { state: { modifypk: postPk } });
                 }}
               >
                 修正
@@ -305,7 +346,12 @@ export default function PostDetail() {
                     <Button colorScheme="blue" mr={3} onClick={onClose}>
                       閉じる
                     </Button>
-                    <Button variant="ghost" onClick={() => data?.id && handleDeletePost(data.id)}>削除</Button>
+                    <Button
+                      variant="ghost"
+                      onClick={() => data?.id && handleDeletePost(data.id)}
+                    >
+                      削除
+                    </Button>
                   </ModalFooter>
                 </ModalContent>
               </Modal>
@@ -315,10 +361,10 @@ export default function PostDetail() {
         <Grid mt={8} h={"60vh"}>
           {data?.photo && data?.photo.length > 0
             ? data?.photo.map((photo) => (
-              <Box key={photo.pk}>
-                <Image src={photo.photo_file} />
-              </Box>
-            ))
+                <Box key={photo.pk}>
+                  <Image src={photo.photo_file} />
+                </Box>
+              ))
             : null}
           <Box mt={8}>
             {data?.content && (
@@ -330,7 +376,9 @@ export default function PostDetail() {
               mt={4}
               isDisabled={disliked}
               size={"lg"}
-              leftIcon={<Icon as={FaThumbsUp} color={liked ? "yellow" : "white"} />}
+              leftIcon={
+                <Icon as={FaThumbsUp} color={liked ? "yellow" : "white"} />
+              }
               onClick={() => data?.id && handleLikeButtonClick(data.id)}
               colorScheme="green"
             >
@@ -340,9 +388,12 @@ export default function PostDetail() {
               mt={4}
               isDisabled={liked}
               size={"lg"}
-              leftIcon={<Icon as={FaThumbsDown} color={disliked ? "yellow" : "white"} />}
+              leftIcon={
+                <Icon as={FaThumbsDown} color={disliked ? "yellow" : "white"} />
+              }
               onClick={() => data?.id && handleDisLikeButtonClick(data.id)}
               colorScheme="blue"
+              ml={1}
             >
               {dislikes}
             </Button>
@@ -361,19 +412,31 @@ export default function PostDetail() {
                 width={review.parent_review !== null ? "90%" : "100%"}
                 py={4}
                 borderBottom="1px solid gray"
-                backgroundColor={review.parent_review !== null ? "lightgray" : "white"}
+                backgroundColor={
+                  review.parent_review !== null ? "lightgray" : "white"
+                }
                 border={review.parent_review !== null ? "1px solid gray" : ""}
               >
                 <HStack>
-                  {review.parent_review !== null &&
+                  {review.parent_review !== null && (
                     <Box flex={0.1} alignContent="center">
                       <Icon as={FaAngleRight}></Icon>
                     </Box>
-                  }
-                  <Box flex={review.parent_review !== null ? 0.85 : 1} borderRight="1px solid gray" textAlign="left">
+                  )}
+                  <Box
+                    flex={review.parent_review !== null ? 0.85 : 1}
+                    borderRight="1px solid gray"
+                    textAlign="left"
+                  >
                     {review.user?.name}
                   </Box>
-                  <Box flex={3} onClick={() => { review.parent_review === null && setParentReviewId(review.id); setIsReplyReview(true); }} 
+                  <Box
+                    flex={3}
+                    onClick={() => {
+                      review.parent_review === null &&
+                        setParentReviewId(review.id);
+                      setIsReplyReview(true);
+                    }}
                     dangerouslySetInnerHTML={{ __html: review.review_content }}
                     whiteSpace="normal"
                   />
@@ -382,32 +445,66 @@ export default function PostDetail() {
                       {formarYearToMinutes(review.created_at)}
                     </Text>
                   </Box>
-                  {review?.is_author && review?.review_content !== "この投稿は削除されました" && (
-                    <Menu>
-                      <MenuButton
-                        as={IconButton}
-                        aria-label="Options"
-                        icon={<FaEllipsisV />}
-                        backgroundColor={review.parent_review !== null ? "lightgray" : "white"}
-                      />
-                      <MenuList>
-                        <MenuItem icon={<FaEdit />} onClick={() => handleEditButtonClick(review.review_content, review.id)}>
-                          編集
-                        </MenuItem>
-                        <MenuItem icon={<FaTrash />} onClick={() => review?.id && handleDeleteReview(review.id)}>
-                          削除
-                        </MenuItem>
-                      </MenuList>
-                    </Menu>
-                  )}
+                  {review?.is_author &&
+                    review?.review_content !== "この投稿は削除されました" && (
+                      <Menu>
+                        <MenuButton
+                          as={IconButton}
+                          aria-label="Options"
+                          icon={<FaEllipsisV />}
+                          backgroundColor={
+                            review.parent_review !== null
+                              ? "lightgray"
+                              : "white"
+                          }
+                        />
+                        <MenuList>
+                          <MenuItem
+                            icon={<FaEdit />}
+                            onClick={() =>
+                              handleEditButtonClick(
+                                review.review_content,
+                                review.id
+                              )
+                            }
+                          >
+                            編集
+                          </MenuItem>
+                          <MenuItem
+                            icon={<FaTrash />}
+                            onClick={() =>
+                              review?.id && handleDeleteReview(review.id)
+                            }
+                          >
+                            削除
+                          </MenuItem>
+                        </MenuList>
+                      </Menu>
+                    )}
                 </HStack>
-                {isReplyReview && parentReviewId === review.id && review?.review_content != "この投稿は削除されました" &&
-                  <Box>
-                    <Input height="width 80%" type="text" textAlign="left" ref={replyInputRef}></Input>
-                    <Button onClick={() => replyButtonClick(review.id)}>投稿</Button>
-                    <Button onClick={() => { setIsReplyReview(false); setParentReviewId(null) }}>キャンセル</Button>
-                  </Box>
-                }
+                {isReplyReview &&
+                  parentReviewId === review.id &&
+                  review?.review_content != "この投稿は削除されました" && (
+                    <Box>
+                      <Input
+                        height="width 80%"
+                        type="text"
+                        textAlign="left"
+                        ref={replyInputRef}
+                      ></Input>
+                      <Button onClick={() => replyButtonClick(review.id)}>
+                        投稿
+                      </Button>
+                      <Button
+                        onClick={() => {
+                          setIsReplyReview(false);
+                          setParentReviewId(null);
+                        }}
+                      >
+                        キャンセル
+                      </Button>
+                    </Box>
+                  )}
               </Box>
             ))}
           </VStack>
