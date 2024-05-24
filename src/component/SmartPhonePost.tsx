@@ -1,7 +1,18 @@
-import { Box, Container, HStack, VStack, Heading, Image, Text, Icon, ListItem, Flex } from "@chakra-ui/react";
+import {
+  Box,
+  Container,
+  HStack,
+  VStack,
+  Heading,
+  Image,
+  Text,
+  Icon,
+  ListItem,
+  Flex,
+} from "@chakra-ui/react";
 import { Link } from "react-router-dom";
 import { IPost } from "../types";
-import { FaThumbsUp, FaThumbsDown } from 'react-icons/fa';
+import { FaThumbsUp, FaThumbsDown } from "react-icons/fa";
 
 const defaultImageUrl = "/default_no_image.jpeg";
 
@@ -22,10 +33,10 @@ export default function SmartPhonePost({
           <Box marginBottom={1} marginTop={1} flexShrink={0}>
             <Image
               src={imageUrl ? imageUrl : defaultImageUrl}
-              height={{ base: "80px", md: "80px" }} // 画像の高さを統一
+              height={{ base: "80px", md: "80px" }}
               objectFit="cover"
               minH="80px"
-              width={{ base: "140px", md: "140px" }} // 画像の幅を統一
+              width={{ base: "140px", md: "140px" }}
             />
           </Box>
           <VStack
@@ -42,7 +53,7 @@ export default function SmartPhonePost({
                 textOverflow="ellipsis"
                 whiteSpace="nowrap"
                 fontSize="sm"
-                maxWidth="40%"
+                maxWidth="50%"
               >
                 {title}
               </Heading>
@@ -56,16 +67,6 @@ export default function SmartPhonePost({
               </Text>
               <Text color={"dimgray"} fontSize="sm">
                 {created_at}
-              </Text>
-            </HStack>
-            <HStack width="100%" justifyContent="flex">
-              <Text color={"orangered"} fontSize="sm" mr={3}>
-                <Icon as={FaThumbsUp} mr={1} />
-                {total_likes}
-              </Text>
-              <Text color={"dodgerblue"} fontSize="sm">
-                <Icon as={FaThumbsDown} mr={1} />
-                {total_dislikes}
               </Text>
             </HStack>
           </VStack>

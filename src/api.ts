@@ -11,18 +11,18 @@ export const getPostList = () =>
   instance.get("post/").then((response) => response.data);
 
 export const getPostListPagenate = ({ queryKey }: QueryFunctionContext) => {
-const [_, page] = queryKey;
-return instance
-  .get(`post/?page=${page}`)
-  .then((response) => response.data);
+  const [_, page] = queryKey;
+  return instance.get(`post/?page=${page}`).then((response) => response.data);
 };
 
-export const getCategoryPostListPagenate = ({ queryKey }: QueryFunctionContext) => {
-  const [_, categoryId ,page] = queryKey;
+export const getCategoryPostListPagenate = ({
+  queryKey,
+}: QueryFunctionContext) => {
+  const [_, categoryId, page] = queryKey;
   return instance
     .get(`category/${categoryId}/post?page=${page}`)
     .then((response) => response.data);
-  };
+};
 
 export const getCategoryPostList = ({ queryKey }: QueryFunctionContext) => {
   const [_, categoryId] = queryKey;
@@ -51,7 +51,6 @@ export const getCategoryPostCount = ({ queryKey }: QueryFunctionContext) => {
     .then((response) => response.data);
 };
 
-
 export const getCategoryPost = ({ queryKey }: QueryFunctionContext) => {
   const [_, categoryPk] = queryKey;
   return instance
@@ -63,26 +62,34 @@ export const getPostDetail = ({ queryKey }: QueryFunctionContext) => {
   const [_, postPk] = queryKey;
   return instance.get(`post/${postPk}`).then((response) => response.data);
 };
-export const DeletePostDetail = async ({ queryKey }: { queryKey: (string | number)[] }) => {
+export const DeletePostDetail = async ({
+  queryKey,
+}: {
+  queryKey: (string | number)[];
+}) => {
   const [_, postPk] = queryKey;
-  return instance.delete(`post/${postPk}`, {
-    headers: {
-      "X-CSRFTOKEN": Cookie.get("csrftoken") || "",
-    },
-  })
-  .then((response) => response.data);
+  return instance
+    .delete(`post/${postPk}`, {
+      headers: {
+        "X-CSRFTOKEN": Cookie.get("csrftoken") || "",
+      },
+    })
+    .then((response) => response.data);
 };
 
-
-
-export const DeleteReviewDetail = async ({ queryKey }: { queryKey: (string | number)[] }) => {
+export const DeleteReviewDetail = async ({
+  queryKey,
+}: {
+  queryKey: (string | number)[];
+}) => {
   const [_, reviewPk] = queryKey;
-  return instance.put(`review/${reviewPk}/delete`, null,{
-    headers: {
-      "X-CSRFTOKEN": Cookie.get("csrftoken") || "",
-    },
-  })
-  .then((response) => response.data);
+  return instance
+    .put(`review/${reviewPk}/delete`, null, {
+      headers: {
+        "X-CSRFTOKEN": Cookie.get("csrftoken") || "",
+      },
+    })
+    .then((response) => response.data);
 };
 
 export const getPostReviews = ({ queryKey }: QueryFunctionContext) => {
@@ -187,16 +194,16 @@ export interface IUpdatePostVariables {
   content: string;
   category: number;
   postPk: number;
-  mainimage:string;
+  mainimage: string;
 }
 export const updatePost = (variables: IUpdatePostVariables) =>
-    instance
-      .put(`post/${variables.postPk}`, variables, {
-        headers: {
-          "X-CSRFToken": Cookie.get("csrftoken") || "",
-        },
-      })
-      .then((response) => response.data);
+  instance
+    .put(`post/${variables.postPk}`, variables, {
+      headers: {
+        "X-CSRFToken": Cookie.get("csrftoken") || "",
+      },
+    })
+    .then((response) => response.data);
 
 export interface IUserUpdateSuccess {
   ok: string;
@@ -254,9 +261,9 @@ export const userUpdate = ({
     .then((response) => response.data);
 
 export const getMyPostList = ({ queryKey }: QueryFunctionContext) => {
-  const [_, author] = queryKey;
+  const [_, author, page] = queryKey;
   return instance
-    .get(`post/${author}/author`)
+    .get(`post/${author}/author?page=${page}`)
     .then((response) => response.data);
 };
 
@@ -269,13 +276,13 @@ export const getOtherInfo = ({ queryKey }: QueryFunctionContext) => {
 export interface IUploadImages {
   blob: Blob;
   uploadURL: string;
-  regexwords:string;
-  count:number;
+  regexwords: string;
+  count: number;
 }
 
 export const uploadImages = ({ blob, uploadURL }: IUploadImages) => {
   const formData = new FormData();
-  formData.append("file",blob)
+  formData.append("file", blob);
 
   return axios
     .post(uploadURL, formData, {
@@ -305,44 +312,50 @@ export interface IUpdateReviewVariables {
   review_content: string;
   reviewPk: number;
 }
-  
+
 export const updateReview = (variables: IUpdateReviewVariables) =>
-instance
-  .put(`review/${variables.reviewPk}/update`, variables, {
-    headers: {
-      "X-CSRFToken": Cookie.get("csrftoken") || "",
-    },
-  })
-  .then((response) => response.data);
+  instance
+    .put(`review/${variables.reviewPk}/update`, variables, {
+      headers: {
+        "X-CSRFToken": Cookie.get("csrftoken") || "",
+      },
+    })
+    .then((response) => response.data);
 
 export const isLike = ({ queryKey }: QueryFunctionContext) => {
   const [_, postpk] = queryKey;
+  return instance.get(`post/${postpk}/like`).then((response) => response.data);
+};
+
+export const addLike = async ({
+  queryKey,
+}: {
+  queryKey: (string | number)[];
+}) => {
+  const [_, postpk] = queryKey;
   return instance
-    .get(`post/${postpk}/like`)
+    .put(`post/${postpk}/like`, null, {
+      headers: {
+        "X-CSRFTOKEN": Cookie.get("csrftoken") || "",
+      },
+    })
     .then((response) => response.data);
 };
 
-export const addLike = async ({ queryKey }: { queryKey: (string | number)[] }) => {
+export const deleteLike = async ({
+  queryKey,
+}: {
+  queryKey: (string | number)[];
+}) => {
   const [_, postpk] = queryKey;
   return instance
-    .put(`post/${postpk}/like`, null,{
+    .delete(`post/${postpk}/like`, {
       headers: {
         "X-CSRFTOKEN": Cookie.get("csrftoken") || "",
       },
     })
     .then((response) => response.data);
-}
-
-export const deleteLike = async ({ queryKey }: { queryKey: (string | number)[] }) => {
-  const [_, postpk] = queryKey;
-  return instance
-    .delete(`post/${postpk}/like`,{
-      headers: {
-        "X-CSRFTOKEN": Cookie.get("csrftoken") || "",
-      },
-    })
-    .then((response) => response.data);
-}
+};
 
 export const isDislike = ({ queryKey }: QueryFunctionContext) => {
   const [_, postpk] = queryKey;
@@ -351,50 +364,66 @@ export const isDislike = ({ queryKey }: QueryFunctionContext) => {
     .then((response) => response.data);
 };
 
-export const addDislike = async ({ queryKey }: { queryKey: (string | number)[] }) => {
+export const addDislike = async ({
+  queryKey,
+}: {
+  queryKey: (string | number)[];
+}) => {
   const [_, postpk] = queryKey;
   return instance
-    .put(`post/${postpk}/dislike`, null,{
+    .put(`post/${postpk}/dislike`, null, {
       headers: {
         "X-CSRFTOKEN": Cookie.get("csrftoken") || "",
       },
     })
     .then((response) => response.data);
-}
+};
 
-export const deleteDislike = async ({ queryKey }: { queryKey: (string | number)[] }) => {
+export const deleteDislike = async ({
+  queryKey,
+}: {
+  queryKey: (string | number)[];
+}) => {
   const [_, postpk] = queryKey;
   return instance
-    .delete(`post/${postpk}/dislike`,{
+    .delete(`post/${postpk}/dislike`, {
       headers: {
         "X-CSRFTOKEN": Cookie.get("csrftoken") || "",
       },
     })
     .then((response) => response.data);
-}
+};
 
 export const isFavorite = ({ queryKey }: QueryFunctionContext) => {
   const [_, categorypk] = queryKey;
   if (categorypk == undefined) {
     return Promise.resolve(false);
   }
-    return instance
+  return instance
     .get(`favorite/${categorypk}/exists`)
     .then((response) => response.data);
 };
 
-export const addFavorite = async ({ queryKey }: { queryKey: (string | number)[] }) => {
+export const addFavorite = async ({
+  queryKey,
+}: {
+  queryKey: (string | number)[];
+}) => {
   const [_, categorypk] = queryKey;
   return instance
-    .post(`favorite/${categorypk}/toggle`, null,{
+    .post(`favorite/${categorypk}/toggle`, null, {
       headers: {
         "X-CSRFTOKEN": Cookie.get("csrftoken") || "",
       },
     })
     .then((response) => response.data);
-}
+};
 
-export const removeFavorite = async ({ queryKey }: { queryKey: (string | number)[] }) => {
+export const removeFavorite = async ({
+  queryKey,
+}: {
+  queryKey: (string | number)[];
+}) => {
   const [_, categorypk] = queryKey;
   return instance
     .put(`favorite/${categorypk}/toggle`, null, {
@@ -403,9 +432,9 @@ export const removeFavorite = async ({ queryKey }: { queryKey: (string | number)
       },
     })
     .then((response) => response.data);
-}
+};
 
-export const GetLikeSortPostList  = ({ queryKey }: QueryFunctionContext) => {
+export const GetLikeSortPostList = ({ queryKey }: QueryFunctionContext) => {
   const [_, page] = queryKey;
   return instance
     .get(`post/sort/likes?page=${page}`)
@@ -413,25 +442,27 @@ export const GetLikeSortPostList  = ({ queryKey }: QueryFunctionContext) => {
 };
 
 export const GetLikeSortCategoryList = ({ queryKey }: QueryFunctionContext) => {
-  const [_, categoryId ,page] = queryKey;
+  const [_, categoryId, page] = queryKey;
   return instance
     .get(`category/${categoryId}/sort/likes?page=${page}`)
     .then((response) => response.data);
-  };
+};
 
-  export const getLikesSortPostCount = () =>
+export const getLikesSortPostCount = () =>
   instance.get("post/sort/likes/count").then((responce) => responce.data);
 
-  export const getLikesSortCategoryPostCount = ({ queryKey }: QueryFunctionContext) => {
-    const [_, categoryPk] = queryKey;
-    return instance
-      .get(`category/${categoryPk}/sort/likes/count`)
-      .then((response) => response.data);
-  };
+export const getLikesSortCategoryPostCount = ({
+  queryKey,
+}: QueryFunctionContext) => {
+  const [_, categoryPk] = queryKey;
+  return instance
+    .get(`category/${categoryPk}/sort/likes/count`)
+    .then((response) => response.data);
+};
 
-  export const GetsearchPostList = ({ queryKey }: QueryFunctionContext) => {
-    const [_, keyword,srcObject,page] = queryKey;
-    return instance
-      .get(`post/${keyword}/search?search=${srcObject}&page=${page}`)
-      .then((response) => response.data);
-  }
+export const GetsearchPostList = ({ queryKey }: QueryFunctionContext) => {
+  const [_, keyword, srcObject, page] = queryKey;
+  return instance
+    .get(`post/${keyword}/search?search=${srcObject}&page=${page}`)
+    .then((response) => response.data);
+};

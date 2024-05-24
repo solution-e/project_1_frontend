@@ -73,6 +73,8 @@ export interface IPostDetail {
   dislikes: number;
   is_author: boolean;
   updated_at: string;
+  total_likes: number;
+  total_dislikes: number;
 }
 
 interface IAuthor {

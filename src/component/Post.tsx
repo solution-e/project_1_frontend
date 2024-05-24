@@ -1,7 +1,18 @@
-import { Box, Container, HStack, VStack, Heading, Image, Text, Icon, ListItem, Flex } from "@chakra-ui/react";
+import {
+  Box,
+  Container,
+  HStack,
+  VStack,
+  Heading,
+  Image,
+  Text,
+  Icon,
+  ListItem,
+  Flex,
+} from "@chakra-ui/react";
 import { Link } from "react-router-dom";
 import { IPost } from "../types";
-import { FaThumbsUp, FaThumbsDown } from 'react-icons/fa';
+import { FaThumbsUp, FaThumbsDown } from "react-icons/fa";
 
 const defaultImageUrl = "/default_no_image.jpeg";
 
@@ -56,21 +67,17 @@ export default function Post({
             direction={{ base: "row", md: "row" }}
             justifyContent={{ base: "space-between", md: "flex-start" }}
             alignItems="center"
-            width="100%"
+            width="auto"
             mt={{ base: 2, md: 0 }}
           >
-            <Text color={"dimgray"} width={{ base: "auto", md: "100px" }}>
+            <Text
+              color={"dimgray"}
+              width={{ base: "auto", md: "130px" }}
+              mr={4}
+            >
               {category}
             </Text>
-            <Text color={"orangered"} width={{ base: "auto", md: "40px" }}>
-              <Icon as={FaThumbsUp} mr={1} />
-              {total_likes}
-            </Text>
-            <Text color={"dodgerblue"} width={{ base: "auto", md: "40px" }}>
-              <Icon as={FaThumbsDown} mr={1} />
-              {total_dislikes}
-            </Text>
-            <Text color={"dimgray"} width={{ base: "auto", md: "100px" }}>
+            <Text color={"dimgray"} width={{ base: "auto", md: "auto" }}>
               {created_at}
             </Text>
           </Flex>

@@ -188,92 +188,94 @@ export default function Home() {
                 )}
               </Box>
             </VStack>
-            <Tabs
-              onChange={handleTabChange}
-              variant="soft-rounded"
-              colorScheme="blue"
-            >
-              <TabList>
-                <Tab>ALL</Tab>
-                <Tab>Best</Tab>
-              </TabList>
-              <TabPanels>
-                <TabPanel>
-                  {data &&
-                    Array.isArray(data.result) &&
-                    data.result.map((post) => (
-                      <List>
-                        {isMobile ? (
-                          <SmartPhonePost
-                            key={post.id}
-                            id={post.id}
-                            imageUrl={post.mainimage}
-                            title={post.title}
-                            category={post.category.name}
-                            created_at={formatHourToMinutes(post.created_at)}
-                            review_count={post.review_count}
-                            total_likes={post.total_likes}
-                            total_dislikes={post.total_dislikes}
-                          />
-                        ) : (
+            <Flex width="100%" justifyContent="center">
+              <Tabs
+                onChange={handleTabChange}
+                variant="soft-rounded"
+                colorScheme="blue"
+              >
+                <TabList ml={3}>
+                  <Tab>ALL</Tab>
+                  <Tab>Best</Tab>
+                </TabList>
+                <TabPanels>
+                  <TabPanel>
+                    {data &&
+                      Array.isArray(data.result) &&
+                      data.result.map((post) => (
+                        <List>
+                          {isMobile ? (
+                            <SmartPhonePost
+                              key={post.id}
+                              id={post.id}
+                              imageUrl={post.mainimage}
+                              title={post.title}
+                              category={post.category.name}
+                              created_at={formatHourToMinutes(post.created_at)}
+                              review_count={post.review_count}
+                              total_likes={post.total_likes}
+                              total_dislikes={post.total_dislikes}
+                            />
+                          ) : (
+                            <Post
+                              key={post.id}
+                              id={post.id}
+                              imageUrl={post.mainimage}
+                              title={post.title}
+                              category={post.category.name}
+                              created_at={formatHourToMinutes(post.created_at)}
+                              review_count={post.review_count}
+                              total_likes={post.total_likes}
+                              total_dislikes={post.total_dislikes}
+                            />
+                          )}
+                        </List>
+                      ))}
+                    {data?.count == 0 && (
+                      <Box>
+                        <Text>対象の投稿物は存在しません</Text>
+                      </Box>
+                    )}
+                    {data && (
+                      <Pagenate
+                        currentPage={page}
+                        totalItems={data.count}
+                      ></Pagenate>
+                    )}
+                  </TabPanel>
+                  <TabPanel>
+                    {SortListData &&
+                      Array.isArray(SortListData) &&
+                      SortListData.map((post) => (
+                        <List spacing={3}>
                           <Post
                             key={post.id}
                             id={post.id}
-                            imageUrl={post.mainimage}
+                            imageUrl={post.imageUrl}
                             title={post.title}
                             category={post.category.name}
-                            created_at={formatHourToMinutes(post.created_at)}
+                            created_at={post.created_at}
                             review_count={post.review_count}
                             total_likes={post.total_likes}
                             total_dislikes={post.total_dislikes}
                           />
-                        )}
-                      </List>
-                    ))}
-                  {data?.count == 0 && (
-                    <Box>
-                      <Text>対象の投稿物は存在しません</Text>
-                    </Box>
-                  )}
-                  {data && (
-                    <Pagenate
-                      currentPage={page}
-                      totalItems={data.count}
-                    ></Pagenate>
-                  )}
-                </TabPanel>
-                <TabPanel>
-                  {SortListData &&
-                    Array.isArray(SortListData) &&
-                    SortListData.map((post) => (
-                      <List spacing={3}>
-                        <Post
-                          key={post.id}
-                          id={post.id}
-                          imageUrl={post.imageUrl}
-                          title={post.title}
-                          category={post.category.name}
-                          created_at={post.created_at}
-                          review_count={post.review_count}
-                          total_likes={post.total_likes}
-                          total_dislikes={post.total_dislikes}
-                        />
-                      </List>
-                    ))}
-                  {SortListData?.count == 0 && (
-                    <Box>
-                      <Text align="center">対象の投稿物は存在しません</Text>
-                    </Box>
-                  )}
-                  {SortListData && (
-                    <Pagenate
-                      currentPage={page}
-                      totalItems={SortListData.count}
-                    ></Pagenate>
-                  )}
-                </TabPanel>
-              </TabPanels>
-            </Tabs>
+                        </List>
+                      ))}
+                    {SortListData?.count == 0 && (
+                      <Box>
+                        <Text align="center">対象の投稿物は存在しません</Text>
+                      </Box>
+                    )}
+                    {SortListData && (
+                      <Pagenate
+                        currentPage={page}
+                        totalItems={SortListData.count}
+                      ></Pagenate>
+                    )}
+                  </TabPanel>
+                </TabPanels>
+              </Tabs>
+            </Flex>
           </Grid>
         </VStack>
       </Box>

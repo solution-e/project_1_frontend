@@ -96,6 +96,9 @@ export default function UploadPost() {
   };
 
   const uploadImageMutation = useMutation(uploadImages, {
+    onMutate: () => {
+      setIsLoading(true);
+    },
     onSuccess: async (
       data: any,
       variables: { regexwords: string; count: number }
@@ -111,6 +114,9 @@ export default function UploadPost() {
   });
 
   const uploadURLMutation = useMutation(getUploadURL, {
+    onMutate: () => {
+      setIsLoading(true);
+    },
     onSuccess: async (
       data: IUploadURLResponse,
       variables: { blob: Blob; regexword: string; count: number }
@@ -233,7 +239,7 @@ export default function UploadPost() {
       <Modal isOpen={isLoading} onClose={() => {}}>
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>投稿中</ModalHeader>
+          <ModalHeader alignItems="center">投稿中</ModalHeader>
           <ModalBody display="flex" justifyContent="center" alignItems="center">
             <Spinner size="xl" />
           </ModalBody>

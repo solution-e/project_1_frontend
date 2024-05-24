@@ -109,8 +109,8 @@ export default function PostDetail() {
   const [dislikes, setDislikes] = useState<number>(0);
   useEffect(() => {
     if (data !== undefined) {
-      setLikes(data.likes);
-      setDislikes(data.dislikes);
+      setLikes(data.total_likes);
+      setDislikes(data.total_dislikes);
     }
   }, [data]);
 
@@ -200,37 +200,53 @@ export default function PostDetail() {
     };
     await mutation.mutate(dataToSubmit);
   };
-
   const handleLikeButtonClick = async (postId: number) => {
     try {
       if (liked) {
-        try {
-          await deleteLikeMutation.mutateAsync(postId);
-          toast({
-            status: "success",
-            title: "いいねを取り消しました",
-            position: "bottom",
-          });
-          setLikes(Number(likes) - 1);
-        } catch (error) {
-          console.error("エラーが発生しました:", error);
-        }
+        await deleteLikeMutation.mutateAsync(postId);
+        toast({
+          status: "success",
+          title: "いいねを取り消しました",
+          position: "bottom",
+        });
+        setLikes((prevLikes) => prevLikes - 1);
       } else {
-        try {
-          await AddLikeMutation.mutateAsync(postId);
-          toast({
-            status: "success",
-            title: "いいねしました",
-            position: "bottom",
-          });
-          setLikes(Number(likes) + 1);
-        } catch (error) {
-          console.error("エラーが発生しました:", error);
-        }
+        await AddLikeMutation.mutateAsync(postId);
+        toast({
+          status: "success",
+          title: "いいねしました",
+          position: "bottom",
+        });
+        setLikes((prevLikes) => prevLikes + 1);
       }
       setLiked(!liked);
     } catch (error) {
-      console.error(error);
+      console.error("エラーが発生しました:", error);
+    }
+  };
+
+  const handleDisLikeButtonClick = async (postId: number) => {
+    try {
+      if (disliked) {
+        await deleteDislikeMutation.mutateAsync(postId);
+        toast({
+          status: "success",
+          title: "低評価を取り消しました",
+          position: "bottom",
+        });
+        setDislikes((prevDislikes) => prevDislikes - 1);
+      } else {
+        await AddDislikeMutation.mutateAsync(postId);
+        toast({
+          status: "success",
+          title: "低評価しました",
+          position: "bottom",
+        });
+        setDislikes((prevDislikes) => prevDislikes + 1);
+      }
+      setDisLiked(!disliked);
+    } catch (error) {
+      console.error("エラーが発生しました:", error);
     }
   };
 
@@ -240,39 +256,6 @@ export default function PostDetail() {
       reviewPk: reviewPkRef.current ?? 0,
     };
     updateReviewMutation.mutate(dataToSubmit);
-  };
-
-  const handleDisLikeButtonClick = async (postId: number) => {
-    try {
-      if (disliked) {
-        try {
-          await deleteDislikeMutation.mutateAsync(postId);
-          toast({
-            status: "success",
-            title: "低評価を取り消しました",
-            position: "bottom",
-          });
-          setDislikes(Number(dislikes) - 1);
-        } catch (error) {
-          console.error("エラーが発生しました:", error);
-        }
-      } else {
-        try {
-          await AddDislikeMutation.mutateAsync(postId);
-          toast({
-            status: "success",
-            title: "低評価しました",
-            position: "bottom",
-          });
-          setDislikes(Number(dislikes) + 1);
-        } catch (error) {
-          console.error("エラーが発生しました:", error);
-        }
-      }
-      setDisLiked(!disliked);
-    } catch (error) {
-      console.error(error);
-    }
   };
 
   const handleEditButtonClick = async (
@@ -303,8 +286,10 @@ export default function PostDetail() {
     <Flex
       paddingX={{ base: "20px", md: "40px", lg: "180px" }}
       direction={{ base: "column", md: "row" }}
+      width={"100%"}
+      alignItems="center"
     >
-      <Box mt={10} width="100%">
+      <Box width={{ base: "100%", md: "80%" }}>
         <Heading>{data?.title}</Heading>
         <HStack borderBottom="2px solid gray" flexWrap="wrap">
           <Box mt={3} display="flex">
