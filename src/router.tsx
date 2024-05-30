@@ -7,7 +7,7 @@ import PostDetail from "./routes/PostDetail";
 import UploadPost from "./routes/UploadPost";
 import CategoryList from "./routes/CategoryList";
 import MyPostList from "./routes/MyPostList";
-import OtherInfo from "./routes/OtherInfo"
+import OtherInfo from "./routes/OtherInfo";
 import UploadMedia from "./routes/UploadMedia";
 import ModifyPost from "./routes/ModifyPost";
 
@@ -47,7 +47,7 @@ const router = createBrowserRouter([
       },
       {
         path: "OtherInfo/:OtherId",
-        element:<OtherInfo />,
+        element: <OtherInfo />,
       },
       {
         path: "post/:postPk/uploadmedia",

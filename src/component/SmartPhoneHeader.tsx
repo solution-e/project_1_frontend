@@ -21,6 +21,9 @@ import {
   Stack,
   Input,
   Select,
+  useMediaQuery,
+  MenuItem,
+  MenuList,
 } from "@chakra-ui/react";
 import { MdOutlineWbSunny } from "react-icons/md";
 import LoginModal from "./LoginModal";
@@ -30,8 +33,9 @@ import { Link, useNavigate } from "react-router-dom";
 import userUser from "../lib/useUser";
 import { logOut } from "../api";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { FiAlignJustify, FiChevronDown } from "react-icons/fi";
+import { FiAlignJustify } from "react-icons/fi";
 import { useRef, useState } from "react";
+import { RiAccountCircleLine, RiAccountCircleFill } from "react-icons/ri";
 import FavoriteModal from "./FavoriteModal";
 
 export default function Header() {
@@ -94,79 +98,34 @@ export default function Header() {
   const handleItemSelect = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedItem(event.target.value);
   };
+  const [isSmartPhone] = useMediaQuery("(max-width: 768px)");
 
   return (
-    <HStack
+    <VStack
       justifyContent={"space-between"}
       py={2}
       px={10}
       borderBottomWidth={1}
       width={"100%"}
+      spacing={4}
     >
-      <Link to={"/"}>
-        <Box color={"green.500"}>
-          <FaFilter size={"15"} />
-        </Box>
-      </Link>
-      <form onSubmit={handleSearch}>
-        <Stack direction="row" spacing={2}>
-          <VStack spacing={8}>
-            <Select
-              value={selectedItem}
-              onChange={handleItemSelect}
-              width="100%"
-            >
-              <option value="all">全て</option>
-              <option value="title">タイトル</option>
-              <option value="user">ユーザー名</option>
-              <option value="content">内容</option>
-            </Select>
-          </VStack>
-          <Input
-            name="src"
-            placeholder="キーワードを入力"
-            variant="filled"
-            size="md"
-            value={keyword}
-            onChange={(e) => setKeyword(e.target.value)}
-            backgroundColor="gainsboro"
-          />
-          <Button type="submit" colorScheme="green">
-            検索
-          </Button>
-        </Stack>
-      </form>
-      <HStack spacing={2}>
-        <IconButton
-          onClick={toggleColorMode}
-          variant={"ghost"}
-          aria-label="Toggle Dark Mode"
-          icon={<Icon />}
-        ></IconButton>
-        {!userLoading ? (
-          !isLoggedIn ? (
-            <>
-              <Button onClick={onLoginOpen}>ログイン</Button>
-              {/* <Button onClick={onSignUpOpen} colorScheme={"red"}>
-                新規登録
-              </Button>*/}
-            </>
-          ) : (
-            <Menu>
-              <MenuButton>
-                <Text>{user?.name} さん</Text>
-              </MenuButton>
-            </Menu>
-          )
-        ) : null}
+      <HStack justifyContent={"space-between"} width={"100%"}>
         <Button onClick={onOpen}>
           <FiAlignJustify />
         </Button>
-        <Drawer isOpen={isOpen} placement="right" onClose={onClose}>
+        <Drawer isOpen={isOpen} placement="left" onClose={onClose}>
           <DrawerOverlay />
           <DrawerContent>
             <DrawerCloseButton />
-            <DrawerHeader>MENU</DrawerHeader>
+            <DrawerHeader>
+              MENU{" "}
+              <IconButton
+                onClick={toggleColorMode}
+                variant={"ghost"}
+                aria-label="Toggle Dark Mode"
+                icon={<Icon />}
+              ></IconButton>
+            </DrawerHeader>
             <DrawerBody>
               <VStack>
                 {isLoggedIn && (
@@ -194,7 +153,78 @@ export default function Header() {
             </DrawerBody>
           </DrawerContent>
         </Drawer>
+        <Link to={"/"}>
+          <Box color={"green.500"}>
+            <FaFilter size={"15"} />
+          </Box>
+        </Link>
+        {!userLoading ? (
+          !isLoggedIn ? (
+            <>
+              <IconButton
+                icon={<RiAccountCircleLine />}
+                aria-label="Login"
+                onClick={onLoginOpen}
+              />
+            </>
+          ) : (
+            <Menu>
+              <MenuButton
+                as={IconButton}
+                aria-label="LoginMenu"
+                icon={<RiAccountCircleFill />}
+              />
+              <MenuList>
+                <MenuItem>
+                  <Link to="/UserDetail/">
+                    <Button>ユーザー情報</Button>
+                  </Link>
+                </MenuItem>
+                <MenuItem>
+                  <Link to="/MyPostList/">
+                    <Button>自分の投稿</Button>
+                  </Link>
+                </MenuItem>
+                <MenuItem>
+                  <Button onClick={onFavoriteOpen}>お気に入りカテゴリ</Button>
+                </MenuItem>
+                <MenuItem>
+                  <Button onClick={onLogOut}>ログアウト</Button>
+                </MenuItem>
+              </MenuList>
+            </Menu>
+          )
+        ) : null}
       </HStack>
+      {isSmartPhone && (
+        <form onSubmit={handleSearch} style={{ width: "100%" }}>
+          <Stack direction="row" spacing={2} width="100%">
+            <Select
+              value={selectedItem}
+              onChange={handleItemSelect}
+              width="30%"
+            >
+              <option value="all">全て</option>
+              <option value="title">タイトル</option>
+              <option value="user">ユーザー名</option>
+              <option value="content">内容</option>
+            </Select>
+            <Input
+              name="src"
+              placeholder="キーワードを入力"
+              variant="filled"
+              size="md"
+              value={keyword}
+              onChange={(e) => setKeyword(e.target.value)}
+              backgroundColor="gainsboro"
+              width="50%"
+            />
+            <Button type="submit" colorScheme="green" width="20%">
+              検索
+            </Button>
+          </Stack>
+        </form>
+      )}
       <LoginModal
         isOpen={isLoginOpen}
         onClose={onLoginClose}
@@ -202,6 +232,6 @@ export default function Header() {
       />
       <SignUpModal isOpen={isSignUpOpen} onClose={onSignUpClose} />
       <FavoriteModal isOpen={isFavoriteOpen} onClose={onFavoriteClose} />
-    </HStack>
+    </VStack>
   );
 }

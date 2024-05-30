@@ -466,3 +466,6 @@ export const GetsearchPostList = ({ queryKey }: QueryFunctionContext) => {
     .get(`post/${keyword}/search?search=${srcObject}&page=${page}`)
     .then((response) => response.data);
 };
+
+export const GetFavoriteCategory = () =>
+  instance.get("favorite/").then((response) => response.data);

@@ -103,6 +103,8 @@ export default function UploadPost() {
       data: any,
       variables: { regexwords: string; count: number }
     ) => {
+      console.log(variables);
+      console.log(contentRef.current);
       contentRef.current = contentRef.current.replace(
         variables.regexwords,
         data.result.variants
@@ -140,7 +142,7 @@ export default function UploadPost() {
         title: "投稿しました",
         position: "bottom",
       });
-      navigate(`/post/${data.id}`);
+      ///navigate(`/post/${data.id}`);
     },
     onSettled: () => {
       setIsLoading(false);
@@ -156,6 +158,7 @@ export default function UploadPost() {
       imgSrcMatches.push(match[1]);
     }
     const blob = BasetoUrl(imgSrcMatches);
+    console.log(blob);
     const uploadPromises = blob.map(async (blobItem, i) => {
       await uploadURLMutation.mutateAsync({
         blob: blobItem,

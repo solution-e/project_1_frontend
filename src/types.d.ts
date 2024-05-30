@@ -147,3 +147,8 @@ interface IIsLike {
 interface IIsDislike {
   isdislikes: boolean;
 }
+
+interface IFavoriteCategory {
+  id: number;
+  category: ICategory[];
+}

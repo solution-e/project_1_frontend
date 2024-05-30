@@ -27,6 +27,7 @@ import {
 interface LoginModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onSignUpOpen: () => void; // SignUpModalを開くための関数を追加
 }
 
 interface IForm {
@@ -34,7 +35,11 @@ interface IForm {
   password: string;
 }
 
-export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
+export default function LoginModal({
+  isOpen,
+  onClose,
+  onSignUpOpen,
+}: LoginModalProps) {
   const {
     register,
     handleSubmit,
@@ -118,6 +123,9 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
               ログイン
             </Button>
           </InputGroup>
+          <Button variant="link" onClick={onSignUpOpen} colorScheme="blue">
+            新規登録はこちら
+          </Button>
         </ModalBody>
       </ModalContent>
     </Modal>

@@ -41,6 +41,7 @@ import {
   MenuList,
   IconButton,
   Textarea,
+  useMediaQuery,
 } from "@chakra-ui/react";
 import { Icon } from "@chakra-ui/react";
 import { Link } from "react-router-dom";
@@ -59,6 +60,7 @@ import {
   FaTrash,
 } from "react-icons/fa";
 import { formarYearToMinutes } from "../component/FormatTime";
+import { FaGear } from "react-icons/fa6";
 
 type MyState = {
   modifyPostPk: string;
@@ -69,6 +71,7 @@ export default function PostDetail() {
   const [isOpen, setIsOpen] = useState(false);
   const onClose = () => setIsOpen(false);
   const onOpen = () => setIsOpen(true);
+  const [isSmartPhone] = useMediaQuery("(max-width: 768px)");
 
   const { data } = useQuery<IPostDetail>([`post`, postPk], getPostDetail);
   const { data: reviewsData } = useQuery<IReviewInfo>(
@@ -288,34 +291,36 @@ export default function PostDetail() {
       direction={{ base: "column", md: "row" }}
       width={"100%"}
       alignItems="center"
+      justifyContent="center"
     >
-      <Box width={{ base: "100%", md: "80%" }}>
-        <Heading>{data?.title}</Heading>
-        <HStack borderBottom="2px solid gray" flexWrap="wrap">
-          <Box mt={3} display="flex">
-            <Text fontSize={"xl"}>
-              <Link to={`/OtherInfo/${data?.author?.id}`}>
-                {data?.author?.name}
-              </Link>
-            </Text>
-            <Text ml={6} fontSize={"xl"}>
-              {data?.updated_at && formarYearToMinutes(data.updated_at)}
-            </Text>
-          </Box>
+      <Box width={{ base: "100%", md: "60%" }}>
+        <HStack>
+          <Heading>{data?.title}</Heading>
           {data?.is_author && (
             <>
-              <Button
-                mt={4}
-                size={"sm"}
-                onClick={() => {
-                  navigate("/post/modifypost", { state: { modifypk: postPk } });
-                }}
-              >
-                修正
-              </Button>
-              <Button mt={4} onClick={onOpen} size={"sm"}>
-                削除
-              </Button>
+              <Menu>
+                <MenuButton
+                  as={IconButton}
+                  aria-label="Options"
+                  icon={<FaGear />}
+                />
+                <MenuList>
+                  <MenuItem
+                    icon={<FaEdit />}
+                    as={Button}
+                    onClick={() => {
+                      navigate("/post/modifypost", {
+                        state: { modifypk: postPk },
+                      });
+                    }}
+                  >
+                    編集
+                  </MenuItem>
+                  <MenuItem icon={<FaTrash />} onClick={onOpen}>
+                    削除
+                  </MenuItem>
+                </MenuList>
+              </Menu>
               <Modal isOpen={isOpen} onClose={onClose}>
                 <ModalOverlay />
                 <ModalContent>
@@ -342,6 +347,27 @@ export default function PostDetail() {
               </Modal>
             </>
           )}
+        </HStack>
+        <HStack
+          borderBottom="2px solid gray"
+          flexWrap="wrap"
+          alignItems="baseline"
+        >
+          <Box mt={3} display="flex" alignItems="baseline">
+            <Text fontSize="xl">
+              <Link to={`/OtherInfo/${data?.author?.id}`}>
+                {data?.author?.name}
+              </Link>
+            </Text>
+            <Text ml={6} fontSize="sm">
+              {data?.created_at && formarYearToMinutes(data.created_at)}
+            </Text>
+            {data && data?.created_at !== data?.updated_at && (
+              <Text fontSize="sm" ml={1}>
+                ({formarYearToMinutes(data?.updated_at)})
+              </Text>
+            )}
+          </Box>
         </HStack>
         <Grid mt={8} h={"60vh"}>
           {data?.photo && data?.photo.length > 0
@@ -402,71 +428,115 @@ export default function PostDetail() {
                 }
                 border={review.parent_review !== null ? "1px solid gray" : ""}
               >
-                <HStack>
-                  {review.parent_review !== null && (
-                    <Box flex={0.1} alignContent="center">
-                      <Icon as={FaAngleRight}></Icon>
+                {isSmartPhone ? (
+                  <VStack alignItems="flex-start">
+                    <Box
+                      textAlign="left"
+                      width="100%"
+                      borderRight="1px solid gray"
+                    >
+                      {review.user?.name}
                     </Box>
-                  )}
-                  <Box
-                    flex={review.parent_review !== null ? 0.85 : 1}
-                    borderRight="1px solid gray"
-                    textAlign="left"
-                  >
-                    {review.user?.name}
-                  </Box>
-                  <Box
-                    flex={3}
-                    onClick={() => {
-                      review.parent_review === null &&
-                        setParentReviewId(review.id);
-                      setIsReplyReview(true);
-                    }}
-                    dangerouslySetInnerHTML={{ __html: review.review_content }}
-                    whiteSpace="normal"
-                  />
-                  <Box flex={0.5} borderRight="1px solid lightgray">
-                    <Text color="dimgray" fontSize={"xs"}>
-                      {formarYearToMinutes(review.created_at)}
-                    </Text>
-                  </Box>
-                  {review?.is_author &&
-                    review?.review_content !== "この投稿は削除されました" && (
-                      <Menu>
-                        <MenuButton
-                          as={IconButton}
-                          aria-label="Options"
-                          icon={<FaEllipsisV />}
-                          backgroundColor={
-                            review.parent_review !== null
-                              ? "lightgray"
-                              : "white"
-                          }
-                        />
-                        <MenuList>
-                          <MenuItem
-                            icon={<FaEdit />}
-                            onClick={() =>
-                              handleEditButtonClick(
-                                review.review_content,
-                                review.id
-                              )
-                            }
-                          >
-                            編集
-                          </MenuItem>
-                          <MenuItem
-                            icon={<FaTrash />}
-                            onClick={() =>
-                              review?.id && handleDeleteReview(review.id)
-                            }
-                          >
-                            削除
-                          </MenuItem>
-                        </MenuList>
-                      </Menu>
+                    <Box
+                      width="100%"
+                      onClick={() => {
+                        review.parent_review === null &&
+                          setParentReviewId(review.id);
+                        setIsReplyReview(true);
+                      }}
+                      dangerouslySetInnerHTML={{
+                        __html: review.review_content,
+                      }}
+                      whiteSpace="normal"
+                    />
+                    <Box
+                      width="100%"
+                      whiteSpace="nowrap"
+                      overflow="hidden"
+                      textOverflow="ellipsis"
+                      borderRight="1px solid lightgray"
+                    >
+                      <Text color="dimgray" fontSize={"xs"}>
+                        {formarYearToMinutes(review.created_at)}
+                      </Text>
+                    </Box>
+                  </VStack>
+                ) : (
+                  <HStack>
+                    {review.parent_review !== null && (
+                      <Box flex={0.1} alignContent="center">
+                        <Icon as={FaAngleRight}></Icon>
+                      </Box>
                     )}
-                </HStack>
+                    <Box
+                      flex={review.parent_review !== null ? 0.85 : 1}
+                      borderRight="1px solid gray"
+                      textAlign="left"
+                    >
+                      {review.user?.name}
+                    </Box>
+                    <Box
+                      flex={3}
+                      onClick={() => {
+                        review.parent_review === null &&
+                          setParentReviewId(review.id);
+                        setIsReplyReview(true);
+                      }}
+                      dangerouslySetInnerHTML={{
+                        __html: review.review_content,
+                      }}
+                      whiteSpace="normal"
+                    />
+                    <Box
+                      flex={0.5}
+                      borderRight="1px solid lightgray"
+                      width="150px"
+                      whiteSpace="nowrap"
+                      overflow="hidden"
+                      textOverflow="ellipsis"
+                    >
+                      <Text color="dimgray" fontSize={"xs"}>
+                        {formarYearToMinutes(review.created_at)}
+                      </Text>
+                    </Box>
+                    {review?.is_author &&
+                      review?.review_content !== "この投稿は削除されました" && (
+                        <Menu>
+                          <MenuButton
+                            as={IconButton}
+                            aria-label="Options"
+                            icon={<FaEllipsisV />}
+                            backgroundColor={
+                              review.parent_review !== null
+                                ? "lightgray"
+                                : "white"
+                            }
+                          />
+                          <MenuList>
+                            <MenuItem
+                              icon={<FaEdit />}
+                              onClick={() =>
+                                handleEditButtonClick(
+                                  review.review_content,
+                                  review.id
+                                )
+                              }
+                            >
+                              編集
+                            </MenuItem>
+                            <MenuItem
+                              icon={<FaTrash />}
+                              onClick={() =>
+                                review?.id && handleDeleteReview(review.id)
+                              }
+                            >
+                              削除
+                            </MenuItem>
+                          </MenuList>
+                        </Menu>
+                      )}
+                  </HStack>
+                )}
                 {isReplyReview &&
                   parentReviewId === review.id &&
                   review?.review_content != "この投稿は削除されました" && (
@@ -478,7 +548,7 @@ export default function PostDetail() {
                         ref={replyInputRef}
                       ></Input>
                       <Button onClick={() => replyButtonClick(review.id)}>
-                        投稿
+                        返信
                       </Button>
                       <Button
                         onClick={() => {
