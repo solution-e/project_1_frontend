@@ -10,6 +10,7 @@ import MyPostList from "./routes/MyPostList";
 import OtherInfo from "./routes/OtherInfo";
 import UploadMedia from "./routes/UploadMedia";
 import ModifyPost from "./routes/ModifyPost";
+import PrivacyPolicy from "./routes/PrivacyPolicy";
 
 const router = createBrowserRouter([
   {
@@ -56,6 +57,10 @@ const router = createBrowserRouter([
       {
         path: "post/modifypost",
         element: <ModifyPost />,
+      },
+      {
+        path: "/PrivacyPolicy",
+        element: <PrivacyPolicy />,
       },
     ],
   },

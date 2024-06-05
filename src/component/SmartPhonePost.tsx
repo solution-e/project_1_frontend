@@ -23,6 +23,7 @@ export default function SmartPhonePost({
   category,
   created_at,
   review_count,
+  views,
   total_likes,
   total_dislikes,
 }: IPost) {
@@ -59,6 +60,9 @@ export default function SmartPhonePost({
               </Heading>
               <Text ml={1} color={"skyblue"} fontSize="sm">
                 [{review_count}]
+              </Text>
+              <Text ml={1} color={"lightslategray"} fontSize={"sm"}>
+                [{views}]
               </Text>
             </HStack>
             <HStack width="100%" justifyContent="start">

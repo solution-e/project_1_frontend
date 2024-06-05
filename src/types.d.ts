@@ -13,6 +13,7 @@ interface IPost {
   imageUrl: string;
   total_likes: number;
   total_dislikes: number;
+  views: number;
 }
 
 export interface IPostInfo {
@@ -73,6 +74,7 @@ export interface IPostDetail {
   dislikes: number;
   is_author: boolean;
   updated_at: string;
+  views: number;
   total_likes: number;
   total_dislikes: number;
 }

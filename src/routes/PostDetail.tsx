@@ -61,6 +61,7 @@ import {
 } from "react-icons/fa";
 import { formarYearToMinutes } from "../component/FormatTime";
 import { FaGear } from "react-icons/fa6";
+import userUser from "../lib/useUser";
 
 type MyState = {
   modifyPostPk: string;
@@ -72,6 +73,7 @@ export default function PostDetail() {
   const onClose = () => setIsOpen(false);
   const onOpen = () => setIsOpen(true);
   const [isSmartPhone] = useMediaQuery("(max-width: 768px)");
+  const { isLoggedIn } = userUser();
 
   const { data } = useQuery<IPostDetail>([`post`, postPk], getPostDetail);
   const { data: reviewsData } = useQuery<IReviewInfo>(
@@ -276,6 +278,13 @@ export default function PostDetail() {
     reviewPkRef.current = 0;
   };
 
+  const AlertLogin = () => {
+    toast({
+      status: "warning",
+      title: "ログインしてください",
+    });
+  };
+
   const replyButtonClick = (parentReviewId: number) => {
     const dataToSubmit = {
       review_content: replyInputRef.current ? replyInputRef.current.value : "",
@@ -360,6 +369,9 @@ export default function PostDetail() {
               </Link>
             </Text>
             <Text ml={6} fontSize="sm">
+              {data?.views}
+            </Text>
+            <Text ml={6} fontSize="sm">
               {data?.created_at && formarYearToMinutes(data.created_at)}
             </Text>
             {data && data?.created_at !== data?.updated_at && (
@@ -421,7 +433,7 @@ export default function PostDetail() {
               <Box
                 key={index}
                 width={review.parent_review !== null ? "90%" : "100%"}
-                py={4}
+                py={2}
                 borderBottom="1px solid gray"
                 backgroundColor={
                   review.parent_review !== null ? "lightgray" : "white"
@@ -429,13 +441,54 @@ export default function PostDetail() {
                 border={review.parent_review !== null ? "1px solid gray" : ""}
               >
                 {isSmartPhone ? (
-                  <VStack alignItems="flex-start">
+                  <VStack alignItems="stretch" justifyContent="space-between">
                     <Box
                       textAlign="left"
                       width="100%"
-                      borderRight="1px solid gray"
+                      borderBottom="0px solid black"
                     >
+                      {review.parent_review !== null && (
+                        <Icon as={FaAngleRight} />
+                      )}
                       {review.user?.name}
+                      {review?.is_author &&
+                        review?.review_content !==
+                          "この投稿は削除されました" && (
+                          <Menu>
+                            <MenuButton
+                              as={IconButton}
+                              aria-label="Options"
+                              icon={<FaEllipsisV />}
+                              backgroundColor={
+                                review.parent_review !== null
+                                  ? "lightgray"
+                                  : "white"
+                              }
+                              size="xs"
+                            />
+                            <MenuList>
+                              <MenuItem
+                                icon={<FaEdit />}
+                                onClick={() =>
+                                  handleEditButtonClick(
+                                    review.review_content,
+                                    review.id
+                                  )
+                                }
+                              >
+                                編集
+                              </MenuItem>
+                              <MenuItem
+                                icon={<FaTrash />}
+                                onClick={() =>
+                                  review?.id && handleDeleteReview(review.id)
+                                }
+                              >
+                                削除
+                              </MenuItem>
+                            </MenuList>
+                          </Menu>
+                        )}
                     </Box>
                     <Box
                       width="100%"
@@ -456,7 +509,7 @@ export default function PostDetail() {
                       textOverflow="ellipsis"
                       borderRight="1px solid lightgray"
                     >
-                      <Text color="dimgray" fontSize={"xs"}>
+                      <Text color="dimgray" fontSize="xs">
                         {formarYearToMinutes(review.created_at)}
                       </Text>
                     </Box>
@@ -476,7 +529,7 @@ export default function PostDetail() {
                       {review.user?.name}
                     </Box>
                     <Box
-                      flex={3}
+                      flex={4}
                       onClick={() => {
                         review.parent_review === null &&
                           setParentReviewId(review.id);
@@ -487,14 +540,7 @@ export default function PostDetail() {
                       }}
                       whiteSpace="normal"
                     />
-                    <Box
-                      flex={0.5}
-                      borderRight="1px solid lightgray"
-                      width="150px"
-                      whiteSpace="nowrap"
-                      overflow="hidden"
-                      textOverflow="ellipsis"
-                    >
+                    <Box flex={0.7} borderRight="1px solid lightgray">
                       <Text color="dimgray" fontSize={"xs"}>
                         {formarYearToMinutes(review.created_at)}
                       </Text>
@@ -578,7 +624,17 @@ export default function PostDetail() {
               ref={inputRef}
             />
             {!isEditing && (
-              <Button margin="5px" type="submit" isLoading={mutation.isLoading}>
+              <Button
+                margin="5px"
+                type="submit"
+                isLoading={mutation.isLoading}
+                onClick={(e) => {
+                  if (!isLoggedIn) {
+                    e.preventDefault();
+                    AlertLogin();
+                  }
+                }}
+              >
                 投稿
               </Button>
             )}

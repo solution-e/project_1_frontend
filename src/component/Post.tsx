@@ -23,6 +23,7 @@ export default function Post({
   category,
   created_at,
   review_count,
+  views,
   total_likes,
   total_dislikes,
 }: IPost) {
@@ -60,6 +61,9 @@ export default function Post({
               </Heading>
               <Text ml={1} color={"skyblue"}>
                 [{review_count}]
+              </Text>
+              <Text ml={1} color={"lightslategray"}>
+                [{views}]
               </Text>
             </Container>
           </HStack>

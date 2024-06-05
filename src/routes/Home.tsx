@@ -203,7 +203,7 @@ export default function Home() {
                     {data &&
                       Array.isArray(data.result) &&
                       data.result.map((post) => (
-                        <List>
+                        <List key={post.id}>
                           {isMobile ? (
                             <SmartPhonePost
                               key={post.id}
@@ -213,6 +213,7 @@ export default function Home() {
                               category={post.category.name}
                               created_at={formatHourToMinutes(post.created_at)}
                               review_count={post.review_count}
+                              views={post.views}
                               total_likes={post.total_likes}
                               total_dislikes={post.total_dislikes}
                             />
@@ -225,6 +226,7 @@ export default function Home() {
                               category={post.category.name}
                               created_at={formatHourToMinutes(post.created_at)}
                               review_count={post.review_count}
+                              views={post.views}
                               total_likes={post.total_likes}
                               total_dislikes={post.total_dislikes}
                             />
@@ -247,7 +249,7 @@ export default function Home() {
                     {SortListData &&
                       Array.isArray(SortListData) &&
                       SortListData.map((post) => (
-                        <List spacing={3}>
+                        <List spacing={3} key={post.id}>
                           <Post
                             key={post.id}
                             id={post.id}
@@ -256,6 +258,7 @@ export default function Home() {
                             category={post.category.name}
                             created_at={post.created_at}
                             review_count={post.review_count}
+                            views={post.views}
                             total_likes={post.total_likes}
                             total_dislikes={post.total_dislikes}
                           />

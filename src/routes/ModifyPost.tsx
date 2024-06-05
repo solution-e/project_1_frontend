@@ -27,6 +27,8 @@ import { useState, useRef, useEffect } from "react";
 import { IUploadPostVariables } from "../api";
 import "react-quill/dist/quill.snow.css";
 import BasetoUrl from "../component/BasetoUrl";
+import userUser from "../lib/useUser";
+import functionAlert from "src/component/functionAlert";
 
 interface IUploadURLResponse {
   result: {
@@ -46,6 +48,8 @@ export default function ModifyPost() {
   const modifypk = location.state?.modifypk;
   const { data } = useQuery<IPostDetail>([`post`, modifypk], getPostDetail);
   const [isLoading, setIsLoading] = useState(false);
+  const { isLoggedIn } = userUser();
+  const { WarningModalComponent } = functionAlert(isLoggedIn);
 
   const toolbarOptions = [
     ["link", "image", "video"],
@@ -231,6 +235,7 @@ export default function ModifyPost() {
           </VStack>
         </Container>
       </Box>
+      <WarningModalComponent />
     </ProtectedPage>
   );
 }

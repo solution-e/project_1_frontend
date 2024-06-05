@@ -32,6 +32,8 @@ import { useState, useRef } from "react";
 import { IUploadPostVariables } from "../api";
 import "react-quill/dist/quill.snow.css";
 import BasetoUrl from "../component/BasetoUrl";
+import functionAlert from "src/component/functionAlert";
+import userUser from "../lib/useUser";
 
 interface IForm {
   file: string[];
@@ -67,6 +69,8 @@ export default function UploadPost() {
     [{ color: [] }, { background: [] }],
     [{ align: [] }],
   ];
+  const { isLoggedIn } = userUser();
+  const { WarningModalComponent } = functionAlert(isLoggedIn);
 
   const formats = [
     "header",
@@ -142,7 +146,7 @@ export default function UploadPost() {
         title: "投稿しました",
         position: "bottom",
       });
-      ///navigate(`/post/${data.id}`);
+      navigate(`/post/${data.id}`);
     },
     onSettled: () => {
       setIsLoading(false);
@@ -248,6 +252,7 @@ export default function UploadPost() {
           </ModalBody>
         </ModalContent>
       </Modal>
+      <WarningModalComponent />
     </ProtectedPage>
   );
 }

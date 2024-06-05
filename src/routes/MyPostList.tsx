@@ -16,19 +16,18 @@ import userUser from "../lib/useUser";
 import { useNavigate } from "react-router-dom";
 import { formatHourToMinutes } from "../component/FormatTime";
 import SmartPhonePost from "src/component/SmartPhonePost";
+import functionAlert from "src/component/functionAlert";
 
 export default function MyPostList() {
   const navigate = useNavigate();
   const { user } = userUser();
   const { isLoggedIn } = userUser();
+  const { WarningModalComponent } = functionAlert(isLoggedIn);
   const { data } = useQuery<IPostInfo>({
     queryKey: ["post", user?.id],
     queryFn: getMyPostList,
   });
   const isMobile = useBreakpointValue({ base: true, md: false });
-  if (!isLoggedIn) {
-    navigate("/");
-  }
 
   return (
     <Flex justifyContent="center" alignItems="center">
@@ -57,6 +56,7 @@ export default function MyPostList() {
                       category={post.category.name}
                       created_at={formatHourToMinutes(post.created_at)}
                       review_count={post.review_count}
+                      views={post.views}
                       total_likes={post.total_likes}
                       total_dislikes={post.total_dislikes}
                     />
@@ -69,6 +69,7 @@ export default function MyPostList() {
                       category={post.category.name}
                       created_at={formatHourToMinutes(post.created_at)}
                       review_count={post.review_count}
+                      views={post.views}
                       total_likes={post.total_likes}
                       total_dislikes={post.total_dislikes}
                     />
@@ -78,6 +79,7 @@ export default function MyPostList() {
           </Grid>
         </VStack>
       </Box>
+      <WarningModalComponent />
     </Flex>
   );
 }

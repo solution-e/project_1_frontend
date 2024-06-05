@@ -119,7 +119,7 @@ export interface IUsernameLoginSuccess {
   ok: string;
 }
 export interface IUsernameLoginError {
-  error: string;
+  response: { data: { error: string; email: string } };
 }
 
 export const usernameLogIn = ({
@@ -151,7 +151,7 @@ export interface ISignUpSuccess {
 }
 
 export interface ISignUpError {
-  response: { data: { error: string } };
+  response: { data: { error: string; email: string } };
 }
 
 export const signUp = ({
@@ -469,3 +469,16 @@ export const GetsearchPostList = ({ queryKey }: QueryFunctionContext) => {
 
 export const GetFavoriteCategory = () =>
   instance.get("favorite/").then((response) => response.data);
+
+export const resendActivationEmail = (email: string) =>
+  instance
+    .post(
+      "/user/resend-activation-email",
+      { email },
+      {
+        headers: {
+          "X-CSRFToken": Cookie.get("csrftoken") || "",
+        },
+      }
+    )
+    .then((response) => response.data);

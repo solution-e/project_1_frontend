@@ -75,6 +75,7 @@ export default function OtherInfo() {
                       category={post.category.name}
                       created_at={formatHourToMinutes(post.created_at)}
                       review_count={post.review_count}
+                      views={post.views}
                       total_likes={post.total_likes}
                       total_dislikes={post.total_dislikes}
                     />
@@ -86,6 +87,7 @@ export default function OtherInfo() {
                       category={post.category.name}
                       created_at={formatHourToMinutes(post.created_at)}
                       review_count={post.review_count}
+                      views={post.views}
                       total_likes={post.total_likes}
                       total_dislikes={post.total_dislikes}
                     />
