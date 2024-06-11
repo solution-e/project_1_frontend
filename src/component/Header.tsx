@@ -1,3 +1,5 @@
+// Header.js
+
 import {
   Box,
   Button,
@@ -33,6 +35,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { FiAlignJustify, FiChevronDown } from "react-icons/fi";
 import { useRef, useState } from "react";
 import FavoriteModal from "./FavoriteModal";
+import NotificationList from "./NotificationsList";
 
 export default function Header() {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -137,6 +140,7 @@ export default function Header() {
         </Stack>
       </form>
       <HStack spacing={2}>
+        <NotificationList />
         <IconButton
           onClick={toggleColorMode}
           variant={"ghost"}

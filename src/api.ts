@@ -482,3 +482,29 @@ export const resendActivationEmail = (email: string) =>
       }
     )
     .then((response) => response.data);
+
+export const getNotifications = () =>
+  instance.get("notifications/").then((response) => response.data);
+
+export interface IPostNotifications {
+  user: number;
+  message: string;
+}
+
+export const postNotifications = (variables: IPostNotifications) =>
+  instance
+    .post("/notifications/create/", variables, {
+      headers: {
+        "X-CSRFToken": Cookie.get("csrftoken") || "",
+      },
+    })
+    .then((response) => response.data);
+
+export const readNotifications = () =>
+  instance
+    .put("notifications/read", null, {
+      headers: {
+        "X-CSRFToken": Cookie.get("csrftoken") || "",
+      },
+    })
+    .then((response) => response.data);

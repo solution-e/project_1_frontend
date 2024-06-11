@@ -219,7 +219,13 @@ export default function SignUpModal({ isOpen, onClose }: SignUpModalProps) {
                 </Box>
               ) : null}
             </VStack>
-            <Button type="submit" mt={4} colorScheme={"red"} w={"100%"}>
+            <Button
+              type="submit"
+              mt={4}
+              isLoading={mutation.isLoading}
+              colorScheme={"red"}
+              w={"100%"}
+            >
               Sign up
             </Button>
           </ModalBody>

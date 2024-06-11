@@ -154,3 +154,16 @@ interface IFavoriteCategory {
   id: number;
   category: ICategory[];
 }
+
+export interface INotification {
+  id: number;
+  message: string;
+  created_at: string;
+  is_read: boolean;
+  user: number;
+}
+
+export interface INotificationsList {
+  count: number;
+  result: INotification[];
+}

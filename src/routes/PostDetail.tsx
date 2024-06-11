@@ -1,20 +1,4 @@
-import { useNavigate, useParams } from "react-router-dom";
-import {
-  DeletePostDetail,
-  DeleteReviewDetail,
-  getPostDetail,
-  getPostReviews,
-  IUploadPostVariables,
-  uploadReview,
-  isLike,
-  deleteLike,
-  addLike,
-  isDislike,
-  addDislike,
-  deleteDislike,
-  updateReview,
-} from "../api";
-import { IIsLike, IPostDetail, IReviewInfo, IIsDislike } from "../types";
+import React, { useEffect, useState, useRef } from "react";
 import {
   Box,
   Button,
@@ -34,7 +18,6 @@ import {
   Center,
   Flex,
   Input,
-  border,
   Menu,
   MenuButton,
   MenuItem,
@@ -44,24 +27,38 @@ import {
   useMediaQuery,
 } from "@chakra-ui/react";
 import { Icon } from "@chakra-ui/react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import "react-quill/dist/quill.snow.css";
-import { useState, useRef, useEffect } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { uploadImages, getUploadURL } from "../api";
-import { useForm } from "react-hook-form";
+import {
+  DeletePostDetail,
+  DeleteReviewDetail,
+  getPostDetail,
+  getPostReviews,
+  IUploadPostVariables,
+  uploadReview,
+  isLike,
+  deleteLike,
+  addLike,
+  isDislike,
+  addDislike,
+  deleteDislike,
+  updateReview,
+  postNotifications, // 新しく追加
+} from "../api";
+import { IIsLike, IPostDetail, IReviewInfo, IIsDislike } from "../types";
 import {
   FaThumbsUp,
   FaThumbsDown,
-  FaArrowRight,
   FaAngleRight,
   FaEllipsisV,
   FaEdit,
   FaTrash,
 } from "react-icons/fa";
-import { formarYearToMinutes } from "../component/FormatTime";
 import { FaGear } from "react-icons/fa6";
 import userUser from "../lib/useUser";
+import { formarYearToMinutes } from "../component/FormatTime";
+import { useForm } from "react-hook-form";
 
 type MyState = {
   modifyPostPk: string;
@@ -73,9 +70,12 @@ export default function PostDetail() {
   const onClose = () => setIsOpen(false);
   const onOpen = () => setIsOpen(true);
   const [isSmartPhone] = useMediaQuery("(max-width: 768px)");
-  const { isLoggedIn } = userUser();
+  const { isLoggedIn, user } = userUser();
 
-  const { data } = useQuery<IPostDetail>([`post`, postPk], getPostDetail);
+  const { data: postData } = useQuery<IPostDetail>(
+    [`post`, postPk],
+    getPostDetail
+  );
   const { data: reviewsData } = useQuery<IReviewInfo>(
     [`post`, postPk, `reviews`],
     getPostReviews
@@ -113,11 +113,11 @@ export default function PostDetail() {
   const [likes, setLikes] = useState<number>(0);
   const [dislikes, setDislikes] = useState<number>(0);
   useEffect(() => {
-    if (data !== undefined) {
-      setLikes(data.total_likes);
-      setDislikes(data.total_dislikes);
+    if (postData !== undefined) {
+      setLikes(postData.total_likes);
+      setDislikes(postData.total_dislikes);
     }
-  }, [data]);
+  }, [postData]);
 
   const replyInputRef = useRef<HTMLInputElement>(null);
 
@@ -193,6 +193,22 @@ export default function PostDetail() {
         title: "投稿しました",
         position: "bottom",
       });
+      try {
+        const message = `${user?.name}がコメントしました`;
+        const notificationUser =
+          parentReviewId == null
+            ? postData?.author.id
+            : reviewsData?.result.find((review) => review.id === parentReviewId)
+                ?.user?.id;
+
+        if (notificationUser && typeof notificationUser === "number") {
+          console.log("aaa");
+          await postNotifications({ message, user: notificationUser });
+        }
+      } catch (error) {
+        console.error("通知作成中にエラーが発生しました:", error);
+      }
+
       window.location.reload();
     },
   });
@@ -205,6 +221,7 @@ export default function PostDetail() {
     };
     await mutation.mutate(dataToSubmit);
   };
+
   const handleLikeButtonClick = async (postId: number) => {
     try {
       if (liked) {
@@ -285,13 +302,13 @@ export default function PostDetail() {
     });
   };
 
-  const replyButtonClick = (parentReviewId: number) => {
+  const replyButtonClick = async (parentReviewId: number) => {
     const dataToSubmit = {
       review_content: replyInputRef.current ? replyInputRef.current.value : "",
       postPk: postPk ? Number(postPk) : 0,
       parent_review: parentReviewId,
     };
-    mutation.mutate(dataToSubmit);
+    await mutation.mutate(dataToSubmit);
   };
 
   return (
@@ -304,8 +321,8 @@ export default function PostDetail() {
     >
       <Box width={{ base: "100%", md: "60%" }}>
         <HStack>
-          <Heading>{data?.title}</Heading>
-          {data?.is_author && (
+          <Heading>{postData?.title}</Heading>
+          {postData?.is_author && (
             <>
               <Menu>
                 <MenuButton
@@ -347,7 +364,9 @@ export default function PostDetail() {
                     </Button>
                     <Button
                       variant="ghost"
-                      onClick={() => data?.id && handleDeletePost(data.id)}
+                      onClick={() =>
+                        postData?.id && handleDeletePost(postData.id)
+                      }
                     >
                       削除
                     </Button>
@@ -364,34 +383,34 @@ export default function PostDetail() {
         >
           <Box mt={3} display="flex" alignItems="baseline">
             <Text fontSize="xl">
-              <Link to={`/OtherInfo/${data?.author?.id}`}>
-                {data?.author?.name}
+              <Link to={`/OtherInfo/${postData?.author?.id}`}>
+                {postData?.author?.name}
               </Link>
             </Text>
             <Text ml={6} fontSize="sm">
-              {data?.views}
+              {postData?.views}
             </Text>
             <Text ml={6} fontSize="sm">
-              {data?.created_at && formarYearToMinutes(data.created_at)}
+              {postData?.created_at && formarYearToMinutes(postData.created_at)}
             </Text>
-            {data && data?.created_at !== data?.updated_at && (
+            {postData && postData?.created_at !== postData?.updated_at && (
               <Text fontSize="sm" ml={1}>
-                ({formarYearToMinutes(data?.updated_at)})
+                ({formarYearToMinutes(postData?.updated_at)})
               </Text>
             )}
           </Box>
         </HStack>
         <Grid mt={8} h={"60vh"}>
-          {data?.photo && data?.photo.length > 0
-            ? data?.photo.map((photo) => (
+          {postData?.photo && postData?.photo.length > 0
+            ? postData?.photo.map((photo) => (
                 <Box key={photo.pk}>
                   <Image src={photo.photo_file} />
                 </Box>
               ))
             : null}
           <Box mt={8}>
-            {data?.content && (
-              <div dangerouslySetInnerHTML={{ __html: data.content }} />
+            {postData?.content && (
+              <div dangerouslySetInnerHTML={{ __html: postData.content }} />
             )}
           </Box>
           <Box display="flex" justifyContent="center">
@@ -402,7 +421,7 @@ export default function PostDetail() {
               leftIcon={
                 <Icon as={FaThumbsUp} color={liked ? "yellow" : "white"} />
               }
-              onClick={() => data?.id && handleLikeButtonClick(data.id)}
+              onClick={() => postData?.id && handleLikeButtonClick(postData.id)}
               colorScheme="green"
             >
               {likes}
@@ -414,7 +433,9 @@ export default function PostDetail() {
               leftIcon={
                 <Icon as={FaThumbsDown} color={disliked ? "yellow" : "white"} />
               }
-              onClick={() => data?.id && handleDisLikeButtonClick(data.id)}
+              onClick={() =>
+                postData?.id && handleDisLikeButtonClick(postData.id)
+              }
               colorScheme="blue"
               ml={1}
             >

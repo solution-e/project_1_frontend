@@ -37,6 +37,7 @@ import { FiAlignJustify } from "react-icons/fi";
 import { useRef, useState } from "react";
 import { RiAccountCircleLine, RiAccountCircleFill } from "react-icons/ri";
 import FavoriteModal from "./FavoriteModal";
+import NotificationList from "./NotificationsList";
 
 export default function Header() {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -158,6 +159,7 @@ export default function Header() {
             <FaFilter size={"15"} />
           </Box>
         </Link>
+        <NotificationList />
         {!userLoading ? (
           !isLoggedIn ? (
             <>
