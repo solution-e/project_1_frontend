@@ -23,11 +23,12 @@ import {
   Stack,
   Input,
   Select,
+  Image,
 } from "@chakra-ui/react";
 import { MdOutlineWbSunny } from "react-icons/md";
 import LoginModal from "./LoginModal";
 import SignUpModal from "./SignUpModal";
-import { FaFilter, FaMoon } from "react-icons/fa";
+import { FaMoon } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
 import userUser from "../lib/useUser";
 import { logOut } from "../api";
@@ -98,6 +99,10 @@ export default function Header() {
     setSelectedItem(event.target.value);
   };
 
+  const { colorMode } = useColorMode();
+  const lightLogo = "/logo-no-background_light.png";
+  const darkLogo = "/logo-no-background.png";
+
   return (
     <HStack
       justifyContent={"space-between"}
@@ -107,8 +112,13 @@ export default function Header() {
       width={"100%"}
     >
       <Link to={"/"}>
-        <Box color={"green.500"}>
-          <FaFilter size={"15"} />
+        <Box>
+          <Image
+            src={colorMode === "light" ? lightLogo : darkLogo}
+            alt="Logo"
+            width="100px"
+            height="auto"
+          />
         </Box>
       </Link>
       <form onSubmit={handleSearch}>
@@ -140,7 +150,7 @@ export default function Header() {
         </Stack>
       </form>
       <HStack spacing={2}>
-        <NotificationList />
+        {isLoggedIn ? <NotificationList /> : null}
         <IconButton
           onClick={toggleColorMode}
           variant={"ghost"}
@@ -158,46 +168,52 @@ export default function Header() {
           ) : (
             <Menu>
               <MenuButton>
-                <Text>{user?.name} さん</Text>
+                <Text>{user.name} さん</Text>
               </MenuButton>
             </Menu>
           )
         ) : null}
-        <Button onClick={onOpen}>
-          <FiAlignJustify />
-        </Button>
-        <Drawer isOpen={isOpen} placement="right" onClose={onClose}>
-          <DrawerOverlay />
-          <DrawerContent>
-            <DrawerCloseButton />
-            <DrawerHeader>MENU</DrawerHeader>
-            <DrawerBody>
-              <VStack>
-                {isLoggedIn && (
-                  <Link to="/UserDetail/">
-                    <Button onClick={onClose}>ユーザー情報</Button>
-                  </Link>
-                )}
-                {isLoggedIn && (
-                  <Link to="/MyPostList/">
-                    <Button onClick={onClose}>自分の投稿</Button>
-                  </Link>
-                )}
-                {isLoggedIn && (
-                  <Button
-                    onClick={() => {
-                      onFavoriteOpen();
-                      onClose();
-                    }}
-                  >
-                    お気に入りカテゴリ
-                  </Button>
-                )}
-                {isLoggedIn && <Button onClick={onLogOut}>ログアウト</Button>}
-              </VStack>
-            </DrawerBody>
-          </DrawerContent>
-        </Drawer>
+        {isLoggedIn ? (
+          <>
+            <Button onClick={onOpen}>
+              <FiAlignJustify />
+            </Button>
+            <Drawer isOpen={isOpen} placement="right" onClose={onClose}>
+              <DrawerOverlay />
+              <DrawerContent>
+                <DrawerCloseButton />
+                <DrawerHeader>MENU</DrawerHeader>
+                <DrawerBody>
+                  <VStack>
+                    {isLoggedIn && (
+                      <Link to="/UserDetail/">
+                        <Button onClick={onClose}>ユーザー情報</Button>
+                      </Link>
+                    )}
+                    {isLoggedIn && (
+                      <Link to="/MyPostList/">
+                        <Button onClick={onClose}>自分の投稿</Button>
+                      </Link>
+                    )}
+                    {isLoggedIn && (
+                      <Button
+                        onClick={() => {
+                          onFavoriteOpen();
+                          onClose();
+                        }}
+                      >
+                        お気に入りカテゴリ
+                      </Button>
+                    )}
+                    {isLoggedIn && (
+                      <Button onClick={onLogOut}>ログアウト</Button>
+                    )}
+                  </VStack>
+                </DrawerBody>
+              </DrawerContent>
+            </Drawer>
+          </>
+        ) : null}
       </HStack>
       <LoginModal
         isOpen={isLoginOpen}
@@ -205,7 +221,9 @@ export default function Header() {
         onSignUpOpen={onSignUpOpen}
       />
       <SignUpModal isOpen={isSignUpOpen} onClose={onSignUpClose} />
-      <FavoriteModal isOpen={isFavoriteOpen} onClose={onFavoriteClose} />
+      {isLoggedIn ? (
+        <FavoriteModal isOpen={isFavoriteOpen} onClose={onFavoriteClose} />
+      ) : null}
     </HStack>
   );
 }

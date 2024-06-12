@@ -93,6 +93,7 @@ export interface IUser {
   name: string;
   is_staff: boolean;
   user_flag: string;
+  isLoggedIn: boolean;
 }
 
 export interface IReviewInfo {

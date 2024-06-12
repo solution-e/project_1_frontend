@@ -19,15 +19,20 @@ import { FaBell } from "react-icons/fa";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getNotifications, readNotifications } from "../api";
 import { INotificationsList, INotification } from "../types";
+import userUser from "../lib/useUser";
 
 const NotificationList = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const toast = useToast();
   const queryClient = useQueryClient();
+  const { userLoading, isLoggedIn, user } = userUser();
 
   const { data, error } = useQuery<INotificationsList>(
     ["notifications"],
-    getNotifications
+    getNotifications,
+    {
+      enabled: isLoggedIn,
+    }
   );
 
   const markAllAsReadMutation = useMutation(readNotifications, {
@@ -44,20 +49,10 @@ const NotificationList = () => {
     },
   });
 
-  if (error) {
-    toast({
-      title: "Error fetching notifications.",
-      status: "error",
-      duration: 5000,
-      isClosable: true,
-    });
-  }
-
   const notifications = data?.result ?? [];
   const unreadNotifications = notifications.filter(
     (notification: INotification) => !notification.is_read
   );
-  console.log(unreadNotifications.length);
 
   const handleDrawerOpen = () => {
     onOpen();

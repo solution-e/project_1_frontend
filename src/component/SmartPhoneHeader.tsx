@@ -24,6 +24,7 @@ import {
   useMediaQuery,
   MenuItem,
   MenuList,
+  Image,
 } from "@chakra-ui/react";
 import { MdOutlineWbSunny } from "react-icons/md";
 import LoginModal from "./LoginModal";
@@ -41,7 +42,7 @@ import NotificationList from "./NotificationsList";
 
 export default function Header() {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const { userLoading, isLoggedIn, user } = userUser();
+  const { userLoading, isLoggedIn } = userUser();
   const {
     isOpen: isLoginOpen,
     onClose: onLoginClose,
@@ -100,6 +101,9 @@ export default function Header() {
     setSelectedItem(event.target.value);
   };
   const [isSmartPhone] = useMediaQuery("(max-width: 768px)");
+  const { colorMode } = useColorMode();
+  const lightLogo = "/logo-no-background_light.png";
+  const darkLogo = "/logo-no-background.png";
 
   return (
     <VStack
@@ -155,46 +159,20 @@ export default function Header() {
           </DrawerContent>
         </Drawer>
         <Link to={"/"}>
-          <Box color={"green.500"}>
-            <FaFilter size={"15"} />
+          <Box>
+            <Image
+              src={colorMode === "light" ? lightLogo : darkLogo}
+              alt="Logo"
+              width="100px"
+              height="auto"
+            />
           </Box>
         </Link>
-        <NotificationList />
         {!userLoading ? (
-          !isLoggedIn ? (
-            <>
-              <IconButton
-                icon={<RiAccountCircleLine />}
-                aria-label="Login"
-                onClick={onLoginOpen}
-              />
-            </>
+          isLoggedIn ? (
+            <NotificationList />
           ) : (
-            <Menu>
-              <MenuButton
-                as={IconButton}
-                aria-label="LoginMenu"
-                icon={<RiAccountCircleFill />}
-              />
-              <MenuList>
-                <MenuItem>
-                  <Link to="/UserDetail/">
-                    <Button>ユーザー情報</Button>
-                  </Link>
-                </MenuItem>
-                <MenuItem>
-                  <Link to="/MyPostList/">
-                    <Button>自分の投稿</Button>
-                  </Link>
-                </MenuItem>
-                <MenuItem>
-                  <Button onClick={onFavoriteOpen}>お気に入りカテゴリ</Button>
-                </MenuItem>
-                <MenuItem>
-                  <Button onClick={onLogOut}>ログアウト</Button>
-                </MenuItem>
-              </MenuList>
-            </Menu>
+            <Button onClick={onLoginOpen}>ログイン</Button>
           )
         ) : null}
       </HStack>
@@ -233,7 +211,9 @@ export default function Header() {
         onSignUpOpen={onSignUpOpen}
       />
       <SignUpModal isOpen={isSignUpOpen} onClose={onSignUpClose} />
-      <FavoriteModal isOpen={isFavoriteOpen} onClose={onFavoriteClose} />
+      {isLoggedIn ? (
+        <FavoriteModal isOpen={isFavoriteOpen} onClose={onFavoriteClose} />
+      ) : null}
     </VStack>
   );
 }

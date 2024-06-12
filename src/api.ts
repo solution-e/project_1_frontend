@@ -1,6 +1,7 @@
 import Cookie from "js-cookie";
 import { QueryFunctionContext } from "@tanstack/react-query";
 import axios from "axios";
+import { error } from "console";
 
 const instance = axios.create({
   baseURL: "http://127.0.0.1:8000/",
@@ -209,7 +210,11 @@ export interface IUserUpdateSuccess {
   ok: string;
 }
 export interface IUserUpdateError {
-  error: string;
+  response: {
+    data: {
+      error: string;
+    };
+  };
 }
 export interface IUserUpdateVariables {
   name: string;

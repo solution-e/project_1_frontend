@@ -201,8 +201,11 @@ export default function PostDetail() {
             : reviewsData?.result.find((review) => review.id === parentReviewId)
                 ?.user?.id;
 
-        if (notificationUser && typeof notificationUser === "number") {
-          console.log("aaa");
+        if (
+          notificationUser &&
+          typeof notificationUser === "number" &&
+          notificationUser !== user?.id
+        ) {
           await postNotifications({ message, user: notificationUser });
         }
       } catch (error) {
