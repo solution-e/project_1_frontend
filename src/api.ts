@@ -4,7 +4,10 @@ import axios from "axios";
 import { error } from "console";
 
 const instance = axios.create({
-  baseURL: "http://127.0.0.1:8000/",
+  baseURL:
+    process.env.NODE_ENV === "development"
+      ? "http://127.0.0.1:8000/"
+      : "https://b-lur.com",
   withCredentials: true,
 });
 

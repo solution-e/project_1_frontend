@@ -10,7 +10,6 @@ export default function Root() {
     <Box>
       {isSmartPhone ? <SmartPhoneHeader /> : <Header />}
       <Outlet />
-      <ReactQueryDevtools />
     </Box>
   );
 }
