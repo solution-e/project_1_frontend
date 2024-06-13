@@ -7,7 +7,7 @@ const instance = axios.create({
   baseURL:
     process.env.NODE_ENV === "development"
       ? "http://127.0.0.1:8000/"
-      : "https://b-lur.com",
+      : "https://blur-front.onrender.com",
   withCredentials: true,
 });
 
