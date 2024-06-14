@@ -12,7 +12,6 @@ const instance = axios.create({
   withCredentials: true,
   timeout: 1000,
   headers: {
-    "X-CSRFToken": Cookies.get("csrftoken"),
     "Content-Type": "application/json",
   },
 });
