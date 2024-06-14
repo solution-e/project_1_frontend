@@ -9,6 +9,10 @@ const instance = axios.create({
       ? "http://127.0.0.1:8000/"
       : "https://blur-3rcc.onrender.com",
   withCredentials: true,
+  headers: {
+    "X-CSRFToken": Cookie.get("csrftoken"),
+    "Content-Type": "application/json",
+  },
 });
 
 export const getPostList = () =>
