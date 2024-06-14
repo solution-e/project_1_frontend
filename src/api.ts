@@ -2,6 +2,7 @@ import Cookie from "js-cookie";
 import { QueryFunctionContext } from "@tanstack/react-query";
 import axios from "axios";
 import { error } from "console";
+import Cookies from "js-cookie";
 
 const instance = axios.create({
   baseURL:
@@ -9,8 +10,9 @@ const instance = axios.create({
       ? "http://127.0.0.1:8000/"
       : "https://blur-3rcc.onrender.com",
   withCredentials: true,
+  timeout: 1000,
   headers: {
-    "X-CSRFToken": Cookie.get("csrftoken"),
+    "X-CSRFToken": Cookies.get("csrftoken"),
     "Content-Type": "application/json",
   },
 });
