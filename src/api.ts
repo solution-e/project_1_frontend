@@ -81,7 +81,7 @@ export const DeletePostDetail = async ({
   return instance
     .delete(`post/${postPk}`, {
       headers: {
-        "X-CSRFTOKEN": Cookie.get("csrftoken") || "",
+        "X-CSRFTOKEN": Cookies.get("csrftoken") || "",
       },
     })
     .then((response) => response.data);
@@ -96,7 +96,7 @@ export const DeleteReviewDetail = async ({
   return instance
     .put(`review/${reviewPk}/delete`, null, {
       headers: {
-        "X-CSRFTOKEN": Cookie.get("csrftoken") || "",
+        "X-CSRFTOKEN": Cookies.get("csrftoken") || "",
       },
     })
     .then((response) => response.data);
@@ -116,7 +116,7 @@ export const logOut = () =>
   instance
     .post(`user/logout`, null, {
       headers: {
-        "X-CSRFTOKEN": Cookie.get("csrftoken") || "",
+        "X-CSRFTOKEN": Cookies.get("csrftoken") || "",
       },
     })
     .then((response) => response.data);
@@ -142,7 +142,7 @@ export const usernameLogIn = ({
       { username, password },
       {
         headers: {
-          "X-CSRFToken": Cookie.get("csrftoken") || "",
+          "X-CSRFToken": Cookies.get("csrftoken") || "",
         },
       }
     )
@@ -177,7 +177,7 @@ export const signUp = ({
       { name, email, username, password, password2 },
       {
         headers: {
-          "X-CSRFToken": Cookie.get("csrftoken") || "",
+          "X-CSRFToken": Cookies.get("csrftoken") || "",
         },
       }
     )
@@ -194,7 +194,7 @@ export const uploadPost = (variables: IUploadPostVariables) =>
   instance
     .post(`post/`, variables, {
       headers: {
-        "X-CSRFToken": Cookie.get("csrftoken") || "",
+        "X-CSRFToken": Cookies.get("csrftoken") || "",
       },
     })
     .then((response) => response.data);
@@ -210,7 +210,7 @@ export const updatePost = (variables: IUpdatePostVariables) =>
   instance
     .put(`post/${variables.postPk}`, variables, {
       headers: {
-        "X-CSRFToken": Cookie.get("csrftoken") || "",
+        "X-CSRFToken": Cookies.get("csrftoken") || "",
       },
     })
     .then((response) => response.data);
@@ -240,7 +240,7 @@ export const getUploadURL = () =>
   instance
     .post(`media/photo/get-url`, null, {
       headers: {
-        "X-CSRFToken": Cookie.get("csrftoken") || "",
+        "X-CSRFToken": Cookies.get("csrftoken") || "",
       },
     })
     .then((response) => response.data);
@@ -268,7 +268,7 @@ export const userUpdate = ({
       { name, old_password, new_password },
       {
         headers: {
-          "X-CSRFToken": Cookie.get("csrftoken") || "",
+          "X-CSRFToken": Cookies.get("csrftoken") || "",
         },
       }
     )
@@ -317,7 +317,7 @@ export const uploadReview = (variables: IUploadReviewVariables) =>
   instance
     .post(`post/${variables.postPk}/reviews`, variables, {
       headers: {
-        "X-CSRFToken": Cookie.get("csrftoken") || "",
+        "X-CSRFToken": Cookies.get("csrftoken") || "",
       },
     })
     .then((response) => response.data);
@@ -331,7 +331,7 @@ export const updateReview = (variables: IUpdateReviewVariables) =>
   instance
     .put(`review/${variables.reviewPk}/update`, variables, {
       headers: {
-        "X-CSRFToken": Cookie.get("csrftoken") || "",
+        "X-CSRFToken": Cookies.get("csrftoken") || "",
       },
     })
     .then((response) => response.data);
@@ -350,7 +350,7 @@ export const addLike = async ({
   return instance
     .put(`post/${postpk}/like`, null, {
       headers: {
-        "X-CSRFTOKEN": Cookie.get("csrftoken") || "",
+        "X-CSRFTOKEN": Cookies.get("csrftoken") || "",
       },
     })
     .then((response) => response.data);
@@ -365,7 +365,7 @@ export const deleteLike = async ({
   return instance
     .delete(`post/${postpk}/like`, {
       headers: {
-        "X-CSRFTOKEN": Cookie.get("csrftoken") || "",
+        "X-CSRFTOKEN": Cookies.get("csrftoken") || "",
       },
     })
     .then((response) => response.data);
@@ -387,7 +387,7 @@ export const addDislike = async ({
   return instance
     .put(`post/${postpk}/dislike`, null, {
       headers: {
-        "X-CSRFTOKEN": Cookie.get("csrftoken") || "",
+        "X-CSRFTOKEN": Cookies.get("csrftoken") || "",
       },
     })
     .then((response) => response.data);
@@ -402,7 +402,7 @@ export const deleteDislike = async ({
   return instance
     .delete(`post/${postpk}/dislike`, {
       headers: {
-        "X-CSRFTOKEN": Cookie.get("csrftoken") || "",
+        "X-CSRFTOKEN": Cookies.get("csrftoken") || "",
       },
     })
     .then((response) => response.data);
@@ -427,7 +427,7 @@ export const addFavorite = async ({
   return instance
     .post(`favorite/${categorypk}/toggle`, null, {
       headers: {
-        "X-CSRFTOKEN": Cookie.get("csrftoken") || "",
+        "X-CSRFTOKEN": Cookies.get("csrftoken") || "",
       },
     })
     .then((response) => response.data);
@@ -442,7 +442,7 @@ export const removeFavorite = async ({
   return instance
     .put(`favorite/${categorypk}/toggle`, null, {
       headers: {
-        "X-CSRFTOKEN": Cookie.get("csrftoken") || "",
+        "X-CSRFTOKEN": Cookies.get("csrftoken") || "",
       },
     })
     .then((response) => response.data);
@@ -491,7 +491,7 @@ export const resendActivationEmail = (email: string) =>
       { email },
       {
         headers: {
-          "X-CSRFToken": Cookie.get("csrftoken") || "",
+          "X-CSRFToken": Cookies.get("csrftoken") || "",
         },
       }
     )
@@ -509,7 +509,7 @@ export const postNotifications = (variables: IPostNotifications) =>
   instance
     .post("/notifications/create/", variables, {
       headers: {
-        "X-CSRFToken": Cookie.get("csrftoken") || "",
+        "X-CSRFToken": Cookies.get("csrftoken") || "",
       },
     })
     .then((response) => response.data);
@@ -518,7 +518,7 @@ export const readNotifications = () =>
   instance
     .put("notifications/read", null, {
       headers: {
-        "X-CSRFToken": Cookie.get("csrftoken") || "",
+        "X-CSRFToken": Cookies.get("csrftoken") || "",
       },
     })
     .then((response) => response.data);
