@@ -38,6 +38,7 @@ import userUser from "../lib/useUser";
 import { useState, useEffect } from "react";
 import Pagenate from "../component/Pagenate";
 import { formatHourToMinutes } from "../component/FormatTime";
+import { Helmet } from "react-helmet-async";
 
 export default function Home() {
   const toast = useToast();
@@ -135,6 +136,9 @@ export default function Home() {
 
   return (
     <Flex justifyContent="center" alignItems="center" width={"100%"}>
+      <Helmet>
+        <meta name="google-adsense-account" content="ca-pub-8391643725266611" />
+      </Helmet>
       <Box width={{ base: "100%", md: "80%" }}>
         <VStack>
           <Grid
