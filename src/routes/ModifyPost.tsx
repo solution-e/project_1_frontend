@@ -27,6 +27,7 @@ import { useState, useRef, useEffect } from "react";
 import { IUploadPostVariables } from "../api";
 import "react-quill/dist/quill.snow.css";
 import BasetoUrl from "../component/BasetoUrl";
+import { Helmet } from "react-helmet-async";
 import userUser from "../lib/useUser";
 import functionAlert from "src/component/functionAlert";
 
@@ -198,6 +199,9 @@ export default function ModifyPost() {
 
   return (
     <ProtectedPage>
+      <Helmet>
+        <meta name="google-adsense-account" content="ca-pub-8391643725266611" />
+      </Helmet>
       <Box pb={40} mt={10} px={{ base: 4, md: 10, lg: 40 }}>
         <Container maxW="container.md">
           <Heading textAlign="center">投稿編集フォーム</Heading>

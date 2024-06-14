@@ -12,16 +12,17 @@ import { useForm } from "react-hook-form";
 import { useParams } from "react-router-dom";
 import { getUploadURL, uploadImage } from "../api";
 import ProtectedPage from "../component/ProtectedPage";
+import { Helmet } from "react-helmet-async";
 
 interface IForm {
   file: FileList;
 }
 
 interface IUploadURLResponse {
-    result: {
-        id: string;
-        uploadURL: string;
-    }
+  result: {
+    id: string;
+    uploadURL: string;
+  };
 }
 
 export default function UploadPhotos() {
@@ -29,7 +30,7 @@ export default function UploadPhotos() {
   const { roomPk } = useParams();
   const uploadImageMutation = useMutation(uploadImage, {
     onSuccess: (data: any) => {
-     console.log();
+      console.log();
     },
   });
   const uploadURLMutation = useMutation(getUploadURL, {

@@ -34,6 +34,7 @@ import "react-quill/dist/quill.snow.css";
 import BasetoUrl from "../component/BasetoUrl";
 import functionAlert from "src/component/functionAlert";
 import userUser from "../lib/useUser";
+import { Helmet } from "react-helmet-async";
 
 interface IForm {
   file: string[];
@@ -192,6 +193,9 @@ export default function UploadPost() {
 
   return (
     <ProtectedPage>
+      <Helmet>
+        <meta name="google-adsense-account" content="ca-pub-8391643725266611" />
+      </Helmet>
       <Box
         pb={40}
         mt={10}

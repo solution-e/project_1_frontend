@@ -17,6 +17,7 @@ import { useNavigate } from "react-router-dom";
 import { formatHourToMinutes } from "../component/FormatTime";
 import SmartPhonePost from "src/component/SmartPhonePost";
 import functionAlert from "src/component/functionAlert";
+import { Helmet } from "react-helmet-async";
 
 export default function MyPostList() {
   const navigate = useNavigate();
@@ -31,6 +32,9 @@ export default function MyPostList() {
 
   return (
     <Flex justifyContent="center" alignItems="center">
+      <Helmet>
+        <meta name="google-adsense-account" content="ca-pub-8391643725266611" />
+      </Helmet>
       <Box>
         <VStack>
           <Grid

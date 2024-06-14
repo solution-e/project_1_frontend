@@ -1,8 +1,12 @@
 import { Box, Flex, Heading, Text, List, ListItem } from "@chakra-ui/react";
+import { Helmet } from "react-helmet-async";
 
 export default function PrivacyPolicy() {
   return (
     <Flex direction="column" align="center" p={5} width="100%">
+      <Helmet>
+        <meta name="google-adsense-account" content="ca-pub-8391643725266611" />
+      </Helmet>
       <Box maxW="800px">
         <Heading as="h1" size="xl" mb={5} textAlign="center">
           プライバシーポリシー

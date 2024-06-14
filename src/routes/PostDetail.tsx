@@ -59,6 +59,7 @@ import { FaGear } from "react-icons/fa6";
 import userUser from "../lib/useUser";
 import { formarYearToMinutes } from "../component/FormatTime";
 import { useForm } from "react-hook-form";
+import { Helmet } from "react-helmet-async";
 
 type MyState = {
   modifyPostPk: string;
@@ -322,6 +323,9 @@ export default function PostDetail() {
       alignItems="center"
       justifyContent="center"
     >
+      <Helmet>
+        <meta name="google-adsense-account" content="ca-pub-8391643725266611" />
+      </Helmet>
       <Box width={{ base: "100%", md: "60%" }}>
         <HStack>
           <Heading>{postData?.title}</Heading>

@@ -21,6 +21,7 @@ import {
   formatYearToMonth,
 } from "../component/FormatTime";
 import Pagenate from "../component/Pagenate";
+import { Helmet } from "react-helmet-async";
 
 export default function OtherInfo() {
   const location = useLocation();
@@ -42,6 +43,9 @@ export default function OtherInfo() {
   }
   return (
     <Flex justifyContent="center" alignItems="center" p={4}>
+      <Helmet>
+        <meta name="google-adsense-account" content="ca-pub-8391643725266611" />
+      </Helmet>
       <Box width={{ base: "100%", md: "80%", lg: "60%" }}>
         <VStack spacing={4}>
           <Heading size="lg">ユーザー情報</Heading>

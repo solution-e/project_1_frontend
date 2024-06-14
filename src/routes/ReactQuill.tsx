@@ -21,6 +21,7 @@ import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { IUploadPostVariables } from "../api";
 import "react-quill/dist/quill.snow.css";
+import { Helmet } from "react-helmet-async";
 
 export default function UploadPost() {
   const [content, setContent] = useState("");

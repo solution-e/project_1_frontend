@@ -13,6 +13,7 @@ import { useQuery } from "@tanstack/react-query";
 import { getCategory } from "../api";
 import { ICategory } from "../types";
 import { Link } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 
 export default function CategoryList() {
   const { data } = useQuery<ICategory[]>({
@@ -22,6 +23,9 @@ export default function CategoryList() {
 
   return (
     <Flex justifyContent="center" alignItems="center">
+      <Helmet>
+        <meta name="google-adsense-account" content="ca-pub-8391643725266611" />
+      </Helmet>
       <Box width="100%">
         <Grid
           templateColumns={{
