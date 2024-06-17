@@ -123,7 +123,13 @@ export const getMe = () =>
   instance.get(`user/me`).then((response) => response.data);
 
 export const logOut = () =>
-  instance.post(`user/logout`, null).then((response) => response.data);
+  instance
+    .post(`user/logout`, null, {
+      headers: {
+        "X-CSRFTOKEN": Cookies.get("csrftoken") || "",
+      },
+    })
+    .then((response) => response.data);
 
 export interface IUsernameLoginVariables {
   username: string;
