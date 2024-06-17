@@ -16,9 +16,28 @@ const instance = axios.create({
   },
 });
 
+const fetchCsrfToken = async () => {
+  try {
+    const response = await axios.get(
+      "https://blur-3rcc.onrender.com/csrf-token-endpoint"
+    );
+    const { csrftoken } = response.data;
+    return csrftoken;
+  } catch (error) {
+    console.error("Error fetching CSRF token:", error);
+    return null;
+  }
+};
+
 instance.interceptors.request.use(
-  (config) => {
-    const csrfToken = Cookies.get("csrftoken");
+  async (config) => {
+    let csrfToken = Cookies.get("csrftoken");
+    if (!csrfToken) {
+      csrfToken = await fetchCsrfToken();
+      if (csrfToken) {
+        Cookies.set("csrftoken", csrfToken);
+      }
+    }
     if (csrfToken) {
       config.headers["X-CSRFToken"] = csrfToken;
     }
