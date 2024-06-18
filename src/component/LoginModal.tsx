@@ -68,7 +68,7 @@ export default function LoginModal({
           status: "success",
         });
         onClose();
-      }, 3000);
+      }, 1000);
       queryClient.refetchQueries(["me"]);
       reset();
     },
