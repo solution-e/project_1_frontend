@@ -16,18 +16,8 @@ const instance = axios.create({
   },
 });
 
-const fetchCsrfToken = async () => {
-  try {
-    const response = await axios.get(
-      "https://blur-3rcc.onrender.com/csrf-token-endpoint"
-    );
-    const { csrftoken } = response.data;
-    return csrftoken;
-  } catch (error) {
-    console.error("Error fetching CSRF token:", error);
-    return null;
-  }
-};
+const fetchCsrfToken = () =>
+  instance.get("user/get-token").then((response) => response.data);
 
 instance.interceptors.request.use(
   async (config) => {
