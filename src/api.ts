@@ -516,7 +516,8 @@ export const resendActivationEmail = (email: string) =>
         },
       }
     )
-    .then((response) => response.data);
+    .then((response) => response.data)
+    .catch((error) => console.error("Error:", error));
 
 export const getNotifications = () =>
   instance.get("notifications/").then((response) => response.data);
