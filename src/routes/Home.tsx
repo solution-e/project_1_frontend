@@ -17,6 +17,7 @@ import {
   Heading,
   List,
   useBreakpointValue,
+  Center,
 } from "@chakra-ui/react";
 import { FaStar } from "react-icons/fa";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -32,13 +33,14 @@ import {
 } from "../api";
 import Post from "../component/Post";
 import SmartPhonePost from "src/component/SmartPhonePost";
-import { IfavoriteStatus, IPostInfo } from "../types";
+import { ICategory, IfavoriteStatus, IPostInfo } from "../types";
 import { useParams, useLocation, useNavigate } from "react-router-dom";
 import userUser from "../lib/useUser";
 import { useState, useEffect } from "react";
 import Pagenate from "../component/Pagenate";
 import { formatHourToMinutes } from "../component/FormatTime";
 import { Helmet } from "react-helmet-async";
+import Category from "src/component/Category";
 
 export default function Home() {
   const toast = useToast();
@@ -150,6 +152,7 @@ export default function Home() {
             marginTop={{ base: 4, md: 100 }}
             width={{ base: "100%", md: "80%" }}
           >
+            {isCategoryInUrl && categoryId}
             <VStack alignItems={"center"}>
               <Box>
                 <Link href={`/category/`}>
