@@ -68,14 +68,14 @@ export default function LoginModal({
           status: "success",
         });
         onClose();
-      }, 1000);
+      }, 3000);
       queryClient.refetchQueries(["me"]);
       reset();
     },
     onError: (error) => {
       if (
         error.response.data.error ===
-        "このEmailは既に登録されていますが、アカウントが有効化されていません"
+        "このアカウントは既に登録されていますが、アカウントが有効化されていません"
       ) {
         setReactivationEmail(error.response.data.email);
       } else {
