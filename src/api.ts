@@ -15,7 +15,8 @@ const instance = axios.create({
     "Content-Type": "application/json",
   },
 });
-
+{
+  /*
 const fetchCsrfToken = () =>
   instance.get("user/get-token").then((response) => response.data);
 
@@ -35,7 +36,8 @@ instance.interceptors.request.use(
   },
   (error) => Promise.reject(error)
 );
-
+*/
+}
 export const getPostList = () =>
   instance.get("post/").then((response) => response.data);
 
