@@ -10,7 +10,7 @@ const instance = axios.create({
       ? "http://127.0.0.1:8000/"
       : "https://admin.b-lur.com/",
   withCredentials: true,
-  timeout: 1000,
+  timeout: 10000,
   headers: {
     "Content-Type": "application/json",
   },
