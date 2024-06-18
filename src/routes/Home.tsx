@@ -40,9 +40,11 @@ import { useState, useEffect } from "react";
 import Pagenate from "../component/Pagenate";
 import { formatHourToMinutes } from "../component/FormatTime";
 import { Helmet } from "react-helmet-async";
-import Category from "src/component/Category";
+import Cookie from "js-cookie";
 
 export default function Home() {
+  const csrfToken = Cookie.get("csrftoken");
+  console.log(csrfToken);
   const toast = useToast();
   const location = useLocation();
   const navigate = useNavigate();

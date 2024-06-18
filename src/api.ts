@@ -12,14 +12,23 @@ const instance = axios.create({
   withCredentials: true,
   timeout: 1000,
   headers: {
-    "X-CSRFToken": Cookies.get("csrftoken"),
     "Content-Type": "application/json",
   },
 });
+{
+  /*
+const fetchCsrfToken = () =>
+  instance.get("user/get-token").then((response) => response.data);
 
 instance.interceptors.request.use(
-  (config) => {
-    const csrfToken = Cookies.get("csrftoken");
+  async (config) => {
+    let csrfToken = Cookies.get("csrftoken");
+    if (!csrfToken) {
+      csrfToken = await fetchCsrfToken();
+      if (csrfToken) {
+        Cookies.set("csrftoken", csrfToken);
+      }
+    }
     if (csrfToken) {
       config.headers["X-CSRFToken"] = csrfToken;
     }
@@ -27,7 +36,8 @@ instance.interceptors.request.use(
   },
   (error) => Promise.reject(error)
 );
-
+*/
+}
 export const getPostList = () =>
   instance.get("post/").then((response) => response.data);
 
@@ -124,7 +134,13 @@ export const getMe = () =>
   instance.get(`user/me`).then((response) => response.data);
 
 export const logOut = () =>
-  instance.post(`user/logout`, null).then((response) => response.data);
+  instance
+    .post(`user/logout`, null, {
+      headers: {
+        "X-CSRFTOKEN": Cookies.get("csrftoken") || "",
+      },
+    })
+    .then((response) => response.data);
 
 export interface IUsernameLoginVariables {
   username: string;
