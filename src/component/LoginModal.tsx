@@ -75,7 +75,7 @@ export default function LoginModal({
     onError: (error) => {
       if (
         error.response.data.error ===
-        "このアカウントは既に登録されていますが、アカウントが有効化されていません"
+          "このEmailは既に登録されていますが、アカウントが有効化されていません"
       ) {
         setReactivationEmail(error.response.data.email);
       } else {

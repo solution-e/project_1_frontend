@@ -24,7 +24,7 @@ import {
 import { useForm } from "react-hook-form";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useState, useRef, useEffect } from "react";
-import { IUploadPostVariables } from "../api";
+import { IUpdatePostVariables } from "../api";
 import "react-quill/dist/quill.snow.css";
 import BasetoUrl from "../component/BasetoUrl";
 import { Helmet } from "react-helmet-async";
@@ -42,7 +42,7 @@ export default function ModifyPost() {
   const [content, setContent] = useState("");
   const contentRef = useRef("");
   const mainImgRef = useRef("");
-  const { register, handleSubmit } = useForm<IUploadPostVariables>();
+  const { register, handleSubmit } = useForm<IUpdatePostVariables>();
   const toast = useToast();
   const navigate = useNavigate();
   const location = useLocation();
@@ -106,7 +106,7 @@ export default function ModifyPost() {
       );
       console.log("contentRef.current after replace:", contentRef.current);
       if (variables.count == 0) {
-        mainImgRef.current = data.result.variants;
+        mainImgRef.current = data.result.variants[0];
       }
     },
   });
@@ -148,7 +148,7 @@ export default function ModifyPost() {
     getCategory
   );
 
-  const onSubmit = async (formData: IUploadPostVariables) => {
+  const onSubmit = async (formData: IUpdatePostVariables) => {
     const imgSrcRegex = /<img.*?src="(.*?)"/g;
     const imgSrcMatches: string[] = [];
     contentRef.current = content;

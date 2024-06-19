@@ -44,7 +44,7 @@ import {
   addDislike,
   deleteDislike,
   updateReview,
-  postNotifications, // 新しく追加
+  postNotifications,
 } from "../api";
 import { IIsLike, IPostDetail, IReviewInfo, IIsDislike } from "../types";
 import {
