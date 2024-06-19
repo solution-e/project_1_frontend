@@ -151,7 +151,6 @@ export default function Home() {
             marginTop={{ base: 4, md: 100 }}
             width={{ base: "100%", md: "80%" }}
           >
-            {isCategoryInUrl && data?.categoryname}
             <VStack alignItems={"center"}>
               <Box>
                 <Link href={`/category/`}>
@@ -192,6 +191,9 @@ export default function Home() {
                     />
                   </Button>
                 )}
+              </Box>
+              <Box fontSize="xl" as="b">
+                {isCategoryInUrl && data?.categoryname}
               </Box>
             </VStack>
             <Flex width="100%" justifyContent="center">
