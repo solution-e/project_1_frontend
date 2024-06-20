@@ -44,15 +44,15 @@ export default function CategoryList() {
                 borderRadius="lg"
                 overflow="hidden"
               >
-                <Accordion allowToggle allowMultiple display="flex">
+                <Accordion allowToggle>
                   <AccordionItem>
-                    <h2>
-                      <AccordionButton>
-                        <AccordionIcon />
+                    <AccordionButton>
+                      <Box flex="1" textAlign="left">
                         {parentCategory.name}
-                      </AccordionButton>
-                    </h2>
-                    <AccordionPanel pb={4} display="flex" flexFlow="column">
+                      </Box>
+                      <AccordionIcon />
+                    </AccordionButton>
+                    <AccordionPanel pb={4}>
                       {data
                         ?.filter(
                           (category) =>

@@ -325,6 +325,16 @@ export default function PostDetail() {
     >
       <Helmet>
         <meta name="google-adsense-account" content="ca-pub-8391643725266611" />
+        <meta name="description" content={postData?.content} />
+        <meta name="keywords" content={postData?.title} />
+        <meta property="og:title" content={postData?.title} />
+        <meta property="og:description" content={postData?.content} />
+        <meta property="og:type" content="article" />
+        <meta property="og:url" content={window.location.href} />
+        {/* <meta
+          property="og:image"
+          content={postData?.photo || "default-image-url"}
+        /> */}
       </Helmet>
       <Box width={{ base: "100%", md: "60%" }}>
         <HStack>

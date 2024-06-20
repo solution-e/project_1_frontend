@@ -139,6 +139,11 @@ export default function Home() {
     <Flex justifyContent="center" alignItems="center" width={"100%"}>
       <Helmet>
         <meta name="google-adsense-account" content="ca-pub-8391643725266611" />
+        <meta name="description" content="自由な掲示板です！！" />
+        <meta property="og:title" />
+        <meta property="og:description" />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content={window.location.href} />
       </Helmet>
       <Box width={{ base: "100%", md: "80%" }}>
         <VStack>
