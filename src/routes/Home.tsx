@@ -139,7 +139,10 @@ export default function Home() {
     <Flex justifyContent="center" alignItems="center" width={"100%"}>
       <Helmet>
         <meta name="google-adsense-account" content="ca-pub-8391643725266611" />
-        <meta name="description" content="自由な掲示板です！！" />
+        <meta
+          name="description"
+          content="blurようこそ。自由なコミュニティーサービスを提供します!"
+        />
         <meta property="og:title" />
         <meta property="og:description" />
         <meta property="og:type" content="website" />
