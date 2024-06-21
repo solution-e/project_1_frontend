@@ -25,6 +25,7 @@ import {
   IconButton,
   Textarea,
   useMediaQuery,
+  useStepContext,
 } from "@chakra-ui/react";
 import { Icon } from "@chakra-ui/react";
 import { Link, useNavigate, useParams } from "react-router-dom";
@@ -60,6 +61,7 @@ import userUser from "../lib/useUser";
 import { formarYearToMinutes } from "../component/FormatTime";
 import { useForm } from "react-hook-form";
 import { Helmet } from "react-helmet-async";
+import { Validation } from "../component/Validater"
 
 type MyState = {
   modifyPostPk: string;
@@ -72,6 +74,13 @@ export default function PostDetail() {
   const onOpen = () => setIsOpen(true);
   const [isSmartPhone] = useMediaQuery("(max-width: 768px)");
   const { isLoggedIn, user } = userUser();
+  const [inputValue, setInputValue] = useState("");
+  const editingRef = useRef<HTMLTextAreaElement>(null);
+  const [childReviewValue, setChildReviewValue] = useState("");
+  const [validateError, setValidateError] = useState("");
+  const [commentValidateError, setCommentValidateError] = useState("");
+  const [childValidateError, setChildValidateError] = useState("");
+  const maxLength = 400;
 
   const { data: postData } = useQuery<IPostDetail>(
     [`post`, postPk],
@@ -120,7 +129,7 @@ export default function PostDetail() {
     }
   }, [postData]);
 
-  const replyInputRef = useRef<HTMLInputElement>(null);
+  const replyInputRef = useRef<HTMLTextAreaElement>(null);
 
   const deletePostMutation = useMutation((postId: number) =>
     DeletePostDetail({ queryKey: ["post", postId] })
@@ -200,7 +209,7 @@ export default function PostDetail() {
           parentReviewId == null
             ? postData?.author.id
             : reviewsData?.result.find((review) => review.id === parentReviewId)
-                ?.user?.id;
+              ?.user?.id;
 
         if (
           notificationUser &&
@@ -218,12 +227,21 @@ export default function PostDetail() {
   });
 
   const onSubmit = async (formData: IUploadPostVariables) => {
+    const reviewContent = inputRef.current ? inputRef.current.value : "";
+    const errorMessage = Validation(reviewContent);
+
+    if (errorMessage) {
+      setCommentValidateError(errorMessage);
+      return;
+    }
+
     const dataToSubmit = {
-      review_content: inputRef.current ? inputRef.current.value : "",
+      review_content: reviewContent,
       postPk: Number(postPk),
       parent_review: null,
     };
     await mutation.mutate(dataToSubmit);
+    setCommentValidateError("");
   };
 
   const handleLikeButtonClick = async (postId: number) => {
@@ -277,11 +295,20 @@ export default function PostDetail() {
   };
 
   const EditButtonClick = () => {
+    const reviewContent = editingRef.current ? editingRef.current.value : "";
+    const errorMessage = Validation(reviewContent);
+
+    if (errorMessage) {
+      setValidateError(errorMessage);
+      return;
+    }
+
     const dataToSubmit = {
-      review_content: inputRef.current ? inputRef.current.value : "",
+      review_content: reviewContent,
       reviewPk: reviewPkRef.current ?? 0,
     };
     updateReviewMutation.mutate(dataToSubmit);
+    setValidateError("");
   };
 
   const handleEditButtonClick = async (
@@ -297,6 +324,7 @@ export default function PostDetail() {
     setEditingReviewContent("");
     setIsEditing(false);
     reviewPkRef.current = 0;
+    setValidateError("");
   };
 
   const AlertLogin = () => {
@@ -307,12 +335,41 @@ export default function PostDetail() {
   };
 
   const replyButtonClick = async (parentReviewId: number) => {
+    const reviewContent = replyInputRef.current ? replyInputRef.current.value : "";
+    const errorMessage = Validation(reviewContent);
+
+    if (errorMessage) {
+      setChildValidateError(errorMessage);
+      return;
+    }
     const dataToSubmit = {
       review_content: replyInputRef.current ? replyInputRef.current.value : "",
       postPk: postPk ? Number(postPk) : 0,
       parent_review: parentReviewId,
     };
     await mutation.mutate(dataToSubmit);
+    setChildValidateError("");
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const { value } = e.target;
+    if (value.length < maxLength) {
+      setInputValue(value);
+    }
+  };
+
+  const handleEditingChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const { value } = e.target;
+    if (value.length < maxLength) {
+      setEditingReviewContent(value);
+    }
+  };
+
+  const handleReplyChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const { value } = e.target;
+    if (value.length < maxLength) {
+      setChildReviewValue(value);
+    }
   };
 
   return (
@@ -420,10 +477,10 @@ export default function PostDetail() {
         <Grid mt={8} h={"60vh"}>
           {postData?.photo && postData?.photo.length > 0
             ? postData?.photo.map((photo) => (
-                <Box key={photo.pk}>
-                  <Image src={photo.photo_file} />
-                </Box>
-              ))
+              <Box key={photo.pk}>
+                <Image src={photo.photo_file} />
+              </Box>
+            ))
             : null}
           <Box mt={8}>
             {postData?.content && (
@@ -491,7 +548,7 @@ export default function PostDetail() {
                       {review.user?.name}
                       {review?.is_author &&
                         review?.review_content !==
-                          "この投稿は削除されました" && (
+                        "この投稿は削除されました" && (
                           <Menu>
                             <MenuButton
                               as={IconButton}
@@ -528,18 +585,39 @@ export default function PostDetail() {
                           </Menu>
                         )}
                     </Box>
-                    <Box
-                      width="100%"
-                      onClick={() => {
-                        review.parent_review === null &&
-                          setParentReviewId(review.id);
-                        setIsReplyReview(true);
-                      }}
-                      dangerouslySetInnerHTML={{
-                        __html: review.review_content,
-                      }}
-                      whiteSpace="normal"
-                    />
+                    {isEditing && reviewPkRef.current === review.id ? (
+                      <>
+                        <Box>
+                          <Textarea
+                            value={editingReviewContent}
+                            onChange={handleEditingChange}
+                            ref={editingRef}
+                          />
+                          <Button onClick={EditButtonClick}>保存</Button>
+                          <Button onClick={handleCancelEdit}>キャンセル</Button>
+                        </Box>
+                        {validateError && <Text color="red">{validateError}</Text>}
+                      </>
+                    )
+                      :
+                      (
+                        <Box
+                          width="100%"
+                          onClick={() => {
+                            review.parent_review === null &&
+                              setParentReviewId(review.id);
+                            setIsReplyReview(true);
+                          }}
+                          dangerouslySetInnerHTML={{
+                            __html: review.review_content,
+                          }}
+                          whiteSpace="normal"
+                          sx={{
+                            wordBreak: "break-word",
+                          }}
+                        />
+                      )
+                    }
                     <Box
                       width="100%"
                       whiteSpace="nowrap"
@@ -566,18 +644,40 @@ export default function PostDetail() {
                     >
                       {review.user?.name}
                     </Box>
-                    <Box
-                      flex={4}
-                      onClick={() => {
-                        review.parent_review === null &&
-                          setParentReviewId(review.id);
-                        setIsReplyReview(true);
-                      }}
-                      dangerouslySetInnerHTML={{
-                        __html: review.review_content,
-                      }}
-                      whiteSpace="normal"
-                    />
+                    {isEditing && reviewPkRef.current === review.id ? (
+                      <Box>
+                        <Box>
+                          <Textarea
+                            value={editingReviewContent}
+                            onChange={handleEditingChange}
+                            ref={editingRef}
+                          />
+                          <Button onClick={EditButtonClick}>保存</Button>
+                          <Button onClick={handleCancelEdit}>キャンセル</Button>
+                        </Box>
+                        {validateError && <Text color="red">{validateError}</Text>}
+                      </Box>
+                    )
+                      :
+                      (
+                        <Box
+                          flex={4}
+                          onClick={() => {
+                            review.parent_review === null &&
+                              setParentReviewId(review.id);
+                            setIsReplyReview(true);
+                          }}
+                          dangerouslySetInnerHTML={{
+                            __html: review.review_content,
+                          }}
+                          whiteSpace="normal"
+                          sx={{
+                            wordBreak: "break-word",
+                          }}
+                        />
+                      )
+                    }
+
                     <Box flex={0.7} borderRight="1px solid lightgray">
                       <Text color="dimgray" fontSize={"xs"}>
                         {formarYearToMinutes(review.created_at)}
@@ -625,12 +725,15 @@ export default function PostDetail() {
                   parentReviewId === review.id &&
                   review?.review_content != "この投稿は削除されました" && (
                     <Box>
-                      <Input
-                        height="width 80%"
-                        type="text"
+                      <Textarea
+                        rows={1}
+                        lineHeight="1.5"
                         textAlign="left"
                         ref={replyInputRef}
-                      ></Input>
+                        onChange={handleReplyChange}
+                        value={childReviewValue}
+                      ></Textarea>
+                      {childValidateError && <Text color="red">{childValidateError}</Text>}
                       <Button onClick={() => replyButtonClick(review.id)}>
                         返信
                       </Button>
@@ -638,6 +741,8 @@ export default function PostDetail() {
                         onClick={() => {
                           setIsReplyReview(false);
                           setParentReviewId(null);
+                          setChildValidateError("");
+                          setChildReviewValue("");
                         }}
                       >
                         キャンセル
@@ -658,30 +763,24 @@ export default function PostDetail() {
               placeholder="コメントを書く"
               border="1px solid gray"
               width={{ base: "90%", md: "80%", lg: "60%" }}
-              defaultValue={editingReviewContent}
               ref={inputRef}
+              onChange={handleChange}
+              value={inputValue}
             />
-            {!isEditing && (
-              <Button
-                margin="5px"
-                type="submit"
-                isLoading={mutation.isLoading}
-                onClick={(e) => {
-                  if (!isLoggedIn) {
-                    e.preventDefault();
-                    AlertLogin();
-                  }
-                }}
-              >
-                投稿
-              </Button>
-            )}
-            {isEditing && (
-              <Box>
-                <Button onClick={EditButtonClick}>保存</Button>
-                <Button onClick={handleCancelEdit}>キャンセル</Button>
-              </Box>
-            )}
+            {commentValidateError && <Text color="red">{commentValidateError}</Text>}
+            <Button
+              margin="5px"
+              type="submit"
+              isLoading={mutation.isLoading}
+              onClick={(e) => {
+                if (!isLoggedIn) {
+                  e.preventDefault();
+                  AlertLogin();
+                }
+              }}
+            >
+              投稿
+            </Button>
           </VStack>
         </Grid>
       </Box>

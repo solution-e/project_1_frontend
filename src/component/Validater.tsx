@@ -1,6 +1,6 @@
-export default function defaultValidation (object:string) {
+export function Validation(object: string) {
     var ErrorsMessage = "";
-    if(!object) {
+    if (!object) {
         ErrorsMessage = '文字を入力してください'
     }
     return ErrorsMessage;

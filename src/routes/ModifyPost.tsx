@@ -30,6 +30,7 @@ import BasetoUrl from "../component/BasetoUrl";
 import { Helmet } from "react-helmet-async";
 import userUser from "../lib/useUser";
 import functionAlert from "src/component/functionAlert";
+import { Validation } from "../component/Validater"
 
 interface IUploadURLResponse {
   result: {
@@ -42,6 +43,7 @@ export default function ModifyPost() {
   const [content, setContent] = useState("");
   const contentRef = useRef("");
   const mainImgRef = useRef("");
+  const [updateError, setUpdateError] = useState("")
   const { register, handleSubmit } = useForm<IUpdatePostVariables>();
   const toast = useToast();
   const navigate = useNavigate();
@@ -97,14 +99,10 @@ export default function ModifyPost() {
       data: any,
       variables: { regexwords: string; count: number }
     ) => {
-      console.log("success");
-      console.log("contentRef.current before replace:", contentRef.current);
-      console.log("variables.regexwords:", variables.regexwords);
       contentRef.current = contentRef.current.replace(
         variables.regexwords,
         data.result.variants
       );
-      console.log("contentRef.current after replace:", contentRef.current);
       if (variables.count == 0) {
         mainImgRef.current = data.result.variants[0];
       }
@@ -138,7 +136,6 @@ export default function ModifyPost() {
         title: "投稿しました",
         position: "bottom",
       });
-      console.log(content);
       navigate(`/post/${data.id}`);
     },
   });
@@ -152,17 +149,27 @@ export default function ModifyPost() {
     const imgSrcRegex = /<img.*?src="(.*?)"/g;
     const imgSrcMatches: string[] = [];
     contentRef.current = content;
+    const errorMessage = Validation(content)
+    if (errorMessage) {
+      setUpdateError(errorMessage)
+      return
+    }
     const base64Regex = /^data:image\/(png|jpeg|jpg|gif);base64,/;
     const base64Matches: string[] = [];
     let match;
     while ((match = imgSrcRegex.exec(content)) !== null) {
       imgSrcMatches.push(match[1]);
     }
+    if (imgSrcMatches.length > 10) {
+      setUpdateError("画像が１０枚を超えています")
+      return
+    }
     imgSrcMatches.forEach((src) => {
       if (base64Regex.test(src)) {
         base64Matches.push(src);
       }
     });
+
     const blob = BasetoUrl(base64Matches);
     const uploadPromises = blob.map(async (blobItem, i) => {
       await uploadURLMutation.mutateAsync({
@@ -224,6 +231,7 @@ export default function ModifyPost() {
               />
             </FormControl>
             <Box width="100%" mb={10}>
+              <Text w="100%" fontSize="sm" textAlign="right">※画像は１０枚まで投稿できます</Text>
               <ReactQuill
                 style={{ width: "100%", height: "400px" }}
                 value={content}
@@ -232,6 +240,7 @@ export default function ModifyPost() {
                 formats={formats}
               />
             </Box>
+            {updateError && <Text color="red">{updateError}</Text>}
             {mutation.isError && <Text color="red">エラーが発生しました</Text>}
             <Button type="submit" isLoading={mutation.isLoading}>
               投稿

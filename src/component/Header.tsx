@@ -123,14 +123,16 @@ export default function Header() {
       </Link>
       <form onSubmit={handleSearch}>
         <Stack direction="row" spacing={2}>
-          <VStack spacing={8}>
+          <VStack spacing={8} width="100%">
             <Select
               value={selectedItem}
               onChange={handleItemSelect}
-              width="100%"
+              width="auto"
+              minWidth="130px"
             >
               <option value="all">全て</option>
               <option value="title">タイトル</option>
+              <option value="category">カテゴリー</option>
               <option value="user">ユーザー名</option>
               <option value="content">内容</option>
             </Select>

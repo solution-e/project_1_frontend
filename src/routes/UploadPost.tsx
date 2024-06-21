@@ -35,6 +35,7 @@ import BasetoUrl from "../component/BasetoUrl";
 import functionAlert from "src/component/functionAlert";
 import userUser from "../lib/useUser";
 import { Helmet } from "react-helmet-async";
+import { Validation } from "../component/Validater"
 
 interface IForm {
   file: string[];
@@ -53,6 +54,8 @@ export default function UploadPost() {
   const contentRef = useRef("");
   const mainImgRef = useRef("");
   const location = useLocation();
+  const [updateError, setUpdateError] = useState("")
+  const imgSrcRegex = /<img.*?src="(.*?)"/g;
   const categoryPk = location.state?.categorypk;
   const { data: categoryData } = useQuery<ICategory>({
     queryKey: ["category", categoryPk],
@@ -108,8 +111,6 @@ export default function UploadPost() {
       data: any,
       variables: { regexwords: string; count: number }
     ) => {
-      console.log(variables);
-      console.log(contentRef.current);
       contentRef.current = contentRef.current.replace(
         variables.regexwords,
         data.result.variants
@@ -155,15 +156,23 @@ export default function UploadPost() {
   });
 
   const onSubmit = async (formData: IUploadPostVariables) => {
-    const imgSrcRegex = /<img.*?src="(.*?)"/g;
+
     const imgSrcMatches: string[] = [];
     contentRef.current = content;
+    const errorMessage = Validation(content)
+    if (errorMessage) {
+      setUpdateError(errorMessage)
+      return
+    }
     let match;
     while ((match = imgSrcRegex.exec(content)) !== null) {
       imgSrcMatches.push(match[1]);
     }
+    if (imgSrcMatches.length > 10) {
+      setUpdateError("画像が１０枚を超えています")
+      return
+    }
     const blob = BasetoUrl(imgSrcMatches);
-    console.log(blob);
     const uploadPromises = blob.map(async (blobItem, i) => {
       await uploadURLMutation.mutateAsync({
         blob: blobItem,
@@ -229,6 +238,7 @@ export default function UploadPost() {
               }}
               mb={10}
             >
+              <Text w="100%" fontSize="sm" textAlign="right">※画像は10枚まで投稿できます</Text>
               <ReactQuill
                 value={content}
                 onChange={handleQuillChange}
@@ -237,6 +247,7 @@ export default function UploadPost() {
                 style={{ height: "400px" }}
               />
             </Box>
+            {updateError && <Text color="red">{updateError}</Text>}
             {mutation.isError && (
               <Text color={"red"}>エラーが発生しました</Text>
             )}
@@ -247,7 +258,7 @@ export default function UploadPost() {
         </Container>
       </Box>
 
-      <Modal isOpen={isLoading} onClose={() => {}}>
+      <Modal isOpen={isLoading} onClose={() => { }}>
         <ModalOverlay />
         <ModalContent>
           <ModalHeader alignItems="center">投稿中</ModalHeader>

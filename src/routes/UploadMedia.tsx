@@ -39,7 +39,6 @@ export default function UploadPhotos() {
         uploadURL: data.result.uploadURL,
         file: watch("file"),
       });
-      console.log(data.result.uploadURL);
     },
   });
   const onSubmit = () => {
