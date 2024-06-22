@@ -61,7 +61,7 @@ import userUser from "../lib/useUser";
 import { formarYearToMinutes } from "../component/FormatTime";
 import { useForm } from "react-hook-form";
 import { Helmet } from "react-helmet-async";
-import { Validation } from "../component/Validater"
+import { Validation } from "../component/Validater";
 
 type MyState = {
   modifyPostPk: string;
@@ -209,7 +209,7 @@ export default function PostDetail() {
           parentReviewId == null
             ? postData?.author.id
             : reviewsData?.result.find((review) => review.id === parentReviewId)
-              ?.user?.id;
+                ?.user?.id;
 
         if (
           notificationUser &&
@@ -335,7 +335,9 @@ export default function PostDetail() {
   };
 
   const replyButtonClick = async (parentReviewId: number) => {
-    const reviewContent = replyInputRef.current ? replyInputRef.current.value : "";
+    const reviewContent = replyInputRef.current
+      ? replyInputRef.current.value
+      : "";
     const errorMessage = Validation(reviewContent);
 
     if (errorMessage) {
@@ -382,16 +384,16 @@ export default function PostDetail() {
     >
       <Helmet>
         <meta name="google-adsense-account" content="ca-pub-8391643725266611" />
-        <meta name="description" content={postData?.content} />
+        <meta name="description" content={postData?.title} />
         <meta name="keywords" content={postData?.title} />
         <meta property="og:title" content={postData?.title} />
-        <meta property="og:description" content={postData?.content} />
+        <meta property="og:description" content={postData?.title} />
         <meta property="og:type" content="article" />
         <meta property="og:url" content={window.location.href} />
-        {/* <meta
+        <meta
           property="og:image"
-          content={postData?.photo || "default-image-url"}
-        /> */}
+          content="https://imagedelivery.net/G0GY2_XNU4h15504boptkw/7a727ef3-761e-4efe-4410-f9d04a42a600/public"
+        />
       </Helmet>
       <Box width={{ base: "100%", md: "60%" }}>
         <HStack>
@@ -477,10 +479,10 @@ export default function PostDetail() {
         <Grid mt={8} h={"60vh"}>
           {postData?.photo && postData?.photo.length > 0
             ? postData?.photo.map((photo) => (
-              <Box key={photo.pk}>
-                <Image src={photo.photo_file} />
-              </Box>
-            ))
+                <Box key={photo.pk}>
+                  <Image src={photo.photo_file} />
+                </Box>
+              ))
             : null}
           <Box mt={8}>
             {postData?.content && (
@@ -548,7 +550,7 @@ export default function PostDetail() {
                       {review.user?.name}
                       {review?.is_author &&
                         review?.review_content !==
-                        "この投稿は削除されました" && (
+                          "この投稿は削除されました" && (
                           <Menu>
                             <MenuButton
                               as={IconButton}
@@ -596,28 +598,27 @@ export default function PostDetail() {
                           <Button onClick={EditButtonClick}>保存</Button>
                           <Button onClick={handleCancelEdit}>キャンセル</Button>
                         </Box>
-                        {validateError && <Text color="red">{validateError}</Text>}
+                        {validateError && (
+                          <Text color="red">{validateError}</Text>
+                        )}
                       </>
-                    )
-                      :
-                      (
-                        <Box
-                          width="100%"
-                          onClick={() => {
-                            review.parent_review === null &&
-                              setParentReviewId(review.id);
-                            setIsReplyReview(true);
-                          }}
-                          dangerouslySetInnerHTML={{
-                            __html: review.review_content,
-                          }}
-                          whiteSpace="normal"
-                          sx={{
-                            wordBreak: "break-word",
-                          }}
-                        />
-                      )
-                    }
+                    ) : (
+                      <Box
+                        width="100%"
+                        onClick={() => {
+                          review.parent_review === null &&
+                            setParentReviewId(review.id);
+                          setIsReplyReview(true);
+                        }}
+                        dangerouslySetInnerHTML={{
+                          __html: review.review_content,
+                        }}
+                        whiteSpace="normal"
+                        sx={{
+                          wordBreak: "break-word",
+                        }}
+                      />
+                    )}
                     <Box
                       width="100%"
                       whiteSpace="nowrap"
@@ -655,28 +656,27 @@ export default function PostDetail() {
                           <Button onClick={EditButtonClick}>保存</Button>
                           <Button onClick={handleCancelEdit}>キャンセル</Button>
                         </Box>
-                        {validateError && <Text color="red">{validateError}</Text>}
+                        {validateError && (
+                          <Text color="red">{validateError}</Text>
+                        )}
                       </Box>
-                    )
-                      :
-                      (
-                        <Box
-                          flex={4}
-                          onClick={() => {
-                            review.parent_review === null &&
-                              setParentReviewId(review.id);
-                            setIsReplyReview(true);
-                          }}
-                          dangerouslySetInnerHTML={{
-                            __html: review.review_content,
-                          }}
-                          whiteSpace="normal"
-                          sx={{
-                            wordBreak: "break-word",
-                          }}
-                        />
-                      )
-                    }
+                    ) : (
+                      <Box
+                        flex={4}
+                        onClick={() => {
+                          review.parent_review === null &&
+                            setParentReviewId(review.id);
+                          setIsReplyReview(true);
+                        }}
+                        dangerouslySetInnerHTML={{
+                          __html: review.review_content,
+                        }}
+                        whiteSpace="normal"
+                        sx={{
+                          wordBreak: "break-word",
+                        }}
+                      />
+                    )}
 
                     <Box flex={0.7} borderRight="1px solid lightgray">
                       <Text color="dimgray" fontSize={"xs"}>
@@ -733,7 +733,9 @@ export default function PostDetail() {
                         onChange={handleReplyChange}
                         value={childReviewValue}
                       ></Textarea>
-                      {childValidateError && <Text color="red">{childValidateError}</Text>}
+                      {childValidateError && (
+                        <Text color="red">{childValidateError}</Text>
+                      )}
                       <Button onClick={() => replyButtonClick(review.id)}>
                         返信
                       </Button>
@@ -767,7 +769,9 @@ export default function PostDetail() {
               onChange={handleChange}
               value={inputValue}
             />
-            {commentValidateError && <Text color="red">{commentValidateError}</Text>}
+            {commentValidateError && (
+              <Text color="red">{commentValidateError}</Text>
+            )}
             <Button
               margin="5px"
               type="submit"
