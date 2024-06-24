@@ -530,9 +530,6 @@ export default function PostDetail() {
                 width={review.parent_review !== null ? "90%" : "100%"}
                 py={2}
                 borderBottom="1px solid gray"
-                backgroundColor={
-                  review.parent_review !== null ? "lightgray" : "white"
-                }
                 border={review.parent_review !== null ? "1px solid gray" : ""}
               >
                 {isSmartPhone ? (
@@ -554,12 +551,8 @@ export default function PostDetail() {
                               as={IconButton}
                               aria-label="Options"
                               icon={<FaEllipsisV />}
-                              backgroundColor={
-                                review.parent_review !== null
-                                  ? "lightgray"
-                                  : "white"
-                              }
                               size="xs"
+                              backgroundColor="transparent"
                             />
                             <MenuList>
                               <MenuItem
@@ -690,11 +683,7 @@ export default function PostDetail() {
                             as={IconButton}
                             aria-label="Options"
                             icon={<FaEllipsisV />}
-                            backgroundColor={
-                              review.parent_review !== null
-                                ? "lightgray"
-                                : "white"
-                            }
+                            backgroundColor="transparent"
                           />
                           <MenuList>
                             <MenuItem

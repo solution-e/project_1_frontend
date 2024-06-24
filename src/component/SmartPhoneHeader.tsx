@@ -186,6 +186,7 @@ export default function Header() {
             >
               <option value="all">全て</option>
               <option value="title">タイトル</option>
+              <option value="category">カテゴリー</option>
               <option value="user">ユーザー名</option>
               <option value="content">内容</option>
             </Select>
