@@ -28,6 +28,7 @@ import {
   useStepContext,
 } from "@chakra-ui/react";
 import { Icon } from "@chakra-ui/react";
+import { BsArrowReturnRight } from "react-icons/bs";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import "react-quill/dist/quill.snow.css";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -532,7 +533,7 @@ export default function PostDetail() {
                 width={review.parent_review !== null ? "90%" : "100%"}
                 py={2}
                 borderBottom="1px solid gray"
-                border={review.parent_review !== null ? "1px solid gray" : ""}
+                border={review.parent_review !== null ? "" : ""}
               >
                 {isSmartPhone ? (
                   <VStack alignItems="stretch" justifyContent="space-between">
@@ -619,7 +620,7 @@ export default function PostDetail() {
                       textOverflow="ellipsis"
                       borderRight="1px solid lightgray"
                     >
-                      <Text color="dimgray" fontSize="xs">
+                      <Text color="dimgray" fontSize="xs" mr={3}>
                         {formarYearToMinutes(review.created_at)}
                       </Text>
                     </Box>
@@ -628,7 +629,7 @@ export default function PostDetail() {
                   <HStack>
                     {review.parent_review !== null && (
                       <Box flex={0.1} alignContent="center">
-                        <Icon as={FaAngleRight}></Icon>
+                        <BsArrowReturnRight />
                       </Box>
                     )}
                     <Box
@@ -671,7 +672,7 @@ export default function PostDetail() {
                       />
                     )}
 
-                    <Box flex={0.7} borderRight="1px solid lightgray">
+                    <Box flex={0.8} borderRight="1px solid lightgray">
                       <Text color="dimgray" fontSize={"xs"}>
                         {formarYearToMinutes(review.created_at)}
                       </Text>
