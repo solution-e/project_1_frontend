@@ -146,6 +146,10 @@ export default function Home() {
         <meta property="og:title" />
         <meta property="og:description" />
         <meta property="og:type" content="website" />
+        <meta
+          property="og:image"
+          content="https://imagedelivery.net/G0GY2_XNU4h15504boptkw/7a727ef3-761e-4efe-4410-f9d04a42a600/public"
+        />
         <meta property="og:url" content={window.location.href} />
       </Helmet>
       <Box width={{ base: "100%", md: "80%" }}>
