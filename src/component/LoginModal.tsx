@@ -24,12 +24,14 @@ import {
   usernameLogIn,
 } from "../api";
 import ReactivationModal from "../component/ReactivationModal";
+import PasswordResetModal from "../component/PasswordResetModal";
+import IDResetModal from "../component/IDResetModal";
 import { useState } from "react";
 
 interface LoginModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSignUpOpen: () => void; // SignUpModalを開くための関数を追加
+  onSignUpOpen: () => void;
 }
 
 interface IForm {
@@ -45,6 +47,9 @@ export default function LoginModal({
   const [reactivationEmail, setReactivationEmail] = useState<string | null>(
     null
   );
+  const [isPasswordResetOpen, setPasswordResetOpen] = useState<boolean>(false);
+  const [isIDResetOpen, setIDResetOpen] = useState<boolean>(false);
+
   const {
     register,
     handleSubmit,
@@ -75,7 +80,7 @@ export default function LoginModal({
     onError: (error) => {
       if (
         error.response.data.error ===
-          "このEmailは既に登録されていますが、アカウントが有効化されていません"
+        "このEmailは既に登録されていますが、アカウントが有効化されていません"
       ) {
         setReactivationEmail(error.response.data.email);
       } else {
@@ -84,9 +89,11 @@ export default function LoginModal({
       }
     },
   });
+
   const onSubmit = ({ username, password }: IForm) => {
     mutation.mutate({ username, password });
   };
+
   return (
     <>
       <Modal onClose={onClose} isOpen={isOpen}>
@@ -138,6 +145,20 @@ export default function LoginModal({
             </InputGroup>
             <Button variant="link" onClick={onSignUpOpen} colorScheme="blue">
               新規登録はこちら
+            </Button><br />
+            <Button
+              variant="link"
+              colorScheme="blue"
+              onClick={() => setIDResetOpen(true)}
+            >
+              IDを忘れた場合はこちら
+            </Button>
+            <Button
+              variant="link"
+              colorScheme="blue"
+              onClick={() => setPasswordResetOpen(true)}
+            >
+              パスワードを忘れた場合はこちら
             </Button>
           </ModalBody>
         </ModalContent>
@@ -149,6 +170,14 @@ export default function LoginModal({
           email={reactivationEmail}
         />
       )}
+      <IDResetModal
+        isOpen={isIDResetOpen}
+        onClose={() => setIDResetOpen(false)}
+      />
+      <PasswordResetModal
+        isOpen={isPasswordResetOpen}
+        onClose={() => setPasswordResetOpen(false)}
+      />
     </>
   );
 }

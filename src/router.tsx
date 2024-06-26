@@ -11,6 +11,7 @@ import OtherInfo from "./routes/OtherInfo";
 import UploadMedia from "./routes/UploadMedia";
 import ModifyPost from "./routes/ModifyPost";
 import PrivacyPolicy from "./routes/PrivacyPolicy";
+import ResetPassword from "./routes/ResetPassword";
 
 const router = createBrowserRouter([
   {
@@ -62,6 +63,10 @@ const router = createBrowserRouter([
         path: "/PrivacyPolicy",
         element: <PrivacyPolicy />,
       },
+      {
+        path: "/ReserPassword/:uid/:token",
+        element: <ResetPassword />,
+      }
     ],
   },
 ]);

@@ -544,3 +544,49 @@ export const readNotifications = () =>
       },
     })
     .then((response) => response.data);
+
+export const verifyToken = async (uid: string, token: string) => {
+  try {
+    const response = await instance.post('user/verify-token', { uid, token });
+    return response.data.message;
+  } catch (error: any) {
+    throw new Error(error.response?.data?.error || 'トークン検証に失敗しました');
+  }
+};
+
+export const resetPassword = async (uid: string, token: string, password: string) => {
+  try {
+    const response = await instance.post('user/reset-password', { uid, token, password });
+    return response.data.message;
+  } catch (error: any) {
+    throw new Error(error.response?.data?.error || 'パスワードリセットに失敗しました');
+  }
+};
+
+export const sendLoginEmail = (email: string) =>
+  instance
+    .post(
+      "/user/send-loginid-Email",
+      { email },
+      {
+        headers: {
+          "X-CSRFToken": Cookies.get("csrftoken") || "",
+        },
+      }
+    )
+    .then((response) => response.data)
+    .catch((error) => console.error("Error:", error));
+
+export const sendPasswordEmail = (email: string) =>
+  instance
+    .post(
+      "/user/send-password-Email",
+      { email },
+      {
+        headers: {
+          "X-CSRFToken": Cookies.get("csrftoken") || "",
+        },
+      }
+    )
+    .then((response) => response.data)
+    .catch((error) => console.error("Error:", error));
