@@ -130,6 +130,19 @@ export default function PostDetail() {
     }
   }, [postData]);
 
+  useEffect(() => {
+    const script = document.createElement("script");
+    script.async = true;
+    script.src =
+      "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8391643725266611";
+    script.crossOrigin = "anonymous";
+    document.body.appendChild(script);
+
+    if (window.adsbygoogle) {
+      window.adsbygoogle.push({});
+    }
+  }, []);
+
   const replyInputRef = useRef<HTMLTextAreaElement>(null);
 
   const deletePostMutation = useMutation((postId: number) =>
@@ -486,6 +499,15 @@ export default function PostDetail() {
               ))
             : null}
           <Box mt={8}>
+            <ins
+              className="adsbygoogle"
+              style={{ display: "block", textAlign: "center" }}
+              data-ad-layout="in-article"
+              data-ad-format="fluid"
+              data-ad-client="ca-pub-8391643725266611"
+              data-ad-slot="9665242924"
+            ></ins>
+            <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
             {postData?.content && (
               <div dangerouslySetInnerHTML={{ __html: postData.content }} />
             )}

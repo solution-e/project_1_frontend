@@ -23,6 +23,7 @@
     "baseUrl": "."
   },
   "include": [
-    "src"
+    "src",
+    "adsbygoogle.d.ts",
   ]
 }

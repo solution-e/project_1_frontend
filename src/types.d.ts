@@ -19,7 +19,7 @@ interface IPost {
 export interface IPostInfo {
   count: number;
   result: IPostList;
-  categoryname:string;
+  categoryname: string;
 }
 
 export interface IPostList {
