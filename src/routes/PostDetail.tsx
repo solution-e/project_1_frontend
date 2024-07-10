@@ -498,7 +498,7 @@ export default function PostDetail() {
                 </Box>
               ))
             : null}
-          <Box mt={4} mb={4}>
+          <Box mt={4}>
             <ins
               className="adsbygoogle"
               style={{ display: "block", textAlign: "center" }}
@@ -508,6 +508,8 @@ export default function PostDetail() {
               data-ad-slot="9665242924"
             ></ins>
             <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+          </Box>
+          <Box mt={4}>
             {postData?.content && (
               <div dangerouslySetInnerHTML={{ __html: postData.content }} />
             )}
