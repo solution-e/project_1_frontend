@@ -498,7 +498,7 @@ export default function PostDetail() {
                 </Box>
               ))
             : null}
-          <Box mt={8}>
+          <Box mt={4} mb={4}>
             <ins
               className="adsbygoogle"
               style={{ display: "block", textAlign: "center" }}
